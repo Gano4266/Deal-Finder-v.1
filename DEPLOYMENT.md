@@ -6,7 +6,7 @@ This is a public soft-pilot deployment guide for the Wilmington Deal Finder PWA.
 
 Use Vercel first. The app is a Next.js project in `app/`, while prototype data and evidence live at the repo root.
 
-Vercel project settings:
+Vercel project settings for Git import:
 
 - Framework preset: Next.js.
 - Root Directory: `app`.
@@ -24,6 +24,8 @@ The outside-source setting and `app/next.config.mjs` file tracing matter because
 Vercel’s monorepo docs say the Root Directory can be set to the app folder, and its Monorepos FAQ says to enable source files outside the Root Directory when a project needs shared files outside that folder.
 
 The Next config sets `outputFileTracingRoot` to the repo root and includes `../fixtures/**`, `../ops/seeds/**`, and admin ops/research files. Vercel’s file guidance recommends Next file tracing for serverless functions that read files at runtime.
+
+If the GitHub integration is not installed, use the checked-in root `vercel.json` and deploy from the full repo directory with the Vercel CLI. That uploads the repo-root fixture files while running the build inside `app/`.
 
 ## Environment
 
