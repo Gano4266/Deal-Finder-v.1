@@ -1,17 +1,47 @@
 import { spawn } from "node:child_process";
+import fs from "node:fs";
 import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const appDir = path.join(repoRoot, "app");
-const reportEmail = process.env.NEXT_PUBLIC_REPORT_EMAIL ?? "";
+
+function readEnvFile(relativePath) {
+  const envPath = path.join(appDir, relativePath);
+
+  if (!fs.existsSync(envPath)) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    fs.readFileSync(envPath, "utf8")
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith("#"))
+      .map((line) => {
+        const separatorIndex = line.indexOf("=");
+        if (separatorIndex === -1) {
+          return [line, ""];
+        }
+
+        return [line.slice(0, separatorIndex), line.slice(separatorIndex + 1)];
+      })
+  );
+}
+
+const localEnv = {
+  ...readEnvFile(".env"),
+  ...readEnvFile(".env.local"),
+  ...process.env
+};
+const reportEmail = localEnv.NEXT_PUBLIC_REPORT_EMAIL ?? "";
 
 function run(command, args, options = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd: options.cwd ?? appDir,
-      env: { ...process.env, ...(options.env ?? {}) },
+      env: { ...localEnv, ...(options.env ?? {}) },
       stdio: options.stdio ?? "inherit"
     });
 
@@ -64,7 +94,7 @@ async function startProductionServer(port) {
   const server = spawn("npm", ["run", "start", "--", "-p", String(port)], {
     cwd: appDir,
     env: {
-      ...process.env,
+      ...localEnv,
       DEAL_FINDER_ADMIN_ENABLED: "false"
     },
     stdio: ["ignore", "inherit", "inherit"]
