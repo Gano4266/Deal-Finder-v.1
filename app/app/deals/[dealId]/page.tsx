@@ -88,7 +88,47 @@ export default async function DealDetailPage({ params }: DealPageProps) {
               <dt>Freshness</dt>
               <dd>{deal.freshnessLabel}</dd>
             </div>
+            <div>
+              <dt>Captured</dt>
+              <dd>{deal.evidenceCapturedAt}</dd>
+            </div>
+            <div>
+              <dt>Proof type</dt>
+              <dd>{deal.screenshotUrl ? "Visual proof + source quote" : "Source quote"}</dd>
+            </div>
           </dl>
+
+          <section className="proofCard" aria-label="Visual proof from source">
+            {deal.screenshotUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={deal.screenshotUrl}
+                alt={`Visual proof from ${deal.sourceDisplayName}`}
+                className="proofPreview"
+                loading="lazy"
+                decoding="async"
+              />
+            ) : (
+              <div className="proofPlaceholder">Visual proof not captured for this source.</div>
+            )}
+            <blockquote className="proofQuote">
+              {deal.sourceQuote || deal.evidenceSummary || "Proof details unavailable; use the official source link to confirm."}
+            </blockquote>
+            <p className="proofCaption">
+              {deal.evidenceSummary || `Captured from ${deal.sourceDisplayName}.`}
+            </p>
+            <dl className="proofMeta">
+              <div>
+                <dt>Internal artifact</dt>
+                <dd>{deal.archiveUrlOrPath || "Not recorded"}</dd>
+              </div>
+              <div>
+                <dt>Visual proof path</dt>
+                <dd>{deal.screenshotPath || "Not recorded"}</dd>
+              </div>
+            </dl>
+          </section>
+
           <div className="cardActions">
             <a href={deal.sourceUrl} className="primaryLink">
               Open official source

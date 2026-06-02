@@ -5,6 +5,7 @@ import {
   getPublicDeals,
   getPublicTonightDeals,
   shortDate,
+  summarizePublicDealsByArea,
   summarizePublicDealsByDay,
   weekdayName
 } from "../../lib/data";
@@ -20,6 +21,12 @@ export default async function TonightPage() {
   const day = weekdayName();
   const dateLabel = shortDate();
   const dayCounts = summarizePublicDealsByDay(allDeals);
+  const areaCounts = summarizePublicDealsByArea(deals);
+  const sortedDeals = [...deals].sort(
+    (left, right) =>
+      left.areaGroup.localeCompare(right.areaGroup) ||
+      left.restaurantName.localeCompare(right.restaurantName)
+  );
 
   return (
     <main className="pageShell">
@@ -57,6 +64,30 @@ export default async function TonightPage() {
         ))}
       </nav>
 
+      <nav className="segmentedNav compactFilters" aria-label="Reviewed tonight by area">
+        {areaCounts.map(({ area, count }) => (
+          <Link
+            key={area}
+            href={`/deals?day=${day}&area=${encodeURIComponent(area)}&sort=area` as Route}
+          >
+            <span>{area}</span>
+            <strong>{count}</strong>
+          </Link>
+        ))}
+      </nav>
+
+      <nav className="segmentedNav compactFilters" aria-label="Quick scans for tonight">
+        <Link href={`/deals?day=${day}&quick=under-10` as Route}>
+          <span>Under $10</span>
+        </Link>
+        <Link href={`/deals?day=${day}&quick=time-listed` as Route}>
+          <span>Time listed</span>
+        </Link>
+        <Link href={`/deals?day=${day}&quick=carryout` as Route}>
+          <span>Takeout verified</span>
+        </Link>
+      </nav>
+
       {deals.length === 0 ? (
         <section className="emptyState" aria-label="No public deals">
           <p className="eyebrow">Nothing listed for {day}</p>
@@ -71,13 +102,14 @@ export default async function TonightPage() {
         </section>
       ) : (
         <section className="dealList" aria-label="Public deals">
-          {deals.map((deal) => (
+          {sortedDeals.map((deal) => (
             <article key={deal.dealId} className="dealCard">
               <div>
                 <p className="eyebrow">{deal.restaurantName}</p>
                 <h2>{deal.publicTitle}</h2>
                 <div className="badgeRow" aria-label="Deal verification">
                   <span>{deal.evidenceLabel}</span>
+                  <span>{deal.areaGroup}</span>
                   <span>{deal.sourceDisplayName}</span>
                   <span>Verified {deal.lastVerifiedAt}</span>
                   <span>{deal.freshnessLabel}</span>

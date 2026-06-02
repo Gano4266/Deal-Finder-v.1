@@ -294,7 +294,8 @@ for (const deal of deals) {
     "next_check_due",
     "source_quote",
     "evidence_summary",
-    "content_hash"
+    "content_hash",
+    "screenshot_path"
   ].forEach((field) => requireValue(deal, field, label));
 
   assert(candidateIds.has(deal.candidate_id), `${label}: candidate_id is not a promoted seed candidate`);
@@ -319,6 +320,7 @@ for (const deal of deals) {
   assert(sha256Pattern.test(deal.content_hash), `${label}: content_hash must be sha256:<64 hex chars>`);
   assertLocalEvidencePath(deal.archive_url_or_path, label, "archive_url_or_path");
   assertLocalEvidencePath(deal.evidence_url_or_path, label, "evidence_url_or_path");
+  assertLocalEvidencePath(deal.screenshot_path, label, "screenshot_path");
 
   const source = sourcesById.get(deal.source_id);
   const capture = capturesById.get(deal.source_capture_id);
@@ -368,7 +370,17 @@ for (const deal of deals) {
     check.evidence_url_or_path === capture.archive_url_or_path,
     `${label}: source check evidence_url_or_path must match capture archive`
   );
+  assert(
+    capture.screenshot_path === deal.screenshot_path,
+    `${label}: capture screenshot_path must match deal screenshot_path`
+  );
+  assert(
+    check.screenshot_path === deal.screenshot_path,
+    `${label}: source check screenshot_path must match deal screenshot_path`
+  );
   assertLocalEvidencePath(check.evidence_url_or_path, label, "source check evidence_url_or_path");
+  assertLocalEvidencePath(capture.screenshot_path, label, "capture screenshot_path");
+  assertLocalEvidencePath(check.screenshot_path, label, "source check screenshot_path");
   assert(
     check.deal_id === deal.deal_id || check.affected_deal_ids.split(";").includes(deal.deal_id),
     `${label}: source check must directly reference the public deal`

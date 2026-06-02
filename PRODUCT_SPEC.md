@@ -58,14 +58,18 @@ The first app should be designed around these routes:
 
 - `/`: redirect or summarize the tonight experience.
 - `/tonight`: primary feed.
+- `/deals`: all reviewed prototype deals with day, area, quick-filter, and sort controls.
 - `/deals/[dealId]`: deal details and evidence.
 - `/restaurants`: browse restaurants.
 - `/restaurants/[restaurantId]`: restaurant profile and active deals.
+- `/carryout`: verified place/source seeds for carryout-oriented discovery. These are not deal claims.
 - `/report`: report stale or incorrect deal data.
 - `/admin`: reviewer dashboard.
+- `/admin/ops`: ops dashboard deep link.
 - `/admin/review`: candidate review queue.
+- `/admin/source-gaps`: source-gap and seed follow-up report.
 
-These routes are a planning contract only. The app is not initialized in this scaffold.
+These routes are now implemented in the Phase 1 static Next.js/PWA prototype. They remain a static-data product contract, not live availability infrastructure.
 
 ## Public Copy Rules
 

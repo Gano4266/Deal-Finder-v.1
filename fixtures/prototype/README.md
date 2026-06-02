@@ -28,6 +28,10 @@ deal_id
 
 For public prototype deals, source captures also preserve durable evidence-file metadata. `content_hash` hashes the normalized captured text; `metadata_json.evidence_file_sha256` hashes the local evidence artifact bytes and is checked by `npm run validate:data`.
 
+Visual proof artifacts live under `app/public/evidence/source-screenshots/` so the app can display them on deal detail pages. Most artifacts are source-page screenshots; blocked pages may use clearly labeled visual evidence cards generated from reviewed source captures. The screenshot path should be repeated consistently on the public deal row, linked source capture row, and linked source check row.
+
+Screenshots improve app-visible proof and local traceability. They do not replace independent off-repo archive captures or direct restaurant confirmations.
+
 ## Non-Live Notice
 
 The Phase 1 app must display a clear static-data notice until live verification exists. Do not use copy such as "available tonight," "open now," "current deal," or "verified today" unless it is actually true for the verification date.

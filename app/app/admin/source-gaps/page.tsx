@@ -1,12 +1,38 @@
 import Link from "next/link";
-import { getSourceGaps } from "../../../lib/data";
+import type { Route } from "next";
+import { getSourceGaps, sourceGapAreaGroupOptions } from "../../../lib/data";
 
 export const dynamic = "force-dynamic";
 
-export default async function SourceGapsPage() {
+type SourceGapsPageProps = {
+  searchParams?: Promise<{
+    area?: string;
+  }>;
+};
+
+function queryFor(area: string) {
+  const query = new URLSearchParams();
+
+  if (area !== "All") {
+    query.set("area", area);
+  }
+
+  const queryText = query.toString();
+  return queryText ? `/admin/source-gaps?${queryText}` : "/admin/source-gaps";
+}
+
+export default async function SourceGapsPage({ searchParams }: SourceGapsPageProps) {
+  const params = await searchParams;
   const gaps = await getSourceGaps();
-  const criticalCount = gaps.filter((gap) => gap.priority === "critical").length;
-  const needsReviewTotal = gaps.reduce((total, gap) => total + gap.needsReviewCount, 0);
+  const areaOptions = ["All", ...sourceGapAreaGroupOptions] as const;
+  const selectedArea = areaOptions.includes((params?.area ?? "All") as (typeof areaOptions)[number])
+    ? params?.area ?? "All"
+    : "All";
+  const visibleGaps = gaps.filter((gap) => selectedArea === "All" || gap.areaGroup === selectedArea);
+  const criticalCount = visibleGaps.filter((gap) => gap.priority === "critical").length;
+  const needsReviewTotal = visibleGaps.reduce((total, gap) => total + gap.needsReviewCount, 0);
+  const countForArea = (area: (typeof areaOptions)[number]) =>
+    area === "All" ? gaps.length : gaps.filter((gap) => gap.areaGroup === area).length;
 
   return (
     <main className="pageShell">
@@ -33,13 +59,27 @@ export default async function SourceGapsPage() {
         </div>
       </section>
 
+      <nav className="segmentedNav compactFilters" aria-label="Filter source gaps by area">
+        {areaOptions.map((area) => (
+          <Link
+            key={area}
+            href={queryFor(area) as Route}
+            className={area === selectedArea ? "active" : ""}
+            aria-current={area === selectedArea ? "page" : undefined}
+          >
+            <span>{area}</span>
+            <strong>{countForArea(area)}</strong>
+          </Link>
+        ))}
+      </nav>
+
       <section className="gapList" aria-label="Source gap report">
-        {gaps.map((gap) => (
+        {visibleGaps.map((gap) => (
           <article key={gap.restaurantName} className={`gapCard ${gap.priority}`}>
             <div>
               <p className="eyebrow">{gap.priority}</p>
               <h2>{gap.restaurantName}</h2>
-              <p className="locationLine">{gap.locationArea}</p>
+              <p className="locationLine">{gap.areaGroup} / {gap.locationArea}</p>
               <p>{gap.notes}</p>
             </div>
 

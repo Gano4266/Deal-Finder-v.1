@@ -50,7 +50,7 @@ Source checks should point `evidence_url_or_path` to the same durable evidence a
 - `source_tier`: `tier_1_official`, `tier_2_official_social`, `tier_3_partner`, `tier_4_secondary`, `tier_5_user_reported`.
 - `source_type`: `website`, `menu`, `ordering_page`, `google_business`, `instagram`, `facebook`, `tiktok`, `newsletter`, `direct_confirmation`, `partner_platform`, `secondary_article`, `user_tip`.
 - `deal_type`: `happy_hour_food`, `taco_night`, `wing_deal`, `burger_special`, `bogo`, `kids_eat_free`, `brunch`, `lunch_special`, `event_food_special`, `other_food_special`.
-- `review_decision`: `approve`, `approve_with_uncertainty`, `reject`, `needs_call`, `needs_source_check`, `expire`, `supersede`.
+- `review_decision`: `approved`, `approved_with_uncertainty`, `rejected`, `needs_call`, `needs_source_check`, `expired`, `superseded`.
 - `source_status`: `active`, `inactive`, `blocked`, `broken`, `needs_review`.
 - `source_priority`: `critical`, `high`, `normal`, `low`.
 - `check_type`: `routine`, `expiration`, `report`, `restaurant_correction`, `source_failure`, `conflict`, `manual_confirmation`.

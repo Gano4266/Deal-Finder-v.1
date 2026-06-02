@@ -93,7 +93,7 @@ export default async function ReportPage({ searchParams }: ReportPageProps) {
             </div>
             <div>
               <dt>Prototype action</dt>
-              <dd>Open review task</dd>
+              <dd>{reportEmail ? "Email operator for review" : "Use fallback template"}</dd>
             </div>
           </dl>
           <p className="notes">

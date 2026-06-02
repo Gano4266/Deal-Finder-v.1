@@ -71,6 +71,7 @@ export type PublicDeal = {
   restaurantId: string;
   neighborhood: string;
   area: string;
+  areaGroup: PublicAreaGroup;
   address: string;
   publicTitle: string;
   publicDescription: string;
@@ -84,11 +85,19 @@ export type PublicDeal = {
   sourceTier: string;
   sourceDisplayName: string;
   evidenceLabel: string;
+  evidenceCapturedAt: string;
+  evidenceSummary: string;
+  evidenceUrlOrPath: string;
   freshnessLabel: string;
   lastVerifiedAt: string;
   nextCheckDue: string;
   expiresOn: string;
+  archiveUrlOrPath: string;
   restrictionNotes: string;
+  screenshotPath: string;
+  screenshotUrl: string;
+  sourceQuote: string;
+  contentHash: string;
   dineIn: boolean;
   takeout: boolean;
   delivery: boolean;
@@ -113,14 +122,34 @@ export type PublicDealDayCount = {
 };
 
 export type PublicDealAreaCount = {
-  area: string;
+  area: PublicAreaGroup;
   count: number;
 };
+
+export const publicAreaGroupOptions = [
+  "Downtown",
+  "South Front",
+  "Monkey Junction",
+  "Mayfaire/Ogden",
+  "South Wilmington",
+  "Other Wilmington"
+] as const;
+
+export type PublicAreaGroup = (typeof publicAreaGroupOptions)[number];
+
+export const sourceGapAreaGroupOptions = [
+  ...publicAreaGroupOptions,
+  "Wrightsville / Boundary Review",
+  "Porters Neck"
+] as const;
+
+export type SourceGapAreaGroup = (typeof sourceGapAreaGroupOptions)[number];
 
 export type RestaurantSummary = {
   restaurantId: string;
   name: string;
   neighborhood: string;
+  areaGroup: PublicAreaGroup;
   address: string;
   phone: string;
   website: string;
@@ -167,6 +196,7 @@ export type ReviewCandidate = {
 export type SourceGap = {
   restaurantName: string;
   locationArea: string;
+  areaGroup: SourceGapAreaGroup;
   primarySourceUrl: string;
   sourceStatus: string;
   authorityRank: string;
@@ -404,6 +434,23 @@ function formatDateLabel(value: string): string {
   }).format(date);
 }
 
+function publicAssetUrl(value: string): string {
+  if (!value) {
+    return "";
+  }
+
+  const publicPrefix = "app/public/";
+  if (value.startsWith(publicPrefix)) {
+    return `/${value.slice(publicPrefix.length)}`;
+  }
+
+  if (value.startsWith("/")) {
+    return value;
+  }
+
+  return "";
+}
+
 function valueRunsOnDay(daysAvailable: string, day: string): boolean {
   const normalizedDay = day.toLowerCase();
   const values = daysAvailable
@@ -460,12 +507,90 @@ export function summarizePublicDealsByArea(deals: PublicDeal[]): PublicDealAreaC
   const counts = new Map<string, number>();
 
   deals.forEach((deal) => {
-    counts.set(deal.area, (counts.get(deal.area) ?? 0) + 1);
+    counts.set(deal.areaGroup, (counts.get(deal.areaGroup) ?? 0) + 1);
   });
 
-  return Array.from(counts.entries())
+  const rankByArea = new Map(publicAreaGroupOptions.map((area, index) => [area, index]));
+
+  return Array.from(counts.entries() as Iterable<[PublicAreaGroup, number]>)
     .map(([area, count]) => ({ area, count }))
-    .sort((left, right) => left.area.localeCompare(right.area));
+    .sort((left, right) => (rankByArea.get(left.area) ?? 99) - (rankByArea.get(right.area) ?? 99));
+}
+
+function areaGroupForLocation(value: string, restaurantName = ""): PublicAreaGroup {
+  const normalized = `${value} ${restaurantName}`.toLowerCase();
+
+  if (normalized.includes("monkey junction")) {
+    return "Monkey Junction";
+  }
+
+  if (
+    normalized.includes("south front") ||
+    normalized.includes("greenfield") ||
+    normalized.includes("cargo district")
+  ) {
+    return "South Front";
+  }
+
+  if (
+    normalized.includes("downtown") ||
+    normalized.includes("castle street") ||
+    normalized.includes("brooklyn arts") ||
+    normalized.includes("riverwalk") ||
+    normalized.includes("riverfront")
+  ) {
+    return "Downtown";
+  }
+
+  if (
+    normalized.includes("mayfaire") ||
+    normalized.includes("forum") ||
+    normalized.includes("ogden") ||
+    normalized.includes("north market") ||
+    normalized.includes("military cutoff") ||
+    normalized.includes("eastwood") ||
+    normalized.includes("wrightsville beach") ||
+    normalized.includes("porters neck") ||
+    normalized.includes("davis community") ||
+    normalized.includes("bridgewater wines")
+  ) {
+    return "Mayfaire/Ogden";
+  }
+
+  if (
+    normalized.includes("south wilmington") ||
+    normalized.includes("independence") ||
+    normalized.includes("shipyard") ||
+    normalized.includes("long leaf mall") ||
+    normalized.includes("masonboro") ||
+    normalized.includes("carolina beach")
+  ) {
+    return "South Wilmington";
+  }
+
+  if (normalized.includes("islands fresh mex")) {
+    return "Monkey Junction";
+  }
+
+  if (normalized.includes("true blue butcher & barrel")) {
+    return "South Front";
+  }
+
+  return "Other Wilmington";
+}
+
+function sourceGapAreaGroupForLocation(value: string, restaurantName = ""): SourceGapAreaGroup {
+  const normalized = `${value} ${restaurantName}`.toLowerCase();
+
+  if (normalized.includes("wrightsville beach")) {
+    return "Wrightsville / Boundary Review";
+  }
+
+  if (normalized.includes("porters neck")) {
+    return "Porters Neck";
+  }
+
+  return areaGroupForLocation(value, restaurantName);
 }
 
 export function passesPublicDealFilter(row: CsvRow, date = getOperatingDate()): boolean {
@@ -500,6 +625,7 @@ function mapDeal(row: CsvRow, restaurantsById: Map<string, CsvRow>): PublicDeal 
     restaurantName: row.restaurant_name,
     neighborhood: restaurant?.neighborhood ?? "",
     area: restaurant?.neighborhood || "Wilmington",
+    areaGroup: areaGroupForLocation(restaurant?.neighborhood ?? "", row.restaurant_name),
     address: restaurant?.address ?? "",
     publicTitle: row.public_title,
     publicDescription: row.public_description,
@@ -513,11 +639,19 @@ function mapDeal(row: CsvRow, restaurantsById: Map<string, CsvRow>): PublicDeal 
     sourceTier: row.source_tier,
     sourceDisplayName: row.source_name || "Official source",
     evidenceLabel: row.direct_confirmation_id ? "Direct restaurant confirmation" : "Official source capture",
+    evidenceCapturedAt: row.evidence_captured_at,
+    evidenceSummary: row.evidence_summary,
+    evidenceUrlOrPath: row.evidence_url_or_path,
     freshnessLabel: freshnessDate ? `Fresh through ${formatDateLabel(freshnessDate)}` : "Freshness date missing",
     lastVerifiedAt: row.last_verified_at,
     nextCheckDue: row.next_check_due,
     expiresOn: row.expires_on,
+    archiveUrlOrPath: row.archive_url_or_path,
     restrictionNotes: row.restriction_notes,
+    screenshotPath: row.screenshot_path,
+    screenshotUrl: publicAssetUrl(row.screenshot_path),
+    sourceQuote: row.source_quote,
+    contentHash: row.content_hash,
     dineIn: isTrue(row.dine_in ?? ""),
     takeout: isTrue(row.takeout ?? ""),
     delivery: isTrue(row.delivery ?? ""),
@@ -572,6 +706,7 @@ function mapRestaurant(row: CsvRow, deals: PublicDeal[]): RestaurantSummary {
     restaurantId: row.restaurant_id,
     name: row.name,
     neighborhood: row.neighborhood,
+    areaGroup: areaGroupForLocation(row.neighborhood, row.name),
     address: row.address,
     phone: row.phone,
     website: row.official_website,
@@ -838,6 +973,7 @@ export async function getSourceGaps(): Promise<SourceGap[]> {
       return {
         restaurantName: source.restaurant_name,
         locationArea: source.location_area,
+        areaGroup: sourceGapAreaGroupForLocation(source.location_area, source.restaurant_name),
         primarySourceUrl: source.primary_source_url,
         sourceStatus: source.source_status,
         authorityRank: source.authority_rank,

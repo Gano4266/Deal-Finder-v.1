@@ -1,9 +1,11 @@
 import Link from "next/link";
 import type { Route } from "next";
 import {
+  type PublicDeal,
   dealRunsOnPublicDay,
   getCarryoutPlaces,
   getPublicDeals,
+  publicAreaGroupOptions,
   publicDealDayOptions,
   summarizePublicDealsByArea,
   summarizePublicDealsByDay
@@ -13,9 +15,17 @@ type DealsPageProps = {
   searchParams?: Promise<{
     area?: string;
     day?: string;
+    quick?: string;
     sort?: string;
   }>;
 };
+
+const quickFilterOptions = [
+  { value: "all", label: "All" },
+  { value: "under-10", label: "Under $10" },
+  { value: "time-listed", label: "Time listed" },
+  { value: "carryout", label: "Takeout verified" }
+] as const;
 
 const sortOptions = [
   { value: "day", label: "Day" },
@@ -23,7 +33,7 @@ const sortOptions = [
   { value: "restaurant", label: "Restaurant" }
 ] as const;
 
-function queryFor(params: { day: string; area: string; sort: string }) {
+function queryFor(params: { day: string; area: string; quick: string; sort: string }) {
   const query = new URLSearchParams();
 
   if (params.day !== "All") {
@@ -32,6 +42,10 @@ function queryFor(params: { day: string; area: string; sort: string }) {
 
   if (params.area !== "All") {
     query.set("area", params.area);
+  }
+
+  if (params.quick !== "all") {
+    query.set("quick", params.quick);
   }
 
   if (params.sort !== "area") {
@@ -54,6 +68,33 @@ function firstDayRank(daysAvailable: string): number {
   return visibleRanks.length ? Math.min(...visibleRanks) : publicDealDayOptions.length;
 }
 
+function firstPriceValue(price: string): number | undefined {
+  const match = price.match(/\$?\s*(\d+(?:\.\d{1,2})?)/);
+
+  if (!match) {
+    return undefined;
+  }
+
+  return Number(match[1]);
+}
+
+function matchesQuickFilter(deal: PublicDeal, quickFilter: string): boolean {
+  if (quickFilter === "under-10") {
+    const value = firstPriceValue(deal.price);
+    return typeof value === "number" && value <= 10;
+  }
+
+  if (quickFilter === "time-listed") {
+    return deal.timeWindow !== "Time not listed";
+  }
+
+  if (quickFilter === "carryout") {
+    return deal.takeout;
+  }
+
+  return true;
+}
+
 export default async function DealsPage({ searchParams }: DealsPageProps) {
   const params = await searchParams;
   const dayOptions = ["All", ...publicDealDayOptions] as const;
@@ -61,24 +102,26 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
     ? params?.day ?? "All"
     : "All";
   const selectedSort = sortOptions.some((option) => option.value === params?.sort) ? params?.sort ?? "area" : "area";
+  const selectedQuickFilter = quickFilterOptions.some((option) => option.value === params?.quick)
+    ? params?.quick ?? "all"
+    : "all";
   const [deals, carryoutPlaces] = await Promise.all([
     getPublicDeals(),
     getCarryoutPlaces()
   ]);
-  const dealAreaOptions = summarizePublicDealsByArea(deals).map((item) => item.area);
-  const areaOptions = ["All", ...dealAreaOptions];
-  if (!areaOptions.includes("Monkey Junction")) {
-    areaOptions.push("Monkey Junction");
-  }
-  const selectedArea = areaOptions.includes(params?.area ?? "All")
+  const areaOptions = ["All", ...publicAreaGroupOptions] as const;
+  const selectedArea = areaOptions.includes((params?.area ?? "All") as (typeof areaOptions)[number])
     ? params?.area ?? "All"
     : "All";
   const visibleDeals = deals
     .filter((deal) => selectedDay === "All" || dealRunsOnPublicDay(deal, selectedDay))
-    .filter((deal) => selectedArea === "All" || deal.area === selectedArea)
+    .filter((deal) => selectedArea === "All" || deal.areaGroup === selectedArea)
+    .filter((deal) => matchesQuickFilter(deal, selectedQuickFilter))
     .sort((left, right) => {
       if (selectedSort === "area") {
-        return left.area.localeCompare(right.area) || left.restaurantName.localeCompare(right.restaurantName);
+        return left.areaGroup.localeCompare(right.areaGroup) ||
+          left.area.localeCompare(right.area) ||
+          left.restaurantName.localeCompare(right.restaurantName);
       }
 
       if (selectedSort === "restaurant") {
@@ -88,23 +131,23 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
       return firstDayRank(left.daysAvailable) - firstDayRank(right.daysAvailable) ||
         left.restaurantName.localeCompare(right.restaurantName);
     });
-  const areaFilteredDeals = deals.filter((deal) => selectedArea === "All" || deal.area === selectedArea);
+  const areaFilteredDeals = deals.filter((deal) => selectedArea === "All" || deal.areaGroup === selectedArea);
   const dayFilteredDeals = deals.filter((deal) => selectedDay === "All" || dealRunsOnPublicDay(deal, selectedDay));
+  const dayAreaFilteredDeals = deals
+    .filter((deal) => selectedDay === "All" || dealRunsOnPublicDay(deal, selectedDay))
+    .filter((deal) => selectedArea === "All" || deal.areaGroup === selectedArea);
   const dayCounts = new Map(summarizePublicDealsByDay(areaFilteredDeals).map((item) => [item.day, item.count]));
   const areaCounts = new Map(summarizePublicDealsByArea(dayFilteredDeals).map((item) => [item.area, item.count]));
+  const countForQuickFilter = (quickFilter: (typeof quickFilterOptions)[number]["value"]) =>
+    dayAreaFilteredDeals.filter((deal) => matchesQuickFilter(deal, quickFilter)).length;
   const countForDay = (day: (typeof dayOptions)[number]) =>
     day === "All" ? areaFilteredDeals.length : dayCounts.get(day) ?? 0;
-  const countForArea = (area: string) => {
+  const countForArea = (area: (typeof areaOptions)[number]) => {
     if (area === "All") {
       return dayFilteredDeals.length;
     }
 
-    const reviewedDealCount = areaCounts.get(area) ?? 0;
-    if (area === "Monkey Junction" && reviewedDealCount === 0) {
-      return carryoutPlaces.length;
-    }
-
-    return reviewedDealCount;
+    return areaCounts.get(area) ?? 0;
   };
   const showMonkeyJunctionLocations = selectedArea === "Monkey Junction";
 
@@ -132,7 +175,7 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
         {dayOptions.map((day) => (
           <Link
             key={day}
-            href={queryFor({ day, area: selectedArea, sort: selectedSort }) as Route}
+            href={queryFor({ day, area: selectedArea, quick: selectedQuickFilter, sort: selectedSort }) as Route}
             className={day === selectedDay ? "active" : ""}
             aria-current={day === selectedDay ? "page" : undefined}
           >
@@ -142,14 +185,14 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
         ))}
       </nav>
 
-      <section className="filterPanel" aria-label="Area and sort controls">
+      <section className="filterPanel" aria-label="Area, quick filter, and sort controls">
         <div>
           <p className="eyebrow">Area</p>
           <nav className="segmentedNav compactFilters" aria-label="Filter reviewed deals by area">
             {areaOptions.map((area) => (
               <Link
                 key={area}
-                href={queryFor({ day: selectedDay, area, sort: selectedSort }) as Route}
+                href={queryFor({ day: selectedDay, area, quick: selectedQuickFilter, sort: selectedSort }) as Route}
                 className={area === selectedArea ? "active" : ""}
                 aria-current={area === selectedArea ? "page" : undefined}
               >
@@ -161,12 +204,29 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
         </div>
 
         <div>
+          <p className="eyebrow">Quick filter</p>
+          <nav className="segmentedNav compactFilters" aria-label="Quick filter reviewed deals">
+            {quickFilterOptions.map((option) => (
+              <Link
+                key={option.value}
+                href={queryFor({ day: selectedDay, area: selectedArea, quick: option.value, sort: selectedSort }) as Route}
+                className={option.value === selectedQuickFilter ? "active" : ""}
+                aria-current={option.value === selectedQuickFilter ? "page" : undefined}
+              >
+                <span>{option.label}</span>
+                <strong>{countForQuickFilter(option.value)}</strong>
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        <div>
           <p className="eyebrow">Sort</p>
           <nav className="segmentedNav compactFilters" aria-label="Sort reviewed deals">
             {sortOptions.map((option) => (
               <Link
                 key={option.value}
-                href={queryFor({ day: selectedDay, area: selectedArea, sort: option.value }) as Route}
+                href={queryFor({ day: selectedDay, area: selectedArea, quick: selectedQuickFilter, sort: option.value }) as Route}
                 className={option.value === selectedSort ? "active" : ""}
                 aria-current={option.value === selectedSort ? "page" : undefined}
               >
@@ -204,6 +264,7 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
                 <h2>{deal.publicTitle}</h2>
                 <div className="badgeRow" aria-label="Deal verification">
                   <span>{deal.area}</span>
+                  {deal.area !== deal.areaGroup ? <span>{deal.areaGroup}</span> : null}
                   <span>{deal.evidenceLabel}</span>
                   <span>{deal.sourceDisplayName}</span>
                   <span>{deal.freshnessLabel}</span>
@@ -211,7 +272,26 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
                   {deal.delivery ? <span>Delivery verified</span> : null}
                 </div>
                 <p>{deal.publicDescription}</p>
+                <p className="locationLine">{deal.area}</p>
               </div>
+              <dl className="factGrid compactFactGrid">
+                <div>
+                  <dt>Price</dt>
+                  <dd>{deal.price || "See source"}</dd>
+                </div>
+                <div>
+                  <dt>When</dt>
+                  <dd>{deal.daysAvailableLabel} {deal.timeWindow}</dd>
+                </div>
+                <div>
+                  <dt>Takeout</dt>
+                  <dd>{deal.takeout ? "Verified" : "Not listed"}</dd>
+                </div>
+                <div>
+                  <dt>Recheck</dt>
+                  <dd>{deal.nextCheckDue || deal.expiresOn}</dd>
+                </div>
+              </dl>
               <div className="cardActions">
                 <Link href={`/deals/${deal.dealId}`} className="primaryLink">
                   Details

@@ -16,3 +16,6 @@ app/out/
 
 # OS/editor noise
 .DS_Store
+
+# Local smoke-test artifacts
+artifacts/

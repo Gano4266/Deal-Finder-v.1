@@ -14,7 +14,7 @@ This repository currently contains operating docs, validation rules, CSV templat
 
 ## Wilmington Seed Market
 
-The first build will focus on 25 Wilmington-area restaurants with recurring or likely recurring food specials. The seed market is an operating backlog, not proof that any deal is live. Candidate deals from notes, screenshots, aggregators, comments, or social chatter must stay in review until an acceptable source or direct confirmation supports publication.
+The first build began with 25 Wilmington, NC restaurant targets and now tracks an expanded static prototype set. Nearby or boundary-sensitive restaurants stay out of the public feed unless Wilmington relevance is explicitly confirmed. The seed market is an operating backlog, not proof that any deal is live. Candidate deals from notes, screenshots, aggregators, comments, or social chatter must stay in review until an acceptable source or direct confirmation supports publication.
 
 See [Wilmington seed restaurants](research/wilmington-seed-restaurants.md) and the seed CSVs in [ops/seeds](ops/seeds/).
 

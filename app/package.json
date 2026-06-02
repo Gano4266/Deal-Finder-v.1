@@ -10,6 +10,9 @@
     "start:lan": "next start -H 0.0.0.0 -p 3000",
     "lint": "next typegen && tsc --noEmit",
     "typecheck": "next typegen && tsc --noEmit",
+    "mobile:smoke": "node ../scripts/mobile-smoke.mjs",
+    "smoke": "node ../scripts/smoke-app.mjs",
+    "accept": "node ../scripts/accept.mjs",
     "validate:data": "node ../scripts/validate-data.mjs"
   },
   "dependencies": {

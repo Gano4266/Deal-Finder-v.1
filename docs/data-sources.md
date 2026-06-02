@@ -22,6 +22,8 @@ Use this priority order when reviewing seed leads and deal candidates:
 
 Third-party aggregators, Reddit, reviews, comments, and user notes cannot make a deal publishable by themselves.
 
+Direct confirmation is treated as `tier_1_official` evidence when captured with reviewer identity, date, and confirmation details. In the authority order it sits below public restaurant-owned sources because public links are easier for users and reviewers to recheck.
+
 ## Source Rules
 
 - Official restaurant sources outrank secondary sources.

@@ -11,8 +11,8 @@ export default async function CarryoutPage() {
           <h1>Monkey Junction carryout</h1>
           <p className="lede">
             Food-first Wilmington places with official source or ordering signals.
-            This public list shows verified place seeds only. They are not
-            published deal claims.
+            This public list shows official-source place seeds only. They are
+            not published deal claims or live ordering guarantees.
           </p>
           <p className="notes">
             Static prototype data, not live availability. Confirm ordering
@@ -22,7 +22,7 @@ export default async function CarryoutPage() {
         <div className="statusPanel" aria-label="Carryout source status">
           <span className="statusLabel">Place seeds</span>
           <strong>{places.length}</strong>
-          <span>Verified carryout sources</span>
+          <span>Official-source place records</span>
         </div>
       </section>
 
@@ -33,7 +33,7 @@ export default async function CarryoutPage() {
               <p className="eyebrow">{place.locationArea}</p>
               <h2>{place.restaurantName}</h2>
               <div className="badgeRow" aria-label="Carryout evidence">
-                <span>{place.sourceStatus === "verified" ? "Official source" : "Needs review"}</span>
+                <span>{place.sourceStatus === "verified" ? "Official source found" : "Needs review"}</span>
                 <span>Carryout seed</span>
                 {place.deliverySignal ? <span>Delivery signal</span> : null}
               </div>

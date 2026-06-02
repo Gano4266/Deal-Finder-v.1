@@ -92,6 +92,9 @@ Public prototype rows must also preserve durable evidence traceability:
 - `content_hash` records the normalized claim or capture text hash.
 - `source_capture.metadata_json.evidence_file_sha256` records the local evidence artifact hash.
 - `source_check.evidence_url_or_path` points to the same durable artifact as the source capture when that check supports a public deal.
+- Public deals should include `screenshot_path` for app-visible proof. For public prototype rows, the deal, linked source capture, and linked source check should point to the same visual proof artifact when one exists. Most artifacts are source-page screenshots; blocked pages may use clearly labeled visual evidence cards generated from reviewed source captures.
+
+Local evidence files and screenshots are traceability artifacts. They are not the same as independent off-repo archives or direct restaurant confirmations.
 
 ## Food Gate
 
