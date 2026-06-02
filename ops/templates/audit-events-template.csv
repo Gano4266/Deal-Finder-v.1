@@ -1,0 +1,1 @@
+audit_event_id,event_at,actor,event_type,entity_type,entity_id,restaurant_id,related_deal_id,related_source_id,related_source_capture_id,related_direct_confirmation_id,related_source_check_id,related_review_task_id,before_state_ref,after_state_ref,summary,evidence_ref,notes

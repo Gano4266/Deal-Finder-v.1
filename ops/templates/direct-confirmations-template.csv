@@ -1,0 +1,1 @@
+direct_confirmation_id,restaurant_id,deal_id,source_check_id,source_capture_id,confirmed_at,confirmed_by,contact_method,contact_name_or_role,contact_channel,confirmation_summary,confirmed_fields,expires_on,next_check_due,review_task_id,notes

@@ -1,0 +1,1 @@
+source_capture_id,source_id,restaurant_id,captured_at,captured_by,capture_method,source_url,source_final_url,source_title,source_published_at,source_observed_at,evidence_type,extracted_text_or_confirmation_note,content_hash,screenshot_path,archive_url_or_path,metadata_json,capture_status,notes

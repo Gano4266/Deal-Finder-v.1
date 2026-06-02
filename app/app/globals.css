@@ -1,0 +1,815 @@
+:root {
+  --ink: #17201e;
+  --muted: #65716d;
+  --paper: #f4f6f2;
+  --surface: #fffdf8;
+  --surface-quiet: #eef3ee;
+  --line: #d6ded7;
+  --line-strong: #bcc9c0;
+  --forest: #17352f;
+  --tomato: #b65c42;
+  --gold: #b88a32;
+  --blue: #2f6578;
+  --success: #2f6d50;
+  --shadow: 0 20px 55px rgba(23, 32, 30, 0.1);
+  --shadow-tight: 0 8px 22px rgba(23, 32, 30, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.88) 0, rgba(244, 246, 242, 0) 360px),
+    var(--paper);
+  -webkit-tap-highlight-color: rgba(184, 138, 50, 0.2);
+  touch-action: manipulation;
+  font-variant-numeric: tabular-nums;
+}
+
+a {
+  color: inherit;
+}
+
+.appHeader {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 74px;
+  padding: calc(10px + env(safe-area-inset-top)) clamp(16px, 4vw, 48px) 10px;
+  background: rgba(255, 253, 248, 0.9);
+  border-bottom: 1px solid rgba(188, 201, 192, 0.82);
+  backdrop-filter: blur(18px) saturate(120%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.brandMark {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(255, 253, 248, 0.1), rgba(255, 253, 248, 0)),
+    linear-gradient(90deg, transparent 43%, var(--surface) 43%, var(--surface) 57%, transparent 57%),
+    linear-gradient(0deg, transparent 43%, var(--surface) 43%, var(--surface) 57%, transparent 57%),
+    var(--forest);
+  border: 1px solid rgba(23, 53, 47, 0.35);
+  box-shadow: inset 0 0 0 4px var(--gold), var(--shadow-tight);
+}
+
+.brand strong,
+.brand small {
+  display: block;
+}
+
+.brand strong {
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+}
+
+.brand small {
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin-top: 2px;
+}
+
+.topNav {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.topNav a,
+.primaryLink,
+.secondaryLink,
+.sourceLink {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+}
+
+.topNav a,
+.secondaryLink {
+  color: var(--forest);
+  border: 1px solid rgba(188, 201, 192, 0.9);
+  background: rgba(255, 253, 248, 0.72);
+}
+
+.topNav a.active {
+  color: #fff;
+  border-color: var(--forest);
+  background: var(--forest);
+  box-shadow: var(--shadow-tight);
+}
+
+.primaryLink,
+.sourceLink {
+  color: #fff;
+  background: var(--forest);
+  border: 1px solid var(--forest);
+  box-shadow: var(--shadow-tight);
+}
+
+.topNav a:hover,
+.primaryLink:hover,
+.secondaryLink:hover,
+.sourceLink:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-tight);
+}
+
+.topNav a:focus-visible,
+.primaryLink:focus-visible,
+.secondaryLink:focus-visible,
+.sourceLink:focus-visible,
+.segmentedNav a:focus-visible,
+.dayCoverage a:focus-visible {
+  outline: 3px solid rgba(184, 138, 50, 0.42);
+  outline-offset: 2px;
+}
+
+.topNav a:active,
+.primaryLink:active,
+.secondaryLink:active,
+.sourceLink:active,
+.segmentedNav a:active,
+.dayCoverage a:active {
+  transform: translateY(0);
+}
+
+.pageShell {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: clamp(24px, 5vw, 56px) 0 64px;
+}
+
+.heroBand,
+.sectionHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 24px;
+  padding: clamp(18px, 3vw, 30px) 0 22px;
+  border-bottom: 1px solid var(--line);
+}
+
+.heroBand h1,
+.sectionHeader h1 {
+  max-width: 820px;
+  margin: 0;
+  color: var(--forest);
+  font-size: clamp(2rem, 5vw, 3.05rem);
+  line-height: 1.04;
+  letter-spacing: 0;
+}
+
+.sectionHeader h1 {
+  font-size: clamp(1.95rem, 4vw, 2.75rem);
+}
+
+.lede,
+.sectionHeader p {
+  max-width: 680px;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.reviewMeta {
+  color: var(--success);
+  font-weight: 800;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--tomato);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.statusPanel {
+  width: min(100%, 290px);
+  padding: 20px;
+  border: 1px solid rgba(23, 53, 47, 0.16);
+  border-radius: 8px;
+  color: #fff;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0)),
+    var(--forest);
+  box-shadow: var(--shadow);
+}
+
+.statusPanel strong {
+  display: block;
+  color: #fff;
+  font-size: 3rem;
+  line-height: 1;
+  margin: 8px 0;
+}
+
+.statusLabel,
+.statusPanel span:last-child {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.9rem;
+}
+
+.emptyState {
+  margin-top: 26px;
+  padding: clamp(22px, 5vw, 40px);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.emptyState h2 {
+  margin: 0;
+  color: var(--forest);
+  font-size: clamp(1.55rem, 4vw, 2.5rem);
+}
+
+.emptyState p {
+  max-width: 680px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.dealList,
+.candidateList,
+.gapList,
+.restaurantList {
+  display: grid;
+  gap: 14px;
+  margin-top: 26px;
+}
+
+.summaryStrip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.summaryStrip div {
+  min-height: 104px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 253, 248, 0.88);
+  box-shadow: var(--shadow-tight);
+}
+
+.summaryStrip strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--forest);
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.segmentedNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.segmentedNav a,
+.dayCoverage a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(188, 201, 192, 0.9);
+  border-radius: 8px;
+  padding: 0 14px;
+  color: var(--forest);
+  background: rgba(255, 253, 248, 0.82);
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.segmentedNav a.active,
+.dayCoverage a.active {
+  color: #fff;
+  background: var(--forest);
+  border-color: var(--forest);
+}
+
+.segmentedNav a:hover,
+.dayCoverage a:hover {
+  transform: translateY(-1px);
+  border-color: var(--line-strong);
+}
+
+.segmentedNav strong,
+.dayCoverage strong {
+  min-width: 24px;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: var(--forest);
+  background: var(--surface-quiet);
+  font-size: 0.78rem;
+}
+
+.segmentedNav a.active strong,
+.dayCoverage a.active strong {
+  color: var(--forest);
+  background: var(--gold);
+}
+
+.dayCoverage {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.dayCoverage a {
+  min-height: 58px;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+}
+
+.filterPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.7fr);
+  gap: 18px;
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid rgba(188, 201, 192, 0.85);
+  border-radius: 8px;
+  background: rgba(255, 253, 248, 0.72);
+  box-shadow: var(--shadow-tight);
+}
+
+.filterPanel .eyebrow {
+  margin-bottom: 8px;
+}
+
+.compactFilters {
+  margin-top: 0;
+}
+
+.dealCard,
+.candidateCard,
+.restaurantCard {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+  border: 1px solid rgba(188, 201, 192, 0.84);
+  border-radius: 8px;
+  background: rgba(255, 253, 248, 0.96);
+  box-shadow: var(--shadow-tight);
+}
+
+.candidateCard {
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+}
+
+.dealCard h2,
+.candidateCard h2,
+.restaurantCard h2,
+.restaurantCard h3 {
+  margin: 0;
+  color: var(--forest);
+  font-size: 1.42rem;
+  letter-spacing: 0;
+}
+
+.restaurantCard {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.restaurantCard p {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.compactList {
+  margin-top: 34px;
+}
+
+.compactList > h2 {
+  margin: 0;
+  color: var(--forest);
+}
+
+.compactRestaurantCard {
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 16px 18px;
+}
+
+.compactRestaurantCard h3 {
+  font-size: 1.05rem;
+}
+
+.compactRestaurantCard p {
+  margin: 6px 0 0;
+}
+
+.dealTitle {
+  color: var(--ink);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.candidateMain p,
+.dealCard p {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.factGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.factGrid div {
+  min-height: 74px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(188, 201, 192, 0.7);
+  background: var(--surface-quiet);
+}
+
+.factGrid dt {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.factGrid dd {
+  margin: 6px 0 0;
+  color: var(--ink);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.reviewStrip {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.badgeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.badgeRow span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  border-radius: 8px;
+  padding: 5px 9px;
+  color: #183832;
+  border: 1px solid rgba(47, 101, 120, 0.18);
+  background: #edf4f3;
+  font-size: 0.78rem;
+  line-height: 1.25;
+  font-weight: 800;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.reviewStrip span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  border-radius: 8px;
+  padding: 0 10px;
+  color: var(--forest);
+  border: 1px solid rgba(188, 201, 192, 0.75);
+  background: var(--surface-quiet);
+  font-size: 0.84rem;
+  font-weight: 700;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.notes {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.sourceLink {
+  justify-self: start;
+}
+
+.disabledLink {
+  justify-self: start;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  padding: 0 14px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  background: var(--surface-quiet);
+  font-weight: 800;
+}
+
+.locationLine {
+  color: var(--blue);
+  font-weight: 800;
+}
+
+.cardActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.compactDealCard {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.detailShell {
+  padding-bottom: 90px;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 26px;
+}
+
+.detailPanel {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.detailPanel h2 {
+  margin: 0 0 16px;
+  color: var(--forest);
+}
+
+.opsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 26px;
+}
+
+.opsSection {
+  margin-top: 34px;
+}
+
+.sectionTitleRow {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sectionTitleRow h2 {
+  margin: 0;
+  color: var(--forest);
+}
+
+.miniDealList {
+  display: grid;
+  gap: 10px;
+}
+
+.miniDeal {
+  display: grid;
+  gap: 5px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: inherit;
+  background: var(--surface-quiet);
+  text-decoration: none;
+}
+
+.miniDeal span {
+  color: var(--forest);
+  font-weight: 800;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.miniDeal small {
+  color: var(--muted);
+  font-weight: 700;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.reportChecklist {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.reportChecklist p {
+  margin: 0;
+  padding: 12px 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--forest);
+  background: var(--surface-quiet);
+  font-weight: 800;
+}
+
+.copyBox {
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-quiet);
+}
+
+.copyBox pre {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.45;
+}
+
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.gapCard {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+  border: 1px solid rgba(188, 201, 192, 0.84);
+  border-left: 6px solid var(--blue);
+  border-radius: 8px;
+  background: rgba(255, 253, 248, 0.96);
+  box-shadow: var(--shadow-tight);
+}
+
+.gapCard.critical {
+  border-left-color: var(--tomato);
+}
+
+.gapCard.high {
+  border-left-color: var(--gold);
+}
+
+@media (max-width: 760px) {
+  .appHeader,
+  .heroBand,
+  .sectionHeader,
+  .candidateCard,
+  .compactDealCard,
+  .restaurantCard,
+  .compactRestaurantCard,
+  .detailGrid,
+  .filterPanel,
+  .opsGrid,
+  .gapCard {
+    grid-template-columns: 1fr;
+  }
+
+  .appHeader {
+    align-items: center;
+    gap: 12px;
+  }
+
+  .topNav {
+    flex: 1 1 auto;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .topNav::-webkit-scrollbar,
+  .segmentedNav::-webkit-scrollbar,
+  .dayCoverage::-webkit-scrollbar {
+    display: none;
+  }
+
+  .topNav a,
+  .segmentedNav a {
+    flex: 0 0 auto;
+  }
+
+  .segmentedNav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .dayCoverage {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .dayCoverage a {
+    min-width: 68px;
+  }
+
+  .statusPanel {
+    width: 100%;
+  }
+
+  .factGrid,
+  .summaryStrip {
+    grid-template-columns: 1fr;
+  }
+
+  .heroBand h1,
+  .sectionHeader h1 {
+    font-size: clamp(1.85rem, 9vw, 2.35rem);
+  }
+
+  .dealCard,
+  .candidateCard,
+  .restaurantCard,
+  .detailPanel {
+    padding: 18px;
+  }
+
+  .cardActions a {
+    flex: 1 1 145px;
+  }
+
+  .headerActions {
+    justify-content: stretch;
+  }
+
+  .sectionTitleRow {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .headerActions a {
+    flex: 1;
+  }
+}

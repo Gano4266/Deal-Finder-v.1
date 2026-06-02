@@ -1,0 +1,1 @@
+review_task_id,related_type,related_id,deal_id,source_id,restaurant_id,source_capture_id,direct_confirmation_id,report_source,opened_at,opened_by,assigned_reviewer,review_reason,risk_flags,priority,status,decision,decision_reason,decided_at,decided_by,next_action,next_action_due,audit_event_id,resolution_notes
