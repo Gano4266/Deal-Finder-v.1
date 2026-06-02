@@ -107,6 +107,16 @@ async function assertAsset(pathname) {
   assert(bytes.byteLength > 1000, `${pathname}: expected non-empty proof image, got ${bytes.byteLength} bytes`);
 }
 
+async function assertJson(pathname, needles = []) {
+  const { body, contentType, response } = await fetchPath(pathname);
+  assert(response.status === 200, `${pathname}: expected 200, got ${response.status}`);
+  assert(contentType.includes("json") || contentType.includes("manifest"), `${pathname}: expected JSON-like content type, got ${contentType}`);
+
+  for (const needle of needles) {
+    assert(body.includes(needle), `${pathname}: missing text ${JSON.stringify(needle)}`);
+  }
+}
+
 async function assertMissingPage(pathname) {
   const { response } = await fetchPath(pathname);
   assert(response.status === 404, `${pathname}: expected 404, got ${response.status}`);
@@ -141,11 +151,19 @@ async function check(label, task) {
 }
 
 await check("home", () => assertPage("/", ["Deal Finder", "Tonight"]));
+await check("robots noindex", () => assertPage("/robots.txt", ["User-Agent: *", "Disallow: /"]));
+await check("pwa manifest", () => assertJson("/manifest.webmanifest", ["Deal Finder Wilmington", "\"start_url\":\"/tonight\"", "\"display\":\"standalone\""]));
+await check("pwa icon 192", () => assertAsset("/icon-192.png"));
+await check("pwa icon 512", () => assertAsset("/icon-512.png"));
+await check("pwa apple touch icon", () => assertAsset("/apple-touch-icon.png"));
 await check("tonight", () => assertPage("/tonight", ["Tonight in Wilmington", "Static prototype data"]));
 await check("deals filters", () => assertPage("/deals?area=Downtown&day=Tuesday&quick=under-10&sort=area", ["Under $10", "Reviewed Wilmington food specials"]));
 await check("monkey junction filter", () => assertPage("/deals?area=Monkey%20Junction", ["Monkey Junction", "non-alcoholic drink purchase"]));
 await check("carryout removed", () => assertMissingPage("/carryout"));
-await check("report", () => assertPage("/report", ["Report stale or incorrect deal info", "Reports open an email draft"]));
+await check("report", async () => {
+  const body = await assertPage("/report", ["Report stale or incorrect deal info", "Reports open an email draft"]);
+  assert(body.includes("mailto:"), "/report: missing mailto handoff");
+});
 await check("report with deal context", () => assertPage("/report?dealId=deal-beat-street-tuesday-2-tacos", [
   "Report stale or incorrect deal info",
   "$2 tacos at Beat Street"

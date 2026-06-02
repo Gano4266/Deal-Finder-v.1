@@ -38,6 +38,8 @@ AI output is never a source. Third-party aggregators, Reddit, reviews, comments,
 
 - [Project brief](PROJECT_BRIEF.md)
 - [Product spec](PRODUCT_SPEC.md)
+- [Deployment guide](DEPLOYMENT.md)
+- [Friend pilot guide](PILOT.md)
 - [Roadmap](ROADMAP.md)
 - [Decision log](DECISIONS.md)
 - [MVP scope](docs/mvp-scope.md)
