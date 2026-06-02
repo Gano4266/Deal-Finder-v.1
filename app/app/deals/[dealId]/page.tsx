@@ -105,8 +105,9 @@ export default async function DealDetailPage({ params }: DealPageProps) {
                 src={deal.screenshotUrl}
                 alt={`Visual proof from ${deal.sourceDisplayName}`}
                 className="proofPreview"
-                loading="lazy"
-                decoding="async"
+                fetchPriority="high"
+                loading="eager"
+                decoding="sync"
               />
             ) : (
               <div className="proofPlaceholder">Visual proof not captured for this source.</div>
