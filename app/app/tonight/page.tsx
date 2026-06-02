@@ -83,9 +83,6 @@ export default async function TonightPage() {
         <Link href={`/deals?day=${day}&quick=time-listed` as Route}>
           <span>Time listed</span>
         </Link>
-        <Link href={`/deals?day=${day}&quick=carryout` as Route}>
-          <span>Takeout verified</span>
-        </Link>
       </nav>
 
       {deals.length === 0 ? (
@@ -113,8 +110,6 @@ export default async function TonightPage() {
                   <span>{deal.sourceDisplayName}</span>
                   <span>Verified {deal.lastVerifiedAt}</span>
                   <span>{deal.freshnessLabel}</span>
-                  {deal.takeout ? <span>Takeout verified</span> : null}
-                  {deal.delivery ? <span>Delivery verified</span> : null}
                 </div>
                 <p>{deal.publicDescription}</p>
                 <p className="locationLine">{deal.neighborhood || deal.address}</p>

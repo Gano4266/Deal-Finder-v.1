@@ -10,22 +10,22 @@ type ReportPageProps = {
 };
 
 function reportSubject(contextLabel: string): string {
-  return `Deal Finder correction: ${contextLabel}`;
+  return `Deal Finder report: ${contextLabel}`;
 }
 
 function reportBody(contextLabel: string, contextUrl: string): string {
-  return [
-    `Context: ${contextLabel}`,
-    contextUrl ? `App page: ${contextUrl}` : "",
+  const lines = [
+    `Deal/restaurant: ${contextLabel}`,
+    ...(contextUrl ? [`Page: ${contextUrl}`] : []),
     "",
-    "What looks wrong?",
+    "Issue:",
     "",
-    "What source or restaurant confirmation should we check?",
+    "Correct info or source:",
     "",
-    "Optional contact info if you want a follow-up:",
-    "",
-    "Do not include sensitive personal information."
-  ].filter(Boolean).join("\n");
+    "Your name/contact, optional:"
+  ];
+
+  return lines.join("\n");
 }
 
 function mailtoHref(to: string, subject: string, body: string): string {
@@ -61,13 +61,11 @@ export default async function ReportPage({ searchParams }: ReportPageProps) {
           <p className="eyebrow">Correction intake</p>
           <h1>Report stale or incorrect deal info</h1>
           <p>
-            Help keep the Wilmington prototype honest. Reports create review
-            work for the operator; they never publish automatically.
+            Send a quick correction if a deal looks stale, wrong, or missing a
+            source detail.
           </p>
           <p className="notes">
-            This static prototype does not store submissions in the app yet.
-            Email reporting is not configured yet unless a reporting inbox is
-            set for this deployment.
+            Reports open an email draft. Nothing publishes automatically.
           </p>
         </div>
         <Link href="/tonight" className="secondaryLink">
@@ -96,20 +94,14 @@ export default async function ReportPage({ searchParams }: ReportPageProps) {
               <dd>{reportEmail ? "Email operator for review" : "Use fallback template"}</dd>
             </div>
           </dl>
-          <p className="notes">
-            Credible restaurant corrections, source conflicts, and reports
-            should route affected public deals to `needs_review` or
-            `needs_recheck` until resolved.
-          </p>
         </article>
 
         <article className="detailPanel">
           <h2>What to include</h2>
           <div className="reportChecklist">
-            <p>What appears wrong or stale</p>
-            <p>Where you saw the current information</p>
-            <p>Whether you are the restaurant or a diner</p>
-            <p>The official source or direct confirmation to check</p>
+            <p>What looks wrong</p>
+            <p>The correct deal info, if you know it</p>
+            <p>A source link or restaurant confirmation</p>
           </div>
           <div className="cardActions">
             {reportEmail ? (

@@ -11,7 +11,6 @@ The app currently reads repo-managed CSV data only. It does not scrape, crawl, u
 - `/deals/[dealId]`: public detail and evidence page for a reviewed deal.
 - `/restaurants`: static Wilmington restaurant source directory.
 - `/restaurants/[restaurantId]`: restaurant profile with reviewed public deals for that restaurant.
-- `/carryout`: verified Monkey Junction / South Wilmington carryout place seeds. These are not deal claims.
 - `/report`: lightweight correction intake. It does not store submissions unless a future backend is added.
 - `/admin` and `/admin/ops`: read-only ops dashboard for public-feed health, rechecks, evidence hardening, source gaps, and seed backlog.
 - `/admin/source-gaps`: static source-gap report.
@@ -19,7 +18,7 @@ The app currently reads repo-managed CSV data only. It does not scrape, crawl, u
 
 ## Current Behavior
 
-The current prototype has reviewed static public deals in `../fixtures/prototype/deals.csv`. `/tonight` filters those rows by the current Wilmington weekday and freshness gates. Source-backed or conflicted candidates that still need human work appear in `/admin/review`. Public carryout rows are verified place/source seeds only.
+The current prototype has reviewed static public deals in `../fixtures/prototype/deals.csv`. `/tonight` filters those rows by the current Wilmington weekday and freshness gates. Source-backed or conflicted candidates that still need human work appear in `/admin/review`. Carryout rows remain ops-only seed backlog.
 
 ## Local Development
 

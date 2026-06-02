@@ -16,13 +16,11 @@ Do not hydrate public `/tonight` from:
 
 Seed rows are an operating backlog. They can drive `/admin/review`, but they are not public feed data.
 
-## Public `/carryout` Source
+## Ops-Only Carryout Seeds
 
-The `/carryout` route may read place/source rows from `ops/seeds/wilmington-carryout-places.csv`.
+The public MVP no longer exposes a `/carryout` route.
 
-Carryout place rows are not deal claims. They may describe source-backed pickup, takeout, delivery, ordering, or location signals, but they must not imply that any restaurant special is published. A carryout place can become a deal only through the normal public deal filter in `fixtures/prototype/deals.csv`.
-
-Public `/carryout` should show only rows with `source_status=verified`. Rows marked `needs_review` remain useful for ops and source-gap work, but should not appear in the public carryout list.
+Carryout place rows in `ops/seeds/wilmington-carryout-places.csv` are ops-only backlog. They may describe source-backed pickup, takeout, delivery, ordering, or location signals, but they must not imply that any restaurant special is published. A carryout place can become a deal only through the normal public deal filter in `fixtures/prototype/deals.csv`.
 
 ## Public `/restaurants` Source
 

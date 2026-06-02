@@ -15,8 +15,7 @@ const pages = [
   { path: "/deals", name: "deals", needles: ["Reviewed Wilmington food specials", "Under $10"] },
   { path: "/deals/deal-beat-street-tuesday-2-tacos", name: "deal-detail", needles: ["$2 tacos at Beat Street", "Open official source"] },
   { path: "/restaurants", name: "restaurants", needles: ["Restaurants being tracked", "Source-only restaurants"] },
-  { path: "/carryout", name: "carryout", needles: ["Monkey Junction carryout", "Official-source place records"] },
-  { path: "/report", name: "report", needles: ["Report stale or incorrect deal info", "does not store submissions in the app yet"] }
+  { path: "/report", name: "report", needles: ["Report stale or incorrect deal info", "Reports open an email draft"] }
 ];
 
 function assert(condition, message) {

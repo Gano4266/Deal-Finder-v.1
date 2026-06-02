@@ -62,7 +62,6 @@ The first app should be designed around these routes:
 - `/deals/[dealId]`: deal details and evidence.
 - `/restaurants`: browse restaurants.
 - `/restaurants/[restaurantId]`: restaurant profile and active deals.
-- `/carryout`: verified place/source seeds for carryout-oriented discovery. These are not deal claims.
 - `/report`: report stale or incorrect deal data.
 - `/admin`: reviewer dashboard.
 - `/admin/ops`: ops dashboard deep link.

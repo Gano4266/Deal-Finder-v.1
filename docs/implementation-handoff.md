@@ -20,7 +20,6 @@ The repo now contains a lean mobile-first Next.js app using static CSV data. The
 - `/deals`: all reviewed prototype deals with day filters.
 - `/restaurants`: static Wilmington restaurant source directory.
 - `/restaurants/[restaurantId]`: restaurant profile with reviewed public deals for that restaurant.
-- `/carryout`: verified place/source seeds for carryout-oriented Wilmington-area discovery. These are not public deal claims.
 - `/report`: lightweight correction intake. Static prototype only; no stored submissions without backend work.
 - `/admin`: read-only ops dashboard for public-feed health, freshness, evidence durability, source gaps, report handoff status, and seed backlog.
 - `/admin/ops`: same ops dashboard route kept as an explicit deep link.
@@ -65,4 +64,4 @@ npm run validate:data
 - No policy permits unsourced public deals.
 - `npm run validate:data`, `npm run lint`, and `npm run build` pass before promotion or deploy.
 - Admin routes are gated before any public deployment.
-- Public carryout rows are verified place/source seeds, not deal claims.
+- Carryout seed rows are ops-only backlog, not public deal claims.

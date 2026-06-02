@@ -126,10 +126,6 @@ const restaurants = readCsv("fixtures/prototype/restaurants.csv").filter((row) =
   row.fixture_data_class === "verified_static" &&
   row.is_live_data === "false"
 );
-const hiddenCarryoutPlaces = readCsv("ops/seeds/wilmington-carryout-places.csv")
-  .filter((row) => row.source_status !== "verified")
-  .map((row) => row.restaurant_name)
-  .filter(Boolean);
 const proofAssets = Array.from(new Set(deals.map((deal) => publicAssetUrl(deal.screenshot_path)).filter(Boolean)));
 
 const failures = [];
@@ -148,19 +144,8 @@ await check("home", () => assertPage("/", ["Deal Finder", "Tonight"]));
 await check("tonight", () => assertPage("/tonight", ["Tonight in Wilmington", "Static prototype data"]));
 await check("deals filters", () => assertPage("/deals?area=Downtown&day=Tuesday&quick=under-10&sort=area", ["Under $10", "Reviewed Wilmington food specials"]));
 await check("monkey junction filter", () => assertPage("/deals?area=Monkey%20Junction", ["Monkey Junction", "non-alcoholic drink purchase"]));
-await check("carryout", async () => {
-  const body = await assertPage("/carryout", [
-    "Monkey Junction carryout",
-    "not published deal claims",
-    "Official-source place records",
-    "Islands Fresh Mex Grill - Monkey Junction"
-  ]);
-
-  for (const hiddenName of hiddenCarryoutPlaces) {
-    assert(!body.includes(hiddenName), `/carryout: non-verified carryout seed should not render publicly: ${hiddenName}`);
-  }
-});
-await check("report", () => assertPage("/report", ["Report stale or incorrect deal info", "does not store submissions in the app yet"]));
+await check("carryout removed", () => assertMissingPage("/carryout"));
+await check("report", () => assertPage("/report", ["Report stale or incorrect deal info", "Reports open an email draft"]));
 await check("report with deal context", () => assertPage("/report?dealId=deal-beat-street-tuesday-2-tacos", [
   "Report stale or incorrect deal info",
   "$2 tacos at Beat Street"

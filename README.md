@@ -18,9 +18,9 @@ The first build began with 25 Wilmington, NC restaurant targets and now tracks a
 
 See [Wilmington seed restaurants](research/wilmington-seed-restaurants.md) and the seed CSVs in [ops/seeds](ops/seeds/).
 
-## Monkey Junction Carryout Seeds
+## Ops-Only Carryout Seeds
 
-The prototype also tracks a small Monkey Junction / South Wilmington carryout seed list for practical "where can I grab food?" use cases. These rows are place/source records, not deal claims. A place can appear in `/carryout` with official carryout or ordering evidence, but a special still cannot appear in `/tonight` unless it has deal-specific source evidence, review, and freshness metadata.
+The repo also tracks a small Monkey Junction / South Wilmington carryout seed list for future research. These rows are ops-only place/source records, not deal claims, and they are no longer part of the public MVP navigation. A special still cannot appear in `/tonight` unless it has deal-specific source evidence, review, and freshness metadata.
 
 ## Source Authority
 
@@ -84,7 +84,7 @@ AI output is never a source. Third-party aggregators, Reddit, reviews, comments,
 
 ## Current Status
 
-Static-data app prototype. `/tonight` reads reviewed public rows from `fixtures/prototype/deals.csv`, filters by Wilmington weekday and freshness gates, and links to deal detail pages. `/carryout` reads place/source seeds from `ops/seeds/wilmington-carryout-places.csv`. `/admin` is a read-only ops dashboard, with `/admin/review` and `/admin/source-gaps` as focused drilldowns for static review operations.
+Static-data app prototype. `/tonight` reads reviewed public rows from `fixtures/prototype/deals.csv`, filters by Wilmington weekday and freshness gates, and links to deal detail pages. Carryout seed rows remain ops-only backlog. `/admin` is a read-only ops dashboard, with `/admin/review` and `/admin/source-gaps` as focused drilldowns for static review operations.
 
 ## Next Practical Milestone
 

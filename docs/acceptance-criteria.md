@@ -61,9 +61,9 @@ visible deal
 - Empty-state copy does not imply live availability.
 - Review tasks exist for each source-backed seed candidate.
 
-## Carryout Acceptance
+## Carryout Seed Acceptance
 
-- `/carryout` reads place/source seed rows from `ops/seeds/wilmington-carryout-places.csv`.
-- Public carryout rows are verified place/source seeds only.
+- Carryout rows remain ops-only seed backlog.
+- The public MVP does not expose `/carryout`.
 - Carryout rows do not imply any restaurant special is published.
 - A carryout place can become a public deal only through the normal `fixtures/prototype/deals.csv` public deal filter.

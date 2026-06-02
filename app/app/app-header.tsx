@@ -7,8 +7,7 @@ import { usePathname } from "next/navigation";
 const navItems = [
   { href: "/tonight", label: "Tonight" },
   { href: "/deals", label: "All Deals" },
-  { href: "/restaurants", label: "Restaurants" },
-  { href: "/carryout", label: "Carryout" }
+  { href: "/restaurants", label: "Restaurants" }
 ] as const;
 
 function isActive(pathname: string, href: string) {

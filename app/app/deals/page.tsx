@@ -3,7 +3,6 @@ import type { Route } from "next";
 import {
   type PublicDeal,
   dealRunsOnPublicDay,
-  getCarryoutPlaces,
   getPublicDeals,
   publicAreaGroupOptions,
   publicDealDayOptions,
@@ -23,8 +22,7 @@ type DealsPageProps = {
 const quickFilterOptions = [
   { value: "all", label: "All" },
   { value: "under-10", label: "Under $10" },
-  { value: "time-listed", label: "Time listed" },
-  { value: "carryout", label: "Takeout verified" }
+  { value: "time-listed", label: "Time listed" }
 ] as const;
 
 const sortOptions = [
@@ -88,10 +86,6 @@ function matchesQuickFilter(deal: PublicDeal, quickFilter: string): boolean {
     return deal.timeWindow !== "Time not listed";
   }
 
-  if (quickFilter === "carryout") {
-    return deal.takeout;
-  }
-
   return true;
 }
 
@@ -105,10 +99,7 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
   const selectedQuickFilter = quickFilterOptions.some((option) => option.value === params?.quick)
     ? params?.quick ?? "all"
     : "all";
-  const [deals, carryoutPlaces] = await Promise.all([
-    getPublicDeals(),
-    getCarryoutPlaces()
-  ]);
+  const deals = await getPublicDeals();
   const areaOptions = ["All", ...publicAreaGroupOptions] as const;
   const selectedArea = areaOptions.includes((params?.area ?? "All") as (typeof areaOptions)[number])
     ? params?.area ?? "All"
@@ -149,7 +140,6 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
 
     return areaCounts.get(area) ?? 0;
   };
-  const showMonkeyJunctionLocations = selectedArea === "Monkey Junction";
 
   return (
     <main className="pageShell">
@@ -243,8 +233,7 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
           <h2>No reviewed deals match this filter yet.</h2>
           <p>
             The static inventory may still have reviewed deals on other days or
-            areas. Monkey Junction currently has verified carryout locations,
-            not reviewed public deal claims.
+            areas.
           </p>
           <div className="cardActions">
             <Link href="/deals" className="primaryLink">
@@ -268,8 +257,6 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
                   <span>{deal.evidenceLabel}</span>
                   <span>{deal.sourceDisplayName}</span>
                   <span>{deal.freshnessLabel}</span>
-                  {deal.takeout ? <span>Takeout verified</span> : null}
-                  {deal.delivery ? <span>Delivery verified</span> : null}
                 </div>
                 <p>{deal.publicDescription}</p>
                 <p className="locationLine">{deal.area}</p>
@@ -282,10 +269,6 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
                 <div>
                   <dt>When</dt>
                   <dd>{deal.daysAvailableLabel} {deal.timeWindow}</dd>
-                </div>
-                <div>
-                  <dt>Takeout</dt>
-                  <dd>{deal.takeout ? "Verified" : "Not listed"}</dd>
                 </div>
                 <div>
                   <dt>Recheck</dt>
@@ -308,46 +291,6 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
         </section>
       )}
 
-      {showMonkeyJunctionLocations ? (
-        <section className="compactList" aria-label="Monkey Junction carryout locations">
-          <div className="sectionTitleRow">
-            <div>
-              <p className="eyebrow">Monkey Junction locations</p>
-              <h2>Verified carryout/place seeds</h2>
-            </div>
-            <Link href={"/carryout" as Route} className="secondaryLink">
-              Carryout page
-            </Link>
-          </div>
-          <p className="notes">
-            These are official-source location records, not public deal claims.
-            A Monkey Junction special still needs deal-specific evidence before
-            it appears in the reviewed deal list.
-          </p>
-          <section className="dealList" aria-label="Monkey Junction locations">
-            {carryoutPlaces.map((place) => (
-              <article key={place.placeId} className="dealCard compactDealCard">
-                <div>
-                  <p className="eyebrow">{place.locationArea}</p>
-                  <h2>{place.restaurantName}</h2>
-                  <div className="badgeRow" aria-label="Location evidence">
-                    <span>Official source</span>
-                    <span>Carryout location</span>
-                    {place.deliverySignal ? <span>Delivery signal</span> : null}
-                  </div>
-                  <p>{place.carryoutSignal}</p>
-                  <p className="locationLine">{place.address}</p>
-                </div>
-                <div className="cardActions">
-                  <a href={place.orderingUrl || place.sourceUrl} className="primaryLink">
-                    Open source
-                  </a>
-                </div>
-              </article>
-            ))}
-          </section>
-        </section>
-      ) : null}
     </main>
   );
 }
