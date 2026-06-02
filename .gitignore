@@ -19,3 +19,4 @@ app/out/
 
 # Local smoke-test artifacts
 artifacts/
+.vercel

@@ -1,0 +1,12 @@
+{
+  "name": "deal-finder-deploy-root",
+  "private": true,
+  "scripts": {
+    "build": "cd app && npm run build"
+  },
+  "dependencies": {
+    "next": "16.2.7",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  }
+}
