@@ -129,6 +129,7 @@ export const publicAreaGroupOptions = [
   "Downtown",
   "South Front",
   "Monkey Junction",
+  "College Rd / UNCW",
   "Mayfaire/Ogden",
   "South Wilmington",
   "Other Wilmington"
@@ -546,6 +547,15 @@ function areaGroupForLocation(value: string, restaurantName = ""): PublicAreaGro
 
   if (normalized.includes("monkey junction")) {
     return "Monkey Junction";
+  }
+
+  if (
+    normalized.includes("college") ||
+    normalized.includes("oleander") ||
+    normalized.includes("uncw") ||
+    normalized.includes("racine")
+  ) {
+    return "College Rd / UNCW";
   }
 
   if (

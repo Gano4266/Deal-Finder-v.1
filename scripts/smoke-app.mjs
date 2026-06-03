@@ -245,7 +245,8 @@ await check("missing restaurant 404", () => assertMissingPage("/restaurants/not-
 await check("withheld restaurant 404", () => assertMissingPage("/restaurants/pinpoint-restaurant"));
 await check("sample deal proof UI", () => assertPage("/deals/deal-beat-street-tuesday-2-tacos", [
   "$2 tacos at Beat Street",
-  "Restaurant wording saved",
+  "Restaurant wording",
+  "Shown below",
   "Check restaurant source",
   "/evidence/source-screenshots/src-beat-street-primary.png"
 ]));

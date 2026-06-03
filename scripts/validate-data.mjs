@@ -359,6 +359,20 @@ for (const deal of deals) {
     captureMetadata.evidence_file_sha256 === fileSha256(capture.archive_url_or_path),
     `${label}: capture metadata_json.evidence_file_sha256 does not match local evidence file`
   );
+  if (captureMetadata.screenshot_file_sha256 || captureMetadata.screenshot_file_path) {
+    assert(
+      captureMetadata.screenshot_file_path === capture.screenshot_path,
+      `${label}: capture metadata_json.screenshot_file_path must match screenshot_path`
+    );
+    assert(
+      sha256Pattern.test(captureMetadata.screenshot_file_sha256 || ""),
+      `${label}: capture metadata_json.screenshot_file_sha256 must be sha256:<64 hex chars>`
+    );
+    assert(
+      captureMetadata.screenshot_file_sha256 === fileSha256(capture.screenshot_path),
+      `${label}: capture metadata_json.screenshot_file_sha256 does not match local screenshot file`
+    );
+  }
   assert(check.restaurant_id === deal.restaurant_id, `${label}: source check restaurant does not match deal restaurant`);
   assert(check.source_id === deal.source_id, `${label}: source check source does not match deal source`);
   assert(check.source_capture_id_after === deal.source_capture_id, `${label}: source check does not point to deal capture`);

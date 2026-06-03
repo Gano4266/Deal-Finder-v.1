@@ -1,12 +1,44 @@
 import Link from "next/link";
 import type { Route } from "next";
-import { getRestaurants } from "../../lib/data";
+import { getRestaurants, publicAreaGroupOptions } from "../../lib/data";
 import { phoneHref } from "../phone-link";
 
-export default async function RestaurantsPage() {
+type RestaurantsPageProps = {
+  searchParams?: Promise<{
+    area?: string;
+  }>;
+};
+
+function queryFor(area: string) {
+  const query = new URLSearchParams();
+
+  if (area !== "All") {
+    query.set("area", area);
+  }
+
+  const queryText = query.toString();
+  return queryText ? `/restaurants?${queryText}` : "/restaurants";
+}
+
+export default async function RestaurantsPage({ searchParams }: RestaurantsPageProps) {
+  const params = await searchParams;
   const restaurants = await getRestaurants();
-  const withDeals = restaurants.filter((restaurant) => restaurant.publicDealCount > 0);
-  const sourceOnly = restaurants.filter((restaurant) => restaurant.publicDealCount === 0);
+  const areaOptions = ["All", ...publicAreaGroupOptions] as const;
+  const selectedArea = areaOptions.includes((params?.area ?? "All") as (typeof areaOptions)[number])
+    ? params?.area ?? "All"
+    : "All";
+  const visibleRestaurants = restaurants.filter(
+    (restaurant) => selectedArea === "All" || restaurant.areaGroup === selectedArea
+  );
+  const withDeals = visibleRestaurants.filter((restaurant) => restaurant.publicDealCount > 0);
+  const sourceOnly = visibleRestaurants.filter((restaurant) => restaurant.publicDealCount === 0);
+  const countForArea = (area: (typeof areaOptions)[number]) => {
+    if (area === "All") {
+      return restaurants.length;
+    }
+
+    return restaurants.filter((restaurant) => restaurant.areaGroup === area).length;
+  };
 
   return (
     <main className="pageShell">
@@ -31,7 +63,7 @@ export default async function RestaurantsPage() {
       <section className="summaryStrip" aria-label="Restaurant coverage summary">
         <div>
           <span className="statusLabel">Restaurants</span>
-          <strong>{restaurants.length}</strong>
+          <strong>{visibleRestaurants.length}</strong>
         </div>
         <div>
           <span className="statusLabel">With deals</span>
@@ -42,6 +74,20 @@ export default async function RestaurantsPage() {
           <strong>{sourceOnly.length}</strong>
         </div>
       </section>
+
+      <nav className="segmentedNav compactFilters" aria-label="Filter restaurants by area">
+        {areaOptions.map((area) => (
+          <Link
+            key={area}
+            href={queryFor(area) as Route}
+            className={area === selectedArea ? "active" : ""}
+            aria-current={area === selectedArea ? "page" : undefined}
+          >
+            <span>{area}</span>
+            <strong>{countForArea(area)}</strong>
+          </Link>
+        ))}
+      </nav>
 
       <section className="restaurantList" aria-label="Restaurants with deals">
         {withDeals.map((restaurant) => (

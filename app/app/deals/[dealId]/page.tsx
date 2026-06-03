@@ -87,8 +87,8 @@ export default async function DealDetailPage({ params }: DealPageProps) {
               <dd>{deal.lastVerifiedAt}</dd>
             </div>
             <div>
-              <dt>Saved wording</dt>
-              <dd>{deal.sourceQuote ? "Restaurant wording saved" : "Check the restaurant page"}</dd>
+              <dt>Restaurant wording</dt>
+              <dd>{deal.sourceQuote ? "Shown below" : "Check the restaurant page"}</dd>
             </div>
           </dl>
 
