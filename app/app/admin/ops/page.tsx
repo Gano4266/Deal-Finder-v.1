@@ -88,8 +88,8 @@ export default async function AdminOpsPage() {
               <dd>{dashboard.stats.directConfirmations}</dd>
             </div>
             <div>
-              <dt>Report inbox</dt>
-              <dd>{dashboard.stats.reportInboxConfigured ? "configured" : "not configured"}</dd>
+              <dt>Report flow</dt>
+              <dd>in-app form</dd>
             </div>
           </dl>
         </article>
@@ -282,8 +282,8 @@ export default async function AdminOpsPage() {
           <p className="eyebrow">Reports</p>
           <h2>Correction intake</h2>
           <p className="notes">
-            Reports remain a static mailto handoff. Configure `NEXT_PUBLIC_REPORT_EMAIL`
-            before relying on user or restaurant corrections.
+            Reports submit in the app. Durable storage and operator
+            notifications are the remaining backend work.
           </p>
           <div className="cardActions">
             <Link href={"/report" as Route} className="primaryLink">

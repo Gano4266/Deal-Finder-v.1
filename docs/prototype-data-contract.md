@@ -39,11 +39,11 @@ Do not hydrate public restaurant pages from seed candidates, review tasks, sourc
 
 ## Public `/report` Source
 
-The `/report` route is a lightweight correction intake surface. In the static prototype, it may read reviewed public deal context and public restaurant context only. It must not write data, publish user content, or imply that a report was stored unless a real backend exists.
+The `/report` route is a lightweight correction intake surface. In the static prototype, it may read reviewed public deal context and public restaurant context only. It must not publish user content or imply that anything changes automatically. Submissions go through `/api/reports`; HubSpot Forms API is the primary delivery path when configured.
 
 Reports and restaurant corrections are review inputs. A credible report should create or update a review task in ops, and affected public deals should be routed to `needs_review` or `needs_recheck` until resolved.
 
-If no reporting inbox is configured, `/report` should clearly say that submissions are not stored in the app yet.
+If no reporting inbox is configured in production, `/report` should clearly say that intake is unavailable or offer an emergency email fallback.
 
 ## Public Deal Filter
 

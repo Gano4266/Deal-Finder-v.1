@@ -17,7 +17,7 @@ The public MVP should provide:
 ### Local Diner
 
 1. Opens the mobile web app.
-2. Lands on tonight's deal feed.
+2. Lands on today's deal feed.
 3. Filters by neighborhood or deal type.
 4. Opens a deal to check restrictions and source.
 5. Reports a stale or incorrect deal if needed.

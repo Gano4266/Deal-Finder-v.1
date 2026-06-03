@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Route } from "next";
+import { PublicDealCard } from "../public-deal-card";
 import {
   type PublicDeal,
   dealRunsOnPublicDay,
@@ -22,7 +23,7 @@ type DealsPageProps = {
 const quickFilterOptions = [
   { value: "all", label: "All" },
   { value: "under-10", label: "Under $10" },
-  { value: "time-listed", label: "Time listed" }
+  { value: "time-listed", label: "Time shown" }
 ] as const;
 
 const sortOptions = [
@@ -122,6 +123,8 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
       return firstDayRank(left.daysAvailable) - firstDayRank(right.daysAvailable) ||
         left.restaurantName.localeCompare(right.restaurantName);
     });
+  const singleDayDeals = visibleDeals.filter((deal) => deal.scheduleKind === "single_day");
+  const recurringDeals = visibleDeals.filter((deal) => deal.scheduleKind === "recurring");
   const areaFilteredDeals = deals.filter((deal) => selectedArea === "All" || deal.areaGroup === selectedArea);
   const dayFilteredDeals = deals.filter((deal) => selectedDay === "All" || dealRunsOnPublicDay(deal, selectedDay));
   const dayAreaFilteredDeals = deals
@@ -145,23 +148,23 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
     <main className="pageShell">
       <section className="sectionHeader">
         <div>
-          <p className="eyebrow">All reviewed deals</p>
-          <h1>Reviewed Wilmington food specials</h1>
+          <p className="eyebrow">All deals</p>
+          <h1>Wilmington food specials</h1>
           <p>
-            Browse every source-backed prototype deal. `/tonight` only shows
-            deals matching today&apos;s weekday.
+            Browse food specials by day, area, price, and restaurant. Today
+            only shows deals matching today&apos;s weekday.
           </p>
           <p className="notes">
-            Static prototype data, not live availability. Confirm details with
-            the listed official source before ordering.
+            Details can change. Check the restaurant&apos;s latest post or site
+            before you order.
           </p>
         </div>
         <Link href="/tonight" className="secondaryLink">
-          Tonight
+          Today
         </Link>
       </section>
 
-      <nav className="segmentedNav" aria-label="Filter reviewed deals by day">
+      <nav className="segmentedNav" aria-label="Filter deals by day">
         {dayOptions.map((day) => (
           <Link
             key={day}
@@ -178,7 +181,7 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
       <section className="filterPanel" aria-label="Area, quick filter, and sort controls">
         <div>
           <p className="eyebrow">Area</p>
-          <nav className="segmentedNav compactFilters" aria-label="Filter reviewed deals by area">
+          <nav className="segmentedNav compactFilters" aria-label="Filter deals by area">
             {areaOptions.map((area) => (
               <Link
                 key={area}
@@ -195,7 +198,7 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
 
         <div>
           <p className="eyebrow">Quick filter</p>
-          <nav className="segmentedNav compactFilters" aria-label="Quick filter reviewed deals">
+          <nav className="segmentedNav compactFilters" aria-label="Quick filter deals">
             {quickFilterOptions.map((option) => (
               <Link
                 key={option.value}
@@ -212,7 +215,7 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
 
         <div>
           <p className="eyebrow">Sort</p>
-          <nav className="segmentedNav compactFilters" aria-label="Sort reviewed deals">
+          <nav className="segmentedNav compactFilters" aria-label="Sort deals">
             {sortOptions.map((option) => (
               <Link
                 key={option.value}
@@ -228,67 +231,55 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
       </section>
 
       {visibleDeals.length === 0 ? (
-        <section className="emptyState" aria-label="No reviewed deals for selected day">
-          <p className="eyebrow">No reviewed deal rows</p>
-          <h2>No reviewed deals match this filter yet.</h2>
+        <section className="emptyState" aria-label="No deals for selected day">
+          <p className="eyebrow">No matches yet</p>
+          <h2>No specials match this view yet.</h2>
           <p>
-            The static inventory may still have reviewed deals on other days or
-            areas.
+            Try another day, area, or quick filter.
           </p>
           <div className="cardActions">
             <Link href="/deals" className="primaryLink">
-              All reviewed deals
+              All deals
             </Link>
             <Link href="/tonight" className="secondaryLink">
-              Tonight
+              Today
             </Link>
           </div>
         </section>
       ) : (
-        <section className="dealList" aria-label="All reviewed deals">
-          {visibleDeals.map((deal) => (
-            <article key={deal.dealId} className="dealCard compactDealCard">
-              <div>
-                <p className="eyebrow">{deal.daysAvailableLabel} / {deal.restaurantName}</p>
-                <h2>{deal.publicTitle}</h2>
-                <div className="badgeRow" aria-label="Deal verification">
-                  <span>{deal.area}</span>
-                  {deal.area !== deal.areaGroup ? <span>{deal.areaGroup}</span> : null}
-                  <span>{deal.evidenceLabel}</span>
-                  <span>{deal.sourceDisplayName}</span>
-                  <span>{deal.freshnessLabel}</span>
+        <>
+          {singleDayDeals.length > 0 ? (
+            <section className="dealList" aria-label="Day-specific deals">
+              <div className="sectionTitleRow">
+                <div>
+                  <p className="eyebrow">Single-day specials</p>
+                  <h2>Day-specific specials</h2>
                 </div>
-                <p>{deal.publicDescription}</p>
-                <p className="locationLine">{deal.area}</p>
+                <span className="countPill">{singleDayDeals.length}</span>
               </div>
-              <dl className="factGrid compactFactGrid">
+              {singleDayDeals.map((deal) => (
+                <PublicDealCard key={deal.dealId} deal={deal} variant="compact" />
+              ))}
+            </section>
+          ) : null}
+
+          {recurringDeals.length > 0 ? (
+            <section className="secondaryDealSection" aria-label="Deals available more than one day">
+              <div className="sectionTitleRow">
                 <div>
-                  <dt>Price</dt>
-                  <dd>{deal.price || "See source"}</dd>
+                  <p className="eyebrow">Available other days too</p>
+                  <h2>Recurring specials</h2>
                 </div>
-                <div>
-                  <dt>When</dt>
-                  <dd>{deal.daysAvailableLabel} {deal.timeWindow}</dd>
-                </div>
-                <div>
-                  <dt>Recheck</dt>
-                  <dd>{deal.nextCheckDue || deal.expiresOn}</dd>
-                </div>
-              </dl>
-              <div className="cardActions">
-                <Link href={`/deals/${deal.dealId}`} className="primaryLink">
-                  Details
-                </Link>
-                <a href={deal.sourceUrl} className="secondaryLink">
-                  Source
-                </a>
-                <Link href={`/report?dealId=${deal.dealId}` as Route} className="secondaryLink">
-                  Report issue
-                </Link>
+                <span className="countPill">{recurringDeals.length}</span>
               </div>
-            </article>
-          ))}
-        </section>
+              <div className="dealList compactSecondaryList">
+                {recurringDeals.map((deal) => (
+                  <PublicDealCard key={deal.dealId} deal={deal} variant="secondary" />
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </>
       )}
 
     </main>

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { notFound } from "next/navigation";
-import { getPublicDealById, getPublicDeals } from "../../../lib/data";
+import { getPublicDealById, getPublicDeals, getRestaurantById } from "../../../lib/data";
+import { phoneHref } from "../../phone-link";
 
 type DealPageProps = {
   params: Promise<{
@@ -22,6 +23,9 @@ export default async function DealDetailPage({ params }: DealPageProps) {
     notFound();
   }
 
+  const restaurant = await getRestaurantById(deal.restaurantId);
+  const restaurantPhoneHref = restaurant ? phoneHref(restaurant.phone) : undefined;
+
   return (
     <main className="pageShell detailShell">
       <section className="sectionHeader">
@@ -30,8 +34,8 @@ export default async function DealDetailPage({ params }: DealPageProps) {
           <h1>{deal.publicTitle}</h1>
           <p>{deal.publicDescription}</p>
         </div>
-        <Link href="/tonight" className="secondaryLink">
-          Tonight
+        <Link href="/deals" className="secondaryLink">
+          All deals
         </Link>
       </section>
 
@@ -66,79 +70,67 @@ export default async function DealDetailPage({ params }: DealPageProps) {
               </dd>
             </div>
           </dl>
-          <p className="notes">{deal.restrictionNotes || "Restrictions not fully captured."}</p>
+          <p className="notes">
+            {deal.restrictionNotes || "Check the restaurant source for any extra restrictions."}
+          </p>
         </article>
 
         <article className="detailPanel">
-          <h2>Evidence</h2>
+          <h2>Where this came from</h2>
           <dl className="factGrid">
             <div>
-              <dt>Evidence</dt>
-              <dd>{deal.evidenceLabel}</dd>
-            </div>
-            <div>
-              <dt>Source</dt>
+              <dt>Restaurant source</dt>
               <dd>{deal.sourceDisplayName}</dd>
             </div>
             <div>
-              <dt>Last checked</dt>
+              <dt>Last confirmed</dt>
               <dd>{deal.lastVerifiedAt}</dd>
             </div>
             <div>
-              <dt>Freshness</dt>
-              <dd>{deal.freshnessLabel}</dd>
-            </div>
-            <div>
-              <dt>Captured</dt>
-              <dd>{deal.evidenceCapturedAt}</dd>
-            </div>
-            <div>
-              <dt>Proof type</dt>
-              <dd>{deal.screenshotUrl ? "Visual proof + source quote" : "Source quote"}</dd>
+              <dt>Saved wording</dt>
+              <dd>{deal.sourceQuote ? "Restaurant wording saved" : "Check the restaurant page"}</dd>
             </div>
           </dl>
 
-          <section className="proofCard" aria-label="Visual proof from source">
+          <section className="proofCard" aria-label="Restaurant source image and text">
             {deal.screenshotUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={deal.screenshotUrl}
-                alt={`Visual proof from ${deal.sourceDisplayName}`}
+                alt={`Restaurant source from ${deal.sourceDisplayName}`}
                 className="proofPreview"
                 fetchPriority="high"
                 loading="eager"
                 decoding="sync"
               />
             ) : (
-              <div className="proofPlaceholder">Visual proof not captured for this source.</div>
+              <div className="proofPlaceholder">No screenshot saved for this special.</div>
             )}
             <blockquote className="proofQuote">
-              {deal.sourceQuote || deal.evidenceSummary || "Proof details unavailable; use the official source link to confirm."}
+              {deal.sourceQuote || "Check the restaurant page for the latest details."}
             </blockquote>
-            <p className="proofCaption">
-              {deal.evidenceSummary || `Captured from ${deal.sourceDisplayName}.`}
-            </p>
-            <dl className="proofMeta">
-              <div>
-                <dt>Internal artifact</dt>
-                <dd>{deal.archiveUrlOrPath || "Not recorded"}</dd>
-              </div>
-              <div>
-                <dt>Visual proof path</dt>
-                <dd>{deal.screenshotPath || "Not recorded"}</dd>
-              </div>
-            </dl>
+            <p className="proofCaption">Last confirmed {deal.lastVerifiedAt}.</p>
           </section>
 
           <div className="cardActions">
             <a href={deal.sourceUrl} className="primaryLink">
-              Open official source
+              Check restaurant source
             </a>
+            <Link href={`/restaurants/${deal.restaurantId}` as Route} className="secondaryLink">
+              View restaurant
+            </Link>
+            {restaurantPhoneHref ? (
+              <a href={restaurantPhoneHref} className="secondaryLink">
+                Call restaurant
+              </a>
+            ) : null}
             <Link href={`/report?dealId=${deal.dealId}` as Route} className="secondaryLink">
-              Report issue
+              Send update
             </Link>
           </div>
-          <p className="notes">{deal.prototypeNotice}</p>
+          <p className="notes">
+            Details can change. Check the restaurant&apos;s latest post or site before you order.
+          </p>
         </article>
       </section>
     </main>

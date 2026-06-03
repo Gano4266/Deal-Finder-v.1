@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { notFound } from "next/navigation";
 import { getRestaurantById, getRestaurants } from "../../../lib/data";
+import { phoneHref } from "../../phone-link";
 
 type RestaurantPageProps = {
   params: Promise<{
@@ -30,12 +31,12 @@ export default async function RestaurantDetailPage({ params }: RestaurantPagePro
           <h1>{restaurant.name}</h1>
           <p>
             {restaurant.publicDealCount > 0
-              ? `${restaurant.publicDealCount} reviewed food-special row${restaurant.publicDealCount === 1 ? "" : "s"} in the static prototype.`
-              : "No reviewed public food-special rows yet. This restaurant remains in the source/review backlog."}
+              ? `${restaurant.publicDealCount} food special${restaurant.publicDealCount === 1 ? "" : "s"} listed.`
+              : "No food specials are ready for this restaurant yet."}
           </p>
           <p className="notes">
-            Static prototype data, not live availability. Confirm details with
-            the listed official source before ordering.
+            Details can change. Check the restaurant&apos;s latest post or site
+            before you order.
           </p>
         </div>
         <Link href={"/restaurants" as Route} className="secondaryLink">
@@ -53,45 +54,56 @@ export default async function RestaurantDetailPage({ params }: RestaurantPagePro
             </div>
             <div>
               <dt>Address</dt>
-              <dd>{restaurant.address || "Address not captured"}</dd>
+              <dd>{restaurant.address || "Not listed"}</dd>
             </div>
             <div>
               <dt>Phone</dt>
-              <dd>{restaurant.phone || "Not captured"}</dd>
+              <dd>
+                {phoneHref(restaurant.phone) ? (
+                  <a href={phoneHref(restaurant.phone)}>{restaurant.phone}</a>
+                ) : (
+                  "Not listed"
+                )}
+              </dd>
             </div>
             <div>
               <dt>Cuisine</dt>
-              <dd>{restaurant.cuisine || restaurant.tags || "Not captured"}</dd>
+              <dd>{restaurant.cuisine || restaurant.tags || "Not listed"}</dd>
             </div>
             <div>
-              <dt>Last checked</dt>
-              <dd>{restaurant.lastChecked || "Not captured"}</dd>
+              <dt>Last confirmed</dt>
+              <dd>{restaurant.lastChecked || "Not listed"}</dd>
             </div>
           </dl>
           <div className="cardActions">
+            {phoneHref(restaurant.phone) ? (
+              <a href={phoneHref(restaurant.phone)} className="primaryLink">
+                Call restaurant
+              </a>
+            ) : null}
             {restaurant.website ? (
-              <a href={restaurant.website} className="primaryLink">
-                Official source
+              <a href={restaurant.website} className={phoneHref(restaurant.phone) ? "secondaryLink" : "primaryLink"}>
+                Official site
               </a>
             ) : null}
             <Link href={`/report?restaurantId=${restaurant.restaurantId}` as Route} className="secondaryLink">
-              Report issue
+              Send update
             </Link>
           </div>
         </article>
 
         <article className="detailPanel">
-          <h2>Reviewed deals</h2>
+          <h2>Specials</h2>
           {restaurant.deals.length === 0 ? (
             <p className="notes">
-              No public deal rows are approved for this restaurant yet.
+              No current specials are listed for this restaurant yet.
             </p>
           ) : (
             <div className="miniDealList">
               {restaurant.deals.map((deal) => (
                 <Link key={deal.dealId} href={`/deals/${deal.dealId}`} className="miniDeal">
                   <span>{deal.publicTitle}</span>
-                  <small>{deal.daysAvailableLabel} / {deal.timeWindow}</small>
+                  <small>{deal.scheduleLabel} / {deal.daysAvailableLabel} / {deal.timeWindow}</small>
                 </Link>
               ))}
             </div>

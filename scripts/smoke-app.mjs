@@ -150,28 +150,69 @@ async function check(label, task) {
   }
 }
 
-await check("home", () => assertPage("/", ["Deal Finder", "Tonight"]));
+await check("home", () => assertPage("/", ["Forkcast", "Today"]));
 await check("robots noindex", () => assertPage("/robots.txt", ["User-Agent: *", "Disallow: /"]));
-await check("pwa manifest", () => assertJson("/manifest.webmanifest", ["Deal Finder Wilmington", "\"start_url\":\"/tonight\"", "\"display\":\"standalone\""]));
+await check("pwa manifest", () => assertJson("/manifest.webmanifest", ["Forkcast Wilmington", "\"start_url\":\"/tonight\"", "\"display\":\"standalone\""]));
 await check("pwa icon 192", () => assertAsset("/icon-192.png"));
 await check("pwa icon 512", () => assertAsset("/icon-512.png"));
 await check("pwa apple touch icon", () => assertAsset("/apple-touch-icon.png"));
-await check("tonight", () => assertPage("/tonight", ["Tonight in Wilmington", "Static prototype data"]));
-await check("deals filters", () => assertPage("/deals?area=Downtown&day=Tuesday&quick=under-10&sort=area", ["Under $10", "Reviewed Wilmington food specials"]));
+await check("tonight", () => assertPage("/tonight", ["Today in Wilmington", "Details can change"]));
+await check("deals filters", () => assertPage("/deals?area=Downtown&day=Tuesday&quick=under-10&sort=area", ["Under $10", "Wilmington food specials"]));
 await check("monkey junction filter", () => assertPage("/deals?area=Monkey%20Junction", ["Monkey Junction", "non-alcoholic drink purchase"]));
 await check("carryout removed", () => assertMissingPage("/carryout"));
 await check("report", async () => {
-  const body = await assertPage("/report", ["Report stale or incorrect deal info", "Reports open an email draft"]);
-  assert(body.includes("mailto:"), "/report: missing mailto handoff");
+  const body = await assertPage("/report", [
+    "Share a Forkcast update",
+    "Correct info",
+    "Suggest a restaurant",
+    "Send a special",
+    "Send update"
+  ]);
+  assert(!body.includes("mailto:"), "/report: should not rely on mailto handoff");
 });
+if (process.env.DEAL_FINDER_SMOKE_SKIP_REPORT_POST === "1") {
+  await check("report submit api skipped", async () => undefined);
+} else {
+  await check("report submit api", async () => {
+    const response = await fetch(`${baseUrl}/api/reports`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Forkcast-Smoke-Test": "true"
+      },
+      body: JSON.stringify({
+        deal_id: "smoke-deal-id",
+        deal_title: "Smoke test special",
+        deal_url: "https://example.com/smoke-deal",
+        message: "Smoke test report",
+        page_url: `${baseUrl}/report`,
+        preferred_contact: "no follow-up",
+        reporter_email: "smoke@example.com",
+        reporter_name: "Smoke Tester",
+        restaurant_id: "smoke-restaurant-id",
+        restaurant_name: "Smoke test",
+        source_context: "Smoke test",
+        submission_type: "submit_deal"
+      })
+    });
+    const body = await response.json();
+    assert(response.status === 200, `/api/reports: expected 200, got ${response.status}`);
+    assert(
+      body.message === "Thanks. This will be reviewed before anything changes on the site." ||
+        body.message === "Local test received. Add HubSpot settings before sharing this form." ||
+        body.message === "Smoke test received. Report intake dry-run is enabled.",
+      "/api/reports: unexpected success copy"
+    );
+  });
+}
 await check("report with deal context", () => assertPage("/report?dealId=deal-beat-street-tuesday-2-tacos", [
-  "Report stale or incorrect deal info",
+  "Share a Forkcast update",
   "$2 tacos at Beat Street"
 ]));
 await check("report with restaurant context", () => assertPage("/report?restaurantId=beat-street", [
-  "Report stale or incorrect deal info",
+  "Share a Forkcast update",
   "Beat Street",
-  "Tracked restaurant"
+  "Restaurant"
 ]));
 if (adminMode === "enabled") {
   await check("admin", () => assertPage("/admin", ["Ops dashboard"]));
@@ -188,15 +229,15 @@ if (adminMode === "enabled") {
 }
 await check("restaurants index", async () => {
   const body = await assertPage("/restaurants", [
-    "Restaurants being tracked",
-    "Source-only restaurants",
-    "Deal counts include only reviewed public food-special rows"
+    "Wilmington restaurants",
+    "On our radar",
+    "Forkcast is tracking"
   ]);
 
   assert(!body.includes("PinPoint Restaurant"), "/restaurants: needs_review restaurant should not render publicly");
 });
 await check("invalid deal filters fallback", () => assertPage("/deals?area=Nope&day=Funday&quick=nope&sort=nope", [
-  "Reviewed Wilmington food specials",
+  "Wilmington food specials",
   "$2 tacos at Beat Street"
 ]));
 await check("missing deal 404", () => assertMissingPage("/deals/not-a-real-deal"));
@@ -204,8 +245,8 @@ await check("missing restaurant 404", () => assertMissingPage("/restaurants/not-
 await check("withheld restaurant 404", () => assertMissingPage("/restaurants/pinpoint-restaurant"));
 await check("sample deal proof UI", () => assertPage("/deals/deal-beat-street-tuesday-2-tacos", [
   "$2 tacos at Beat Street",
-  "Visual proof path",
-  "Open official source",
+  "Restaurant wording saved",
+  "Check restaurant source",
   "/evidence/source-screenshots/src-beat-street-primary.png"
 ]));
 await check("sample restaurant deals", () => assertPage("/restaurants/beat-street", [
@@ -217,7 +258,7 @@ await check("sample restaurant deals", () => assertPage("/restaurants/beat-stree
 for (const deal of deals) {
   await check(`deal ${deal.deal_id}`, () => assertPage(`/deals/${deal.deal_id}`, [
     deal.deal_id,
-    "Visual proof + source quote",
+    "Where this came from",
     publicAssetUrl(deal.screenshot_path)
   ]));
 }

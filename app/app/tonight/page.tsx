@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Route } from "next";
+import { PublicDealCard } from "../public-deal-card";
 import {
   getPrototypeStats,
   getPublicDeals,
@@ -27,30 +28,31 @@ export default async function TonightPage() {
       left.areaGroup.localeCompare(right.areaGroup) ||
       left.restaurantName.localeCompare(right.restaurantName)
   );
+  const singleDayDeals = sortedDeals.filter((deal) => deal.scheduleKind === "single_day");
+  const recurringDeals = sortedDeals.filter((deal) => deal.scheduleKind === "recurring");
 
   return (
     <main className="pageShell">
       <section className="heroBand">
         <div>
-          <p className="eyebrow">Verified food deals</p>
-          <h1>Tonight in Wilmington</h1>
+          <p className="eyebrow">Today&apos;s forecast</p>
+          <h1>Today in Wilmington</h1>
           <p className="lede">
-            Showing reviewed static prototype rows matching {day}, {dateLabel}.
-            Every listed deal has source evidence and a recheck date.
+            Food specials listed for {day}, {dateLabel}.
           </p>
           <p className="notes">
-            Static prototype data, not live availability. Confirm details with
-            the listed official source before ordering.
+            Details can change. Check the restaurant&apos;s latest post or site
+            before you order.
           </p>
         </div>
-        <div className="statusPanel" aria-label="Prototype status">
-          <span className="statusLabel">Reviewed tonight</span>
+        <div className="statusPanel" aria-label="Deal status">
+          <span className="statusLabel">Today</span>
           <strong>{deals.length}</strong>
-          <span>{stats.publicDealsPassingFilter} total reviewed deals</span>
+          <span>{stats.publicDealsPassingFilter} total listed deals</span>
         </div>
       </section>
 
-      <nav className="dayCoverage" aria-label="Reviewed deal coverage by day">
+      <nav className="dayCoverage" aria-label="Deal coverage by day">
         {dayCounts.map(({ day: dayOption, count }) => (
           <Link
             key={dayOption}
@@ -64,7 +66,7 @@ export default async function TonightPage() {
         ))}
       </nav>
 
-      <nav className="segmentedNav compactFilters" aria-label="Reviewed tonight by area">
+      <nav className="segmentedNav compactFilters" aria-label="Deals today by area">
         {areaCounts.map(({ area, count }) => (
           <Link
             key={area}
@@ -76,7 +78,7 @@ export default async function TonightPage() {
         ))}
       </nav>
 
-      <nav className="segmentedNav compactFilters" aria-label="Quick scans for tonight">
+      <nav className="segmentedNav compactFilters" aria-label="Quick scans for today">
         <Link href={`/deals?day=${day}&quick=under-10` as Route}>
           <span>Under $10</span>
         </Link>
@@ -88,64 +90,46 @@ export default async function TonightPage() {
       {deals.length === 0 ? (
         <section className="emptyState" aria-label="No public deals">
           <p className="eyebrow">Nothing listed for {day}</p>
-          <h2>No reviewed food deals are listed for tonight yet.</h2>
+          <h2>No specials are on the board for {day} yet.</h2>
           <p>
-            The reviewed prototype has deals on other days. Check all reviewed
-            deals while more Wilmington sources are being confirmed.
+            Try another day while we keep adding Wilmington specials.
           </p>
           <Link href="/deals" className="primaryLink">
-            See all reviewed deals
+            See all deals
           </Link>
         </section>
       ) : (
-        <section className="dealList" aria-label="Public deals">
-          {sortedDeals.map((deal) => (
-            <article key={deal.dealId} className="dealCard">
+        <>
+          <section className="dealList" aria-label="Today specials">
+            <div className="sectionTitleRow">
               <div>
-                <p className="eyebrow">{deal.restaurantName}</p>
-                <h2>{deal.publicTitle}</h2>
-                <div className="badgeRow" aria-label="Deal verification">
-                  <span>{deal.evidenceLabel}</span>
-                  <span>{deal.areaGroup}</span>
-                  <span>{deal.sourceDisplayName}</span>
-                  <span>Verified {deal.lastVerifiedAt}</span>
-                  <span>{deal.freshnessLabel}</span>
-                </div>
-                <p>{deal.publicDescription}</p>
-                <p className="locationLine">{deal.neighborhood || deal.address}</p>
+                <p className="eyebrow">Worth checking first</p>
+                <h2>Today&apos;s specials</h2>
               </div>
-              <dl className="factGrid">
+              <span className="countPill">{singleDayDeals.length}</span>
+            </div>
+            {singleDayDeals.map((deal) => (
+              <PublicDealCard key={deal.dealId} deal={deal} />
+            ))}
+          </section>
+
+          {recurringDeals.length > 0 ? (
+            <section className="secondaryDealSection" aria-label="More deals available today">
+              <div className="sectionTitleRow">
                 <div>
-                  <dt>Price</dt>
-                  <dd>{deal.price || "See source"}</dd>
+                  <p className="eyebrow">Available other days too</p>
+                  <h2>Also good today</h2>
                 </div>
-                <div>
-                  <dt>When</dt>
-                  <dd>{deal.daysAvailableLabel} {deal.timeWindow}</dd>
-                </div>
-                <div>
-                  <dt>Checked</dt>
-                  <dd>{deal.lastVerifiedAt}</dd>
-                </div>
-                <div>
-                  <dt>Recheck</dt>
-                  <dd>{deal.nextCheckDue || deal.expiresOn}</dd>
-                </div>
-              </dl>
-              <div className="cardActions">
-                <Link href={`/deals/${deal.dealId}`} className="primaryLink">
-                  Details
-                </Link>
-                <a href={deal.sourceUrl} className="secondaryLink">
-                  Official source
-                </a>
-                <Link href={`/report?dealId=${deal.dealId}` as Route} className="secondaryLink">
-                  Report issue
-                </Link>
+                <span className="countPill">{recurringDeals.length}</span>
               </div>
-            </article>
-          ))}
-        </section>
+              <div className="dealList compactSecondaryList">
+                {recurringDeals.map((deal) => (
+                  <PublicDealCard key={deal.dealId} deal={deal} variant="secondary" />
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </>
       )}
     </main>
   );

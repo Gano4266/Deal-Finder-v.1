@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { getPublicDealById, getRestaurantById } from "../../lib/data";
+import { ReportForm } from "./report-form";
 
 type ReportPageProps = {
   searchParams?: Promise<{
@@ -9,32 +10,12 @@ type ReportPageProps = {
   }>;
 };
 
-function reportSubject(contextLabel: string): string {
-  return `Deal Finder report: ${contextLabel}`;
-}
-
-function reportBody(contextLabel: string, contextUrl: string): string {
-  const lines = [
-    `Deal/restaurant: ${contextLabel}`,
-    ...(contextUrl ? [`Page: ${contextUrl}`] : []),
-    "",
-    "Issue:",
-    "",
-    "Correct info or source:",
-    "",
-    "Your name/contact, optional:"
-  ];
-
-  return lines.join("\n");
-}
-
-function mailtoHref(to: string, subject: string, body: string): string {
-  const query = new URLSearchParams({
-    subject,
-    body
-  });
-
-  return `mailto:${to}?${query.toString()}`;
+function reportIntakeAvailable() {
+  return Boolean(
+    (process.env.HUBSPOT_PORTAL_ID && process.env.HUBSPOT_INTAKE_FORM_GUID) ||
+    process.env.REPORT_WEBHOOK_URL ||
+    process.env.NODE_ENV !== "production"
+  );
 }
 
 export default async function ReportPage({ searchParams }: ReportPageProps) {
@@ -44,38 +25,46 @@ export default async function ReportPage({ searchParams }: ReportPageProps) {
     params?.restaurantId ? getRestaurantById(params.restaurantId) : Promise.resolve(undefined)
   ]);
   const restaurant = restaurantFromParam ?? (deal ? await getRestaurantById(deal.restaurantId) : undefined);
-  const contextLabel = deal?.publicTitle ?? restaurant?.name ?? "general Wilmington correction";
+  const contextLabel = deal?.publicTitle ?? restaurant?.name ?? "general Wilmington report";
   const contextPath = deal
     ? `/deals/${deal.dealId}`
     : restaurant
       ? `/restaurants/${restaurant.restaurantId}`
       : "";
-  const reportEmail = process.env.NEXT_PUBLIC_REPORT_EMAIL ?? "";
-  const subject = reportSubject(contextLabel);
-  const body = reportBody(contextLabel, contextPath);
+  const contextType = deal ? "deal" : restaurant ? "restaurant" : "general";
+  const intakeAvailable = reportIntakeAvailable();
+  const emergencyEmail = process.env.NEXT_PUBLIC_REPORT_EMAIL;
 
   return (
     <main className="pageShell detailShell">
       <section className="sectionHeader">
         <div>
-          <p className="eyebrow">Correction intake</p>
-          <h1>Report stale or incorrect deal info</h1>
+          <p className="eyebrow">Send an update</p>
+          <h1>Share a Forkcast update</h1>
           <p>
-            Send a quick correction if a deal looks stale, wrong, or missing a
-            source detail.
+            Spotted a change, missing restaurant, or special worth adding?
+            Send it our way.
           </p>
-          <p className="notes">
-            Reports open an email draft. Nothing publishes automatically.
-          </p>
+          {!intakeAvailable ? (
+            <p className="notes">
+              This form is not connected yet. Please check back later.
+              {emergencyEmail ? (
+                <>
+                  {" "}For now, email{" "}
+                  <a href={`mailto:${emergencyEmail}`}>{emergencyEmail}</a>.
+                </>
+              ) : null}
+            </p>
+          ) : null}
         </div>
-        <Link href="/tonight" className="secondaryLink">
-          Tonight
+        <Link href="/deals" className="secondaryLink">
+          All deals
         </Link>
       </section>
 
       <section className="detailGrid">
         <article className="detailPanel">
-          <h2>Report context</h2>
+          <h2>What you&apos;re updating</h2>
           <dl className="factGrid">
             <div>
               <dt>Item</dt>
@@ -86,46 +75,38 @@ export default async function ReportPage({ searchParams }: ReportPageProps) {
               <dd>{restaurant?.name ?? deal?.restaurantName ?? "Not specified"}</dd>
             </div>
             <div>
-              <dt>Source status</dt>
-              <dd>{deal ? "Reviewed public deal" : restaurant ? "Tracked restaurant" : "General report"}</dd>
+              <dt>Type</dt>
+              <dd>{deal ? "Deal" : restaurant ? "Restaurant" : "General report"}</dd>
             </div>
             <div>
-              <dt>Prototype action</dt>
-              <dd>{reportEmail ? "Email operator for review" : "Use fallback template"}</dd>
+              <dt>Next step</dt>
+              <dd>Thanks. This will be reviewed before anything changes on the site.</dd>
             </div>
           </dl>
         </article>
 
         <article className="detailPanel">
-          <h2>What to include</h2>
-          <div className="reportChecklist">
-            <p>What looks wrong</p>
-            <p>The correct deal info, if you know it</p>
-            <p>A source link or restaurant confirmation</p>
-          </div>
+          <h2>Send update</h2>
+          <ReportForm
+            contextLabel={contextLabel}
+            contextPath={contextPath}
+            contextType={contextType}
+            dealId={deal?.dealId}
+            dealTitle={deal?.publicTitle}
+            intakeAvailable={intakeAvailable}
+            restaurantName={restaurant?.name ?? deal?.restaurantName}
+            restaurantId={restaurant?.restaurantId}
+          />
           <div className="cardActions">
-            {reportEmail ? (
-              <a href={mailtoHref(reportEmail, subject, body)} className="primaryLink">
-                Email correction
-              </a>
-            ) : (
-              <span className="disabledLink">
-                Reporting inbox not configured
-              </span>
-            )}
             {contextPath ? (
               <Link href={contextPath as Route} className="secondaryLink">
                 Back to context
               </Link>
             ) : (
               <Link href="/deals" className="secondaryLink">
-              Reviewed deals
-            </Link>
+                All deals
+              </Link>
           )}
-          </div>
-          <div className="copyBox" aria-label="Copyable correction template">
-            <p className="eyebrow">Fallback template</p>
-            <pre>{body}</pre>
           </div>
         </article>
       </section>

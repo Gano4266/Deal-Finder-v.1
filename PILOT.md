@@ -16,7 +16,7 @@ PASTE_LIVE_URL
 
 On iPhone: open in Safari, tap Share, then Add to Home Screen.
 
-If anything looks wrong or stale, tap “Report issue” on the deal page.
+If anything looks wrong or stale, tap “Send update” on the deal page.
 ```
 
 ## What To Ask
@@ -26,7 +26,7 @@ If anything looks wrong or stale, tap “Report issue” on the deal page.
 - Was the source/proof visible enough to trust?
 - Was the app too crowded on your phone?
 - Did Add to Home Screen work?
-- Did Report issue open a usable email draft?
+- Did Send update submit in the app and show the review message?
 
 ## Pilot Rules
 

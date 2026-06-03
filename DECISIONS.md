@@ -31,3 +31,9 @@ Reason: Source formats are messy, social posts are stale quickly, and AI extract
 Decision: Use repo-managed CSV and Markdown templates for the first operating workflow.
 
 Reason: They are easy to audit, version, and later import into a database.
+
+## 2026-06-03: Forkcast Brand Direction
+
+Decision: Use Forkcast as the product name and lock the brand direction around "Today's forecast."
+
+Reason: Forkcast gives the product a stronger, more memorable frame than Deal Finder. It supports a local dining intelligence position instead of a generic coupon or listing-app position. The exact production logo vector remains provisional until the Signal F mark is tested at app-icon sizes.

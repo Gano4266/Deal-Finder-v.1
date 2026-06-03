@@ -1,10 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import { readCsv, type CsvRow } from "./csv";
-
-const moduleDir = dirname(fileURLToPath(import.meta.url));
 
 function hasPrototypeFixtures(directory: string): boolean {
   return existsSync(path.join(directory, "fixtures/prototype/deals.csv"));
@@ -38,7 +35,7 @@ function resolveRepoRoot(): string {
     throw new Error(`DEAL_FINDER_REPO_ROOT does not contain fixtures/prototype/deals.csv: ${configuredRoot}`);
   }
 
-  const discoveredRoot = [process.cwd(), moduleDir]
+  const discoveredRoot = [process.cwd()]
     .map(searchForRepoRoot)
     .find((value): value is string => Boolean(value));
 
@@ -79,6 +76,8 @@ export type PublicDeal = {
   price: string;
   daysAvailable: string;
   daysAvailableLabel: string;
+  scheduleKind: "single_day" | "recurring";
+  scheduleLabel: string;
   timeWindow: string;
   sourceUrl: string;
   sourceName: string;
@@ -147,11 +146,13 @@ export type SourceGapAreaGroup = (typeof sourceGapAreaGroupOptions)[number];
 
 export type RestaurantSummary = {
   restaurantId: string;
+  restaurantIds: string[];
   name: string;
   neighborhood: string;
   areaGroup: PublicAreaGroup;
   address: string;
   phone: string;
+  phoneHref: string;
   website: string;
   cuisine: string;
   tags: string;
@@ -279,7 +280,6 @@ export type OpsDashboard = {
     dueSoonSourceChecks: number;
     overdueSourceChecks: number;
     failedSourceChecks: number;
-    reportInboxConfigured: boolean;
   };
   recheckQueue: OpsRecheckItem[];
   evidenceGapDeals: OpsRecheckItem[];
@@ -287,7 +287,6 @@ export type OpsDashboard = {
   sourceGaps: SourceGap[];
   recentAuditEvents: OpsRecentAuditEvent[];
   manifestDrift: OpsManifestDrift[];
-  reportEmail: string;
 };
 
 function isTrue(value: string): boolean {
@@ -492,6 +491,31 @@ function formatDaysAvailableLabel(daysAvailable: string): string {
   return values.join(" / ");
 }
 
+function classifyDealSchedule(daysAvailable: string) {
+  const values = daysAvailable
+    .split(/[;,]/)
+    .map((value) => value.trim().toLowerCase())
+    .filter(Boolean);
+  const normalizedValues = new Set(values);
+  const matchingDays = publicDealDayOptions.filter((day) => valueRunsOnDay(daysAvailable, day));
+  const recurring =
+    normalizedValues.has("daily") ||
+    normalizedValues.has("every day") ||
+    normalizedValues.has("weekdays") ||
+    matchingDays.length !== 1;
+  const recurringLabel =
+    normalizedValues.has("daily") || normalizedValues.has("every day")
+      ? "Daily"
+      : normalizedValues.has("weekdays")
+        ? "Weekdays"
+        : "Multiple days";
+
+  return {
+    scheduleKind: recurring ? "recurring" as const : "single_day" as const,
+    scheduleLabel: recurring ? recurringLabel : `${matchingDays[0]} special`
+  };
+}
+
 export function dealRunsOnPublicDay(deal: PublicDeal, day: string): boolean {
   return valueRunsOnDay(deal.daysAvailable, day);
 }
@@ -618,6 +642,7 @@ export function passesPublicDealFilter(row: CsvRow, date = getOperatingDate()): 
 function mapDeal(row: CsvRow, restaurantsById: Map<string, CsvRow>): PublicDeal {
   const restaurant = restaurantsById.get(row.restaurant_id);
   const freshnessDate = row.expires_on || row.next_check_due;
+  const schedule = classifyDealSchedule(row.days_available);
 
   return {
     dealId: row.deal_id,
@@ -633,16 +658,18 @@ function mapDeal(row: CsvRow, restaurantsById: Map<string, CsvRow>): PublicDeal 
     price: row.price || row.discount,
     daysAvailable: row.days_available,
     daysAvailableLabel: formatDaysAvailableLabel(row.days_available),
+    scheduleKind: schedule.scheduleKind,
+    scheduleLabel: schedule.scheduleLabel,
     timeWindow: toTimeWindow(row.start_time, row.end_time),
     sourceUrl: row.source_url,
     sourceName: row.source_name,
     sourceTier: row.source_tier,
     sourceDisplayName: row.source_name || "Official source",
-    evidenceLabel: row.direct_confirmation_id ? "Direct restaurant confirmation" : "Official source capture",
+    evidenceLabel: row.direct_confirmation_id ? "Restaurant confirmed" : "Proof checked",
     evidenceCapturedAt: row.evidence_captured_at,
     evidenceSummary: row.evidence_summary,
     evidenceUrlOrPath: row.evidence_url_or_path,
-    freshnessLabel: freshnessDate ? `Fresh through ${formatDateLabel(freshnessDate)}` : "Freshness date missing",
+    freshnessLabel: freshnessDate ? `Checked through ${formatDateLabel(freshnessDate)}` : "Check date missing",
     lastVerifiedAt: row.last_verified_at,
     nextCheckDue: row.next_check_due,
     expiresOn: row.expires_on,
@@ -699,16 +726,55 @@ function uniqueDealDays(deals: PublicDeal[]): string[] {
   return publicDealDayOptions.filter((day) => deals.some((deal) => valueRunsOnDay(deal.daysAvailable, day)));
 }
 
-function mapRestaurant(row: CsvRow, deals: PublicDeal[]): RestaurantSummary {
-  const restaurantDeals = deals.filter((deal) => deal.restaurantId === row.restaurant_id);
+function canonicalRestaurantKey(row: CsvRow): string {
+  const name = (row.name ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  const address = (row.address ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  return address ? `${name}|${address}` : name;
+}
+
+function groupRestaurantRows(rows: CsvRow[]): CsvRow[][] {
+  const groups = new Map<string, CsvRow[]>();
+
+  rows.forEach((row) => {
+    const key = canonicalRestaurantKey(row);
+    const group = groups.get(key) ?? [];
+    group.push(row);
+    groups.set(key, group);
+  });
+
+  return Array.from(groups.values());
+}
+
+function dealBelongsToRestaurant(deal: PublicDeal, restaurantIds: string[]) {
+  return restaurantIds.includes(deal.restaurantId);
+}
+
+function phoneHref(value: string): string {
+  const digits = value.replace(/\D/g, "");
+
+  if (digits.length === 10) {
+    return `tel:+1${digits}`;
+  }
+
+  if (digits.length === 11 && digits.startsWith("1")) {
+    return `tel:+${digits}`;
+  }
+
+  return "";
+}
+
+function mapRestaurant(row: CsvRow, deals: PublicDeal[], restaurantIds = [row.restaurant_id]): RestaurantSummary {
+  const restaurantDeals = deals.filter((deal) => dealBelongsToRestaurant(deal, restaurantIds));
 
   return {
     restaurantId: row.restaurant_id,
+    restaurantIds,
     name: row.name,
     neighborhood: row.neighborhood,
     areaGroup: areaGroupForLocation(row.neighborhood, row.name),
     address: row.address,
     phone: row.phone,
+    phoneHref: phoneHref(row.phone),
     website: row.official_website,
     cuisine: row.cuisine,
     tags: row.tags,
@@ -779,9 +845,10 @@ export async function getRestaurants(): Promise<RestaurantSummary[]> {
     getPublicDeals()
   ]);
 
-  return restaurantRows
-    .filter((row) => passesPublicRestaurantFilter(row) && !isPublicRestaurantHold(row))
-    .map((row) => mapRestaurant(row, deals))
+  const publicRows = restaurantRows.filter((row) => passesPublicRestaurantFilter(row) && !isPublicRestaurantHold(row));
+
+  return groupRestaurantRows(publicRows)
+    .map((rows) => mapRestaurant(rows[0], deals, rows.map((row) => row.restaurant_id)))
     .sort(
       (left, right) =>
         right.publicDealCount - left.publicDealCount ||
@@ -794,21 +861,21 @@ export async function getRestaurantById(restaurantId: string): Promise<Restauran
     readCsv(restaurantsPath),
     getPublicDeals()
   ]);
-  const row = restaurantRows.find(
-    (restaurant) =>
-      restaurant.restaurant_id === restaurantId &&
-      passesPublicRestaurantFilter(restaurant) &&
-      !isPublicRestaurantHold(restaurant)
+  const publicRows = restaurantRows.filter((row) => passesPublicRestaurantFilter(row) && !isPublicRestaurantHold(row));
+  const group = groupRestaurantRows(publicRows).find((rows) =>
+    rows.some((restaurant) => restaurant.restaurant_id === restaurantId)
   );
+  const row = group?.[0];
 
   if (!row) {
     return undefined;
   }
 
-  const restaurantDeals = deals.filter((deal) => deal.restaurantId === restaurantId);
+  const restaurantIds = group.map((restaurant) => restaurant.restaurant_id);
+  const restaurantDeals = deals.filter((deal) => dealBelongsToRestaurant(deal, restaurantIds));
 
   return {
-    ...mapRestaurant(row, deals),
+    ...mapRestaurant(row, deals, restaurantIds),
     deals: restaurantDeals
   };
 }
@@ -1202,8 +1269,7 @@ export async function getOpsDashboard(date = getOperatingDate(), horizonDays = 1
       evidenceGapDeals: evidenceGapDeals.length,
       dueSoonSourceChecks: countRowsDue(sourceCheckRows, date, horizonDays),
       overdueSourceChecks: countRowsOverdue(sourceCheckRows, date),
-      failedSourceChecks: sourceCheckRows.filter(isFailedSourceCheck).length,
-      reportInboxConfigured: !isBlank(process.env.NEXT_PUBLIC_REPORT_EMAIL ?? "")
+      failedSourceChecks: sourceCheckRows.filter(isFailedSourceCheck).length
     },
     recheckQueue,
     evidenceGapDeals,
@@ -1222,8 +1288,7 @@ export async function getOpsDashboard(date = getOperatingDate(), horizonDays = 1
         dealId: row.related_deal_id,
         evidenceRef: row.evidence_ref
       })),
-    manifestDrift: manifestDrift(actualCounts),
-    reportEmail: process.env.NEXT_PUBLIC_REPORT_EMAIL ?? ""
+    manifestDrift: manifestDrift(actualCounts)
   };
 }
 

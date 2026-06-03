@@ -1,13 +1,18 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { AppHeader } from "./app-header";
+import { PrimaryNav } from "./primary-nav";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Deal Finder Wilmington",
-  description: "Source-grounded Wilmington, NC restaurant food deals.",
+  title: "Forkcast Wilmington",
+  description: "Today's forecast for Wilmington, NC food specials.",
   icons: {
     icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/icon-512.png", sizes: "512x512", type: "image/png" }
     ],
@@ -16,12 +21,12 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Deal Finder"
+    title: "Forkcast"
   }
 };
 
 export const viewport: Viewport = {
-  themeColor: "#17352f",
+  themeColor: "#2377ad",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover"
@@ -36,6 +41,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AppHeader />
+        <PrimaryNav />
         {children}
       </body>
     </html>

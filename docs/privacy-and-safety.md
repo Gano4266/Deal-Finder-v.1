@@ -24,7 +24,7 @@ Do not collect precise location or personal identity unless a later feature requ
 
 Reports should lower confidence or create review tasks when credible. Public user content should not publish automatically.
 
-In the static prototype, `/report` is a manual handoff surface. It may prefill an email template when a reporting inbox is configured, but it does not store submissions, create accounts, or collect precise location. Report copy should ask for only the correction context, an official source or restaurant confirmation when available, and optional contact information for follow-up.
+In the static prototype, `/report` is an in-app intake surface that sends review leads to `/api/reports`. HubSpot Forms API is the primary delivery path when configured; local/dev may log test submissions, and production should show an honest unavailable state if intake is not configured. Report copy should ask for only the correction context, an official source or restaurant confirmation when available, and optional contact information for follow-up.
 
 ## Restaurant Corrections
 

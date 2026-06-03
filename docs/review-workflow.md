@@ -73,6 +73,6 @@ High-risk records always require review:
 
 Restaurant corrections should be handled quickly. If a credible correction says a public deal is wrong, lower confidence and route to review until resolved.
 
-The static `/report` route is intake guidance only. It does not store reports in the app. When a user or restaurant correction arrives through email or another manual channel, create or update a review task with the report source, affected deal or restaurant, reason, priority, next action, and decision.
+The static `/report` route is an in-app intake surface that sends review leads through `/api/reports` to HubSpot when configured. When a user or restaurant correction arrives through HubSpot, webhook fallback, email, or another manual channel, create or update a review task with the report source, affected deal or restaurant, reason, priority, next action, and decision.
 
 `approved_with_uncertainty` is public only when evidence is still publishable, and it should not publish with `confidence_status=unverified`. Expired deals are hidden unless newer evidence extends them. Source failure, conflict, credible public report, or restaurant correction routes affected public deals to `needs_review` or `needs_recheck`.

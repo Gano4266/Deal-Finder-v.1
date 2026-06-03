@@ -1,6 +1,6 @@
-# Deal Finder
+# Forkcast
 
-Deal Finder is a static-data MVP prototype for a Wilmington, North Carolina restaurant deals app. The first product goal is practical: answer "What are the best restaurant deals in Wilmington tonight?" with source-grounded food specials, clear freshness metadata, and no hallucinated offers.
+Forkcast is a static-data MVP prototype for a Wilmington, North Carolina restaurant specials app. The first product goal is practical: answer "What is worth going out for tonight?" with source-grounded food specials, clear freshness metadata, and no hallucinated offers.
 
 This repository currently contains operating docs, validation rules, CSV templates, prototype fixtures, and a runnable mobile-first Next.js/PWA scaffold in `app/`.
 
@@ -42,6 +42,7 @@ AI output is never a source. Third-party aggregators, Reddit, reviews, comments,
 - [Friend pilot guide](PILOT.md)
 - [Roadmap](ROADMAP.md)
 - [Decision log](DECISIONS.md)
+- [Brand direction](docs/brand.md)
 - [MVP scope](docs/mvp-scope.md)
 - [Implementation handoff](docs/implementation-handoff.md)
 - [Data model](docs/data-model.md)

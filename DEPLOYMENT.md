@@ -1,6 +1,6 @@
 # Deployment
 
-This is a public soft-pilot deployment guide for the Wilmington Deal Finder PWA.
+This is a public soft-pilot deployment guide for the Wilmington Forkcast PWA.
 
 ## Recommended Path
 
@@ -32,11 +32,14 @@ If the GitHub integration is not installed, use the checked-in root `vercel.json
 Production environment variables:
 
 ```sh
-NEXT_PUBLIC_REPORT_EMAIL=ryanganovski37@gmail.com
 DEAL_FINDER_ADMIN_ENABLED=false
+HUBSPOT_PORTAL_ID=your_hubspot_portal_id
+HUBSPOT_INTAKE_FORM_GUID=your_deal_finder_intake_form_guid
+REPORT_WEBHOOK_URL=
+NEXT_PUBLIC_REPORT_EMAIL=
 ```
 
-Leave `DEAL_FINDER_REPO_ROOT` unset unless deployment logs say the app cannot locate `fixtures/prototype/deals.csv`.
+`REPORT_WEBHOOK_URL` is only a generic fallback. `NEXT_PUBLIC_REPORT_EMAIL` is only an emergency fallback if the in-app intake is unavailable. Leave `DEAL_FINDER_REPO_ROOT` unset unless deployment logs say the app cannot locate `fixtures/prototype/deals.csv`.
 
 ## Pre-Deploy Gate
 
@@ -56,6 +59,7 @@ After Vercel gives you a URL, run:
 cd app
 DEAL_FINDER_SMOKE_BASE_URL=https://YOUR-VERCEL-URL.vercel.app \
 DEAL_FINDER_SMOKE_ADMIN_MODE=disabled \
+DEAL_FINDER_SMOKE_SKIP_REPORT_POST=1 \
 npm run smoke
 
 DEAL_FINDER_SMOKE_BASE_URL=https://YOUR-VERCEL-URL.vercel.app \
@@ -66,7 +70,7 @@ Then test on iPhone Safari:
 
 1. Open the live URL.
 2. Confirm `/tonight`, `/deals`, one deal detail page, `/restaurants`, and `/report`.
-3. Tap Report issue and confirm the email draft goes to `ryanganovski37@gmail.com`.
+3. Tap Send note and confirm the in-app form submits to HubSpot with the success copy: "Thanks. This will be reviewed before anything changes on the site."
 4. Tap Share, then Add to Home Screen.
 5. Open the home-screen icon and confirm it starts at `/tonight`.
 
@@ -75,6 +79,6 @@ Then test on iPhone Safari:
 - Do not enable `/admin` for the friend pilot.
 - Keep `robots.txt` no-indexed during the private soft pilot.
 - Do not present prototype rows as live availability.
-- Keep `NEXT_PUBLIC_REPORT_EMAIL` configured before sharing.
+- Keep HubSpot intake variables configured before sharing the report form.
 - Re-run data validation before every public data update.
 - Recheck public deals before broad sharing if any `next_check_due` date is overdue.

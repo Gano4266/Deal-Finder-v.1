@@ -35,7 +35,6 @@ const localEnv = {
   ...readEnvFile(".env.local"),
   ...process.env
 };
-const reportEmail = localEnv.NEXT_PUBLIC_REPORT_EMAIL ?? "";
 
 function run(command, args, options = {}) {
   return new Promise((resolve, reject) => {
@@ -95,7 +94,8 @@ async function startProductionServer(port) {
     cwd: appDir,
     env: {
       ...localEnv,
-      DEAL_FINDER_ADMIN_ENABLED: "false"
+      DEAL_FINDER_ADMIN_ENABLED: "false",
+      FORKCAST_REPORT_SMOKE_DRY_RUN: "true"
     },
     stdio: ["ignore", "inherit", "inherit"]
   });
@@ -130,10 +130,6 @@ await run("npm", ["run", "lint"]);
 
 console.log("accept: production build");
 await run("npm", ["run", "build"]);
-
-if (!reportEmail) {
-  console.warn("accept warning: NEXT_PUBLIC_REPORT_EMAIL is not set; report intake is not ready for unguided testing.");
-}
 
 const port = await findFreePort();
 const baseUrl = `http://127.0.0.1:${port}`;

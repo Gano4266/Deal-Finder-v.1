@@ -20,7 +20,7 @@ Cons:
 
 ## SwiftUI/Xcode
 
-Best later if Deal Finder becomes deeply Apple-native.
+Best later if Forkcast becomes deeply Apple-native.
 
 Pros:
 
