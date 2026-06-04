@@ -20,6 +20,11 @@ export function PublicDealCard({ deal, variant = "standard" }: PublicDealCardPro
 
   return (
     <article className={className}>
+      <Link
+        href={`/deals/${deal.dealId}`}
+        className="dealCardPrimaryLink"
+        aria-label={`View details for ${deal.publicTitle} at ${deal.restaurantName}`}
+      />
       <div>
         <p className="eyebrow">{deal.restaurantName}</p>
         <h2>{deal.publicTitle}</h2>

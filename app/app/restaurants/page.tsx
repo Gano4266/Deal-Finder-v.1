@@ -1,19 +1,26 @@
 import Link from "next/link";
 import type { Route } from "next";
+import { SearchForm } from "../search-form";
+import { matchesSearchQuery, normalizeSearchQuery } from "../../lib/public-search";
 import { getRestaurants, publicAreaGroupOptions } from "../../lib/data";
 import { phoneHref } from "../phone-link";
 
 type RestaurantsPageProps = {
   searchParams?: Promise<{
     area?: string;
+    q?: string;
   }>;
 };
 
-function queryFor(area: string) {
+function queryFor(area: string, q: string) {
   const query = new URLSearchParams();
 
   if (area !== "All") {
     query.set("area", area);
+  }
+
+  if (q) {
+    query.set("q", q);
   }
 
   const queryText = query.toString();
@@ -22,6 +29,7 @@ function queryFor(area: string) {
 
 export default async function RestaurantsPage({ searchParams }: RestaurantsPageProps) {
   const params = await searchParams;
+  const selectedSearchQuery = normalizeSearchQuery(params?.q);
   const restaurants = await getRestaurants();
   const areaOptions = ["All", ...publicAreaGroupOptions] as const;
   const selectedArea = areaOptions.includes((params?.area ?? "All") as (typeof areaOptions)[number])
@@ -29,21 +37,42 @@ export default async function RestaurantsPage({ searchParams }: RestaurantsPageP
     : "All";
   const visibleRestaurants = restaurants.filter(
     (restaurant) => selectedArea === "All" || restaurant.areaGroup === selectedArea
-  );
+  ).filter((restaurant) => matchesSearchQuery([
+    restaurant.name,
+    restaurant.neighborhood,
+    restaurant.areaGroup,
+    restaurant.address,
+    restaurant.cuisine,
+    restaurant.tags,
+    restaurant.publicDealDays.join(" ")
+  ], selectedSearchQuery));
   const withDeals = visibleRestaurants.filter((restaurant) => restaurant.publicDealCount > 0);
   const sourceOnly = visibleRestaurants.filter((restaurant) => restaurant.publicDealCount === 0);
-  const emptyHeading = selectedArea === "All"
+  const searchFilteredRestaurants = restaurants.filter((restaurant) => matchesSearchQuery([
+    restaurant.name,
+    restaurant.neighborhood,
+    restaurant.areaGroup,
+    restaurant.address,
+    restaurant.cuisine,
+    restaurant.tags,
+    restaurant.publicDealDays.join(" ")
+  ], selectedSearchQuery));
+  const emptyHeading = selectedSearchQuery
+    ? `No restaurants match "${selectedSearchQuery}" yet.`
+    : selectedArea === "All"
     ? "No restaurants match this area yet."
     : `No ${selectedArea} restaurants match this area yet.`;
-  const emptyCopy = selectedArea === "All"
+  const emptyCopy = selectedSearchQuery
+    ? "Try another search or area."
+    : selectedArea === "All"
     ? "Try another area while Forkcast keeps expanding coverage."
     : "Try another area or check back as the local read fills in.";
   const countForArea = (area: (typeof areaOptions)[number]) => {
     if (area === "All") {
-      return restaurants.length;
+      return searchFilteredRestaurants.length;
     }
 
-    return restaurants.filter((restaurant) => restaurant.areaGroup === area).length;
+    return searchFilteredRestaurants.filter((restaurant) => restaurant.areaGroup === area).length;
   };
 
   return (
@@ -81,11 +110,22 @@ export default async function RestaurantsPage({ searchParams }: RestaurantsPageP
         </div>
       </section>
 
+      <SearchForm
+        action="/restaurants"
+        clearHref={queryFor(selectedArea, "")}
+        hiddenFields={[
+          selectedArea !== "All" ? { name: "area", value: selectedArea } : undefined
+        ].filter((field): field is { name: string; value: string } => Boolean(field))}
+        label="Search restaurants"
+        placeholder="Try tacos, pizza, seafood, K38..."
+        query={selectedSearchQuery}
+      />
+
       <nav className="segmentedNav compactFilters" aria-label="Filter restaurants by area">
         {areaOptions.map((area) => (
           <Link
             key={area}
-            href={queryFor(area) as Route}
+            href={queryFor(area, selectedSearchQuery) as Route}
             className={area === selectedArea ? "active" : ""}
             aria-current={area === selectedArea ? "page" : undefined}
           >

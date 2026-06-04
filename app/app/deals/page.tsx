@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { PublicDealCard } from "../public-deal-card";
+import { SearchForm } from "../search-form";
 import {
   type PublicDeal,
   dealRunsOnPublicDay,
@@ -10,11 +11,14 @@ import {
   summarizePublicDealsByArea,
   summarizePublicDealsByDay
 } from "../../lib/data";
+import { dealMatchesMealFilter, mealFilterOptions } from "../../lib/meal-filter";
+import { matchesSearchQuery, normalizeSearchQuery } from "../../lib/public-search";
 
 type DealsPageProps = {
   searchParams?: Promise<{
     area?: string;
     day?: string;
+    q?: string;
     quick?: string;
     sort?: string;
   }>;
@@ -22,6 +26,7 @@ type DealsPageProps = {
 
 const quickFilterOptions = [
   { value: "all", label: "All" },
+  ...mealFilterOptions.filter((option) => option.value !== "all"),
   { value: "under-10", label: "Under $10" },
   { value: "time-listed", label: "Time shown" }
 ] as const;
@@ -32,7 +37,7 @@ const sortOptions = [
   { value: "restaurant", label: "Restaurant" }
 ] as const;
 
-function queryFor(params: { day: string; area: string; quick: string; sort: string }) {
+function queryFor(params: { day: string; area: string; q: string; quick: string; sort: string }) {
   const query = new URLSearchParams();
 
   if (params.day !== "All") {
@@ -41,6 +46,10 @@ function queryFor(params: { day: string; area: string; quick: string; sort: stri
 
   if (params.area !== "All") {
     query.set("area", params.area);
+  }
+
+  if (params.q) {
+    query.set("q", params.q);
   }
 
   if (params.quick !== "all") {
@@ -78,6 +87,10 @@ function firstPriceValue(price: string): number | undefined {
 }
 
 function matchesQuickFilter(deal: PublicDeal, quickFilter: string): boolean {
+  if (quickFilter === "breakfast" || quickFilter === "lunch" || quickFilter === "dinner") {
+    return dealMatchesMealFilter(deal, quickFilter);
+  }
+
   if (quickFilter === "under-10") {
     const value = firstPriceValue(deal.price);
     return typeof value === "number" && value <= 10;
@@ -90,8 +103,28 @@ function matchesQuickFilter(deal: PublicDeal, quickFilter: string): boolean {
   return true;
 }
 
+function matchesDealSearch(deal: PublicDeal, query: string): boolean {
+  return matchesSearchQuery([
+    deal.restaurantName,
+    deal.publicTitle,
+    deal.publicDescription,
+    deal.dealType,
+    deal.price,
+    deal.daysAvailableLabel,
+    deal.scheduleLabel,
+    deal.timeWindow,
+    deal.neighborhood,
+    deal.area,
+    deal.areaGroup,
+    deal.address,
+    deal.restrictionNotes,
+    deal.sourceName
+  ], query);
+}
+
 export default async function DealsPage({ searchParams }: DealsPageProps) {
   const params = await searchParams;
+  const selectedSearchQuery = normalizeSearchQuery(params?.q);
   const dayOptions = ["All", ...publicDealDayOptions] as const;
   const selectedDay = dayOptions.includes((params?.day ?? "All") as (typeof dayOptions)[number])
     ? params?.day ?? "All"
@@ -108,6 +141,7 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
   const visibleDeals = deals
     .filter((deal) => selectedDay === "All" || dealRunsOnPublicDay(deal, selectedDay))
     .filter((deal) => selectedArea === "All" || deal.areaGroup === selectedArea)
+    .filter((deal) => matchesDealSearch(deal, selectedSearchQuery))
     .filter((deal) => matchesQuickFilter(deal, selectedQuickFilter))
     .sort((left, right) => {
       if (selectedSort === "area") {
@@ -123,19 +157,25 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
       return firstDayRank(left.daysAvailable) - firstDayRank(right.daysAvailable) ||
         left.restaurantName.localeCompare(right.restaurantName);
     });
-  const emptyHeading = selectedArea === "All"
+  const emptyHeading = selectedSearchQuery
+    ? `No specials match "${selectedSearchQuery}" yet.`
+    : selectedArea === "All"
     ? "No specials match this view yet."
     : `No ${selectedArea} food specials match this view yet.`;
-  const emptyCopy = selectedArea === "All"
+  const emptyCopy = selectedSearchQuery
+    ? "Try another search, day, area, or quick filter."
+    : selectedArea === "All"
     ? "Try another day, area, or quick filter."
     : "Try another day or clear the filters while Forkcast keeps expanding the local read.";
   const singleDayDeals = visibleDeals.filter((deal) => deal.scheduleKind === "single_day");
   const recurringDeals = visibleDeals.filter((deal) => deal.scheduleKind === "recurring");
-  const areaFilteredDeals = deals.filter((deal) => selectedArea === "All" || deal.areaGroup === selectedArea);
-  const dayFilteredDeals = deals.filter((deal) => selectedDay === "All" || dealRunsOnPublicDay(deal, selectedDay));
+  const searchFilteredDeals = deals.filter((deal) => matchesDealSearch(deal, selectedSearchQuery));
+  const areaFilteredDeals = searchFilteredDeals.filter((deal) => selectedArea === "All" || deal.areaGroup === selectedArea);
+  const dayFilteredDeals = searchFilteredDeals.filter((deal) => selectedDay === "All" || dealRunsOnPublicDay(deal, selectedDay));
   const dayAreaFilteredDeals = deals
     .filter((deal) => selectedDay === "All" || dealRunsOnPublicDay(deal, selectedDay))
-    .filter((deal) => selectedArea === "All" || deal.areaGroup === selectedArea);
+    .filter((deal) => selectedArea === "All" || deal.areaGroup === selectedArea)
+    .filter((deal) => matchesDealSearch(deal, selectedSearchQuery));
   const dayCounts = new Map(summarizePublicDealsByDay(areaFilteredDeals).map((item) => [item.day, item.count]));
   const areaCounts = new Map(summarizePublicDealsByArea(dayFilteredDeals).map((item) => [item.area, item.count]));
   const countForQuickFilter = (quickFilter: (typeof quickFilterOptions)[number]["value"]) =>
@@ -174,7 +214,7 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
         {dayOptions.map((day) => (
           <Link
             key={day}
-            href={queryFor({ day, area: selectedArea, quick: selectedQuickFilter, sort: selectedSort }) as Route}
+            href={queryFor({ day, area: selectedArea, q: selectedSearchQuery, quick: selectedQuickFilter, sort: selectedSort }) as Route}
             className={day === selectedDay ? "active" : ""}
             aria-current={day === selectedDay ? "page" : undefined}
           >
@@ -184,6 +224,20 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
         ))}
       </nav>
 
+      <SearchForm
+        action="/deals"
+        clearHref={queryFor({ day: selectedDay, area: selectedArea, q: "", quick: selectedQuickFilter, sort: selectedSort })}
+        hiddenFields={[
+          selectedDay !== "All" ? { name: "day", value: selectedDay } : undefined,
+          selectedArea !== "All" ? { name: "area", value: selectedArea } : undefined,
+          selectedQuickFilter !== "all" ? { name: "quick", value: selectedQuickFilter } : undefined,
+          selectedSort !== "area" ? { name: "sort", value: selectedSort } : undefined
+        ].filter((field): field is { name: string; value: string } => Boolean(field))}
+        label="Search deals"
+        placeholder="Try tacos, pizza, burger, lunch..."
+        query={selectedSearchQuery}
+      />
+
       <section className="filterPanel" aria-label="Area, quick filter, and sort controls">
         <div>
           <p className="eyebrow">Area</p>
@@ -191,7 +245,7 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
             {areaOptions.map((area) => (
               <Link
                 key={area}
-                href={queryFor({ day: selectedDay, area, quick: selectedQuickFilter, sort: selectedSort }) as Route}
+                href={queryFor({ day: selectedDay, area, q: selectedSearchQuery, quick: selectedQuickFilter, sort: selectedSort }) as Route}
                 className={area === selectedArea ? "active" : ""}
                 aria-current={area === selectedArea ? "page" : undefined}
               >
@@ -203,12 +257,12 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
         </div>
 
         <div>
-          <p className="eyebrow">Quick filter</p>
-          <nav className="segmentedNav compactFilters" aria-label="Quick filter deals">
+          <p className="eyebrow">Meal & quick</p>
+          <nav className="segmentedNav compactFilters" aria-label="Filter deals by meal or quick option">
             {quickFilterOptions.map((option) => (
               <Link
                 key={option.value}
-                href={queryFor({ day: selectedDay, area: selectedArea, quick: option.value, sort: selectedSort }) as Route}
+                href={queryFor({ day: selectedDay, area: selectedArea, q: selectedSearchQuery, quick: option.value, sort: selectedSort }) as Route}
                 className={option.value === selectedQuickFilter ? "active" : ""}
                 aria-current={option.value === selectedQuickFilter ? "page" : undefined}
               >
@@ -225,7 +279,7 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
             {sortOptions.map((option) => (
               <Link
                 key={option.value}
-                href={queryFor({ day: selectedDay, area: selectedArea, quick: selectedQuickFilter, sort: option.value }) as Route}
+                href={queryFor({ day: selectedDay, area: selectedArea, q: selectedSearchQuery, quick: selectedQuickFilter, sort: option.value }) as Route}
                 className={option.value === selectedSort ? "active" : ""}
                 aria-current={option.value === selectedSort ? "page" : undefined}
               >

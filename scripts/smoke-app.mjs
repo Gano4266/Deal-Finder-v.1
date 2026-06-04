@@ -159,6 +159,11 @@ await check("pwa icon 512", () => assertAsset("/icon-512.png"));
 await check("pwa apple touch icon", () => assertAsset("/apple-touch-icon.png"));
 await check("tonight", () => assertPage("/tonight", ["Today's forecast", "Verify details before you order"]));
 await check("deals filters", () => assertPage("/deals?area=Downtown&day=Tuesday&quick=under-10&sort=area", ["Under $10", "Food specials worth knowing"]));
+await check("deals keyword search", () => assertPage("/deals?q=taco", ["Search deals", "$2 tacos"]));
+await check("deals keyword no match", () => assertPage("/deals?q=notarealdeal", ["No specials match \"notarealdeal\" yet."]));
+await check("deals breakfast filter", () => assertPage("/deals?quick=breakfast", ["Breakfast", "Katy's Grill & Bar"]));
+await check("deals lunch filter", () => assertPage("/deals?quick=lunch", ["Lunch", "Hell's Kitchen"]));
+await check("deals dinner filter", () => assertPage("/deals?quick=dinner", ["Dinner", "$2 tacos"]));
 await check("carolina beach main filter", () => assertPage("/deals?area=Carolina%20Beach", ["Carolina Beach", "K38 Baja Grill"]));
 await check("southport separate from main deals", async () => {
   const body = await assertPage("/deals", ["Food specials worth knowing"]);
@@ -245,7 +250,16 @@ await check("restaurants index", async () => {
   assert(body.includes("K38 Baja Grill"), "/restaurants: Carolina Beach rows should render in main restaurants");
   assert(!body.includes("Provision Company"), "/restaurants: Southport rows should stay out of main restaurants");
 });
+await check("restaurants keyword search", async () => {
+  const body = await assertPage("/restaurants?q=K38", ["Search restaurants", "K38 Baja Grill"]);
+  assert(!body.includes("Provision Company"), "/restaurants?q=K38: Southport rows should stay out of main restaurants");
+});
 await check("southport prototype", () => assertPage("/southport", ["Today's forecast", "Provision Company", "Southport is a separate soft-pilot market"]));
+await check("southport all deals", () => assertPage("/southport/deals", ["All Southport deals", "Provision Company", "Southport preview"]));
+await check("southport restaurants", () => assertPage("/southport/restaurants", ["Southport restaurants", "View Southport deals", "Southport preview"]));
+await check("southport deals keyword search", () => assertPage("/southport/deals?q=lunch", ["Search Southport deals", "Provision Company", "Southport preview"]));
+await check("southport deals lunch filter", () => assertPage("/southport/deals?quick=lunch", ["Lunch", "Provision Company", "Southport preview"]));
+await check("southport restaurants keyword search", () => assertPage("/southport/restaurants?q=provision", ["Search Southport restaurants", "Provision Company", "Southport preview"]));
 await check("invalid deal filters fallback", () => assertPage("/deals?area=Nope&day=Funday&quick=nope&sort=nope", [
   "Food specials worth knowing",
   "$2 tacos"

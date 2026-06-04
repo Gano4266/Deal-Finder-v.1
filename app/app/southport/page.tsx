@@ -44,9 +44,12 @@ export default async function SouthportPage({ searchParams }: SouthportPageProps
           <span>Today</span>
           <strong>{todayDeals.length}</strong>
         </Link>
-        <Link href="/southport?view=all" className={isAllView ? "active" : ""} aria-current={isAllView ? "page" : undefined}>
-          <span>All Southport</span>
+        <Link href="/southport/deals" className={isAllView ? "active" : ""} aria-current={isAllView ? "page" : undefined}>
+          <span>All Deals</span>
           <strong>{southportDeals.length}</strong>
+        </Link>
+        <Link href="/southport/restaurants">
+          <span>Restaurants</span>
         </Link>
       </nav>
 
@@ -76,7 +79,7 @@ export default async function SouthportPage({ searchParams }: SouthportPageProps
                   : `No Southport specials are on the board for ${day}.`}
               </h2>
               <p>
-                <Link href="/southport?view=all" className="primaryLink">
+                <Link href="/southport/deals" className="primaryLink">
                   See all Southport deals
                 </Link>
               </p>
@@ -116,7 +119,7 @@ export default async function SouthportPage({ searchParams }: SouthportPageProps
           {!isAllView && southportDeals.length > todayDeals.length ? (
             <section className="secondaryDealSection">
               <p className="eyebrow">More Southport deals</p>
-              <Link href="/southport?view=all" className="secondaryLink">
+              <Link href="/southport/deals" className="secondaryLink">
                 See all {southportDeals.length} Southport deals
               </Link>
             </section>

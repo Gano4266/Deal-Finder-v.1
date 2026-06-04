@@ -12,7 +12,7 @@ const viewport = { width: 390, height: 844, deviceScaleFactor: 3 };
 
 const pages = [
   { path: "/tonight", name: "tonight", needles: ["Today's forecast", "Verify details before you order"] },
-  { path: "/deals", name: "deals", needles: ["Food specials worth knowing", "Under $10"] },
+  { path: "/deals?quick=lunch", name: "deals-lunch", needles: ["Food specials worth knowing", "Lunch"] },
   { path: "/deals/deal-beat-street-tuesday-2-tacos", name: "deal-detail", needles: ["$2 tacos", "Check official details"] },
   { path: "/restaurants", name: "restaurants", needles: ["Restaurants Forkcast is watching", "On our radar"] },
   { path: "/report", name: "report", needles: ["Share a Forkcast update", "Send a special"] }

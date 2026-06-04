@@ -79,6 +79,8 @@ export type PublicDeal = {
   daysAvailableLabel: string;
   scheduleKind: "single_day" | "recurring";
   scheduleLabel: string;
+  startTime: string;
+  endTime: string;
   timeWindow: string;
   sourceUrl: string;
   sourceName: string;
@@ -700,6 +702,8 @@ function mapDeal(row: CsvRow, restaurantsById: Map<string, CsvRow>): PublicDeal 
     daysAvailableLabel: formatDaysAvailableLabel(row.days_available),
     scheduleKind: schedule.scheduleKind,
     scheduleLabel: schedule.scheduleLabel,
+    startTime: row.start_time,
+    endTime: row.end_time,
     timeWindow: toTimeWindow(row.start_time, row.end_time),
     sourceUrl: row.source_url,
     sourceName: row.source_name,
@@ -905,13 +909,13 @@ function passesReviewedDealOpsGate(row: CsvRow): boolean {
   );
 }
 
-export async function getRestaurants(): Promise<RestaurantSummary[]> {
+async function getRestaurantsForMarket(market: "main" | "southport" | "all"): Promise<RestaurantSummary[]> {
   const [restaurantRows, deals] = await Promise.all([
     readCsv(restaurantsPath),
-    getPublicDeals()
+    getPublicDealsForMarket(market)
   ]);
 
-  const publicRows = restaurantRows.filter((row) => passesPublicRestaurantFilter(row, "main") && !isPublicRestaurantHold(row));
+  const publicRows = restaurantRows.filter((row) => passesPublicRestaurantFilter(row, market) && !isPublicRestaurantHold(row));
 
   return groupRestaurantRows(publicRows)
     .map((rows) => mapRestaurant(rows[0], deals, rows.map((row) => row.restaurant_id)))
@@ -922,10 +926,18 @@ export async function getRestaurants(): Promise<RestaurantSummary[]> {
     );
 }
 
+export async function getRestaurants(): Promise<RestaurantSummary[]> {
+  return getRestaurantsForMarket("main");
+}
+
+export async function getSouthportRestaurants(): Promise<RestaurantSummary[]> {
+  return getRestaurantsForMarket("southport");
+}
+
 export async function getRestaurantById(restaurantId: string): Promise<RestaurantDetail | undefined> {
   const [restaurantRows, deals] = await Promise.all([
     readCsv(restaurantsPath),
-    getPublicDeals()
+    getAllReviewedPrototypeDeals()
   ]);
   const publicRows = restaurantRows.filter((row) => passesPublicRestaurantFilter(row, "all") && !isPublicRestaurantHold(row));
   const group = groupRestaurantRows(publicRows).find((rows) =>
