@@ -84,7 +84,7 @@ function matchesQuickFilter(deal: PublicDeal, quickFilter: string): boolean {
   }
 
   if (quickFilter === "time-listed") {
-    return deal.timeWindow !== "Time not listed";
+    return deal.timeWindow !== "N/A";
   }
 
   return true;
@@ -123,6 +123,12 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
       return firstDayRank(left.daysAvailable) - firstDayRank(right.daysAvailable) ||
         left.restaurantName.localeCompare(right.restaurantName);
     });
+  const emptyHeading = selectedArea === "All"
+    ? "No specials match this view yet."
+    : `No ${selectedArea} food specials match this view yet.`;
+  const emptyCopy = selectedArea === "All"
+    ? "Try another day, area, or quick filter."
+    : "Try another day or clear the filters while Forkcast keeps expanding the local read.";
   const singleDayDeals = visibleDeals.filter((deal) => deal.scheduleKind === "single_day");
   const recurringDeals = visibleDeals.filter((deal) => deal.scheduleKind === "recurring");
   const areaFilteredDeals = deals.filter((deal) => selectedArea === "All" || deal.areaGroup === selectedArea);
@@ -149,7 +155,7 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
       <section className="sectionHeader">
         <div>
           <p className="eyebrow">All deals</p>
-          <h1>Wilmington food specials</h1>
+          <h1>Food specials worth knowing</h1>
           <p>
             Browse food specials by day, area, price, and restaurant. Today
             only shows deals matching today&apos;s weekday.
@@ -233,10 +239,8 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
       {visibleDeals.length === 0 ? (
         <section className="emptyState" aria-label="No deals for selected day">
           <p className="eyebrow">No matches yet</p>
-          <h2>No specials match this view yet.</h2>
-          <p>
-            Try another day, area, or quick filter.
-          </p>
+          <h2>{emptyHeading}</h2>
+          <p>{emptyCopy}</p>
           <div className="cardActions">
             <Link href="/deals" className="primaryLink">
               All deals
@@ -253,9 +257,8 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
               <div className="sectionTitleRow">
                 <div>
                   <p className="eyebrow">Single-day specials</p>
-                  <h2>Day-specific specials</h2>
+                  <h2>One-day specials</h2>
                 </div>
-                <span className="countPill">{singleDayDeals.length}</span>
               </div>
               {singleDayDeals.map((deal) => (
                 <PublicDealCard key={deal.dealId} deal={deal} variant="compact" />
@@ -270,7 +273,6 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
                   <p className="eyebrow">Available other days too</p>
                   <h2>Recurring specials</h2>
                 </div>
-                <span className="countPill">{recurringDeals.length}</span>
               </div>
               <div className="dealList compactSecondaryList">
                 {recurringDeals.map((deal) => (

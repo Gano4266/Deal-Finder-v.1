@@ -129,8 +129,9 @@ async function assertAdminDisabled(pathname) {
 }
 
 const deals = readCsv("fixtures/prototype/deals.csv");
+const publicFixtureCities = new Set(["Wilmington", "Southport", "Oak Island", "Carolina Beach"]);
 const restaurants = readCsv("fixtures/prototype/restaurants.csv").filter((row) =>
-  row.city === "Wilmington" &&
+  publicFixtureCities.has(row.city) &&
   row.state === "NC" &&
   row.status === "active" &&
   row.fixture_data_class === "verified_static" &&
@@ -152,12 +153,18 @@ async function check(label, task) {
 
 await check("home", () => assertPage("/", ["Forkcast", "Today"]));
 await check("robots noindex", () => assertPage("/robots.txt", ["User-Agent: *", "Disallow: /"]));
-await check("pwa manifest", () => assertJson("/manifest.webmanifest", ["Forkcast Wilmington", "\"start_url\":\"/tonight\"", "\"display\":\"standalone\""]));
+await check("pwa manifest", () => assertJson("/manifest.webmanifest", ["Forkcast", "\"start_url\":\"/tonight\"", "\"display\":\"standalone\""]));
 await check("pwa icon 192", () => assertAsset("/icon-192.png"));
 await check("pwa icon 512", () => assertAsset("/icon-512.png"));
 await check("pwa apple touch icon", () => assertAsset("/apple-touch-icon.png"));
-await check("tonight", () => assertPage("/tonight", ["Today in Wilmington", "Details can change"]));
-await check("deals filters", () => assertPage("/deals?area=Downtown&day=Tuesday&quick=under-10&sort=area", ["Under $10", "Wilmington food specials"]));
+await check("tonight", () => assertPage("/tonight", ["Today's forecast", "Verify details before you order"]));
+await check("deals filters", () => assertPage("/deals?area=Downtown&day=Tuesday&quick=under-10&sort=area", ["Under $10", "Food specials worth knowing"]));
+await check("carolina beach main filter", () => assertPage("/deals?area=Carolina%20Beach", ["Carolina Beach", "K38 Baja Grill"]));
+await check("southport separate from main deals", async () => {
+  const body = await assertPage("/deals", ["Food specials worth knowing"]);
+  assert(!body.includes("Provision Company"), "/deals: Southport rows should stay out of main deals");
+  assert(!body.includes("Fishy Fishy Cafe"), "/deals: Southport rows should stay out of main deals");
+});
 await check("monkey junction filter", () => assertPage("/deals?area=Monkey%20Junction", ["Monkey Junction", "non-alcoholic drink purchase"]));
 await check("carryout removed", () => assertMissingPage("/carryout"));
 await check("report", async () => {
@@ -207,7 +214,7 @@ if (process.env.DEAL_FINDER_SMOKE_SKIP_REPORT_POST === "1") {
 }
 await check("report with deal context", () => assertPage("/report?dealId=deal-beat-street-tuesday-2-tacos", [
   "Share a Forkcast update",
-  "$2 tacos at Beat Street"
+  "$2 tacos"
 ]));
 await check("report with restaurant context", () => assertPage("/report?restaurantId=beat-street", [
   "Share a Forkcast update",
@@ -229,37 +236,39 @@ if (adminMode === "enabled") {
 }
 await check("restaurants index", async () => {
   const body = await assertPage("/restaurants", [
-    "Wilmington restaurants",
+    "Restaurants Forkcast is watching",
     "On our radar",
     "Forkcast is tracking"
   ]);
 
   assert(!body.includes("PinPoint Restaurant"), "/restaurants: needs_review restaurant should not render publicly");
+  assert(body.includes("K38 Baja Grill"), "/restaurants: Carolina Beach rows should render in main restaurants");
+  assert(!body.includes("Provision Company"), "/restaurants: Southport rows should stay out of main restaurants");
 });
+await check("southport prototype", () => assertPage("/southport", ["Today's forecast", "Provision Company", "Southport is a separate soft-pilot market"]));
 await check("invalid deal filters fallback", () => assertPage("/deals?area=Nope&day=Funday&quick=nope&sort=nope", [
-  "Wilmington food specials",
-  "$2 tacos at Beat Street"
+  "Food specials worth knowing",
+  "$2 tacos"
 ]));
 await check("missing deal 404", () => assertMissingPage("/deals/not-a-real-deal"));
 await check("missing restaurant 404", () => assertMissingPage("/restaurants/not-a-real-restaurant"));
 await check("withheld restaurant 404", () => assertMissingPage("/restaurants/pinpoint-restaurant"));
 await check("sample deal proof UI", () => assertPage("/deals/deal-beat-street-tuesday-2-tacos", [
-  "$2 tacos at Beat Street",
-  "Restaurant wording",
+  "$2 tacos",
+  "Original wording",
   "Shown below",
-  "Check restaurant source",
+  "Check official details",
   "/evidence/source-screenshots/src-beat-street-primary.png"
 ]));
 await check("sample restaurant deals", () => assertPage("/restaurants/beat-street", [
   "beat-street",
-  "$2 tacos at Beat Street",
+  "$2 tacos",
   "/deals/deal-beat-street-tuesday-2-tacos"
 ]));
 
 for (const deal of deals) {
   await check(`deal ${deal.deal_id}`, () => assertPage(`/deals/${deal.deal_id}`, [
-    deal.deal_id,
-    "Where this came from",
+    "Official details",
     publicAssetUrl(deal.screenshot_path)
   ]));
 }

@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Forkcast Wilmington",
+    name: "Forkcast",
     short_name: "Forkcast",
-    description: "Today's forecast for Wilmington, NC food specials.",
+    description: "Today's forecast for food specials worth knowing.",
     start_url: "/tonight",
     display: "standalone",
     background_color: "#faf7f2",

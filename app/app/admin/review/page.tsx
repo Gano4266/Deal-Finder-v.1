@@ -1,13 +1,44 @@
 import Link from "next/link";
+import type { Route } from "next";
 import { getOpenReviewCandidates, getPrototypeStats } from "../../../lib/data";
 
 export const dynamic = "force-dynamic";
 
-export default async function ReviewPage() {
+type ReviewPageProps = {
+  searchParams?: Promise<{
+    area?: string;
+  }>;
+};
+
+function queryFor(area: string) {
+  const query = new URLSearchParams();
+
+  if (area !== "All") {
+    query.set("area", area);
+  }
+
+  const queryText = query.toString();
+  return queryText ? `/admin/review?${queryText}` : "/admin/review";
+}
+
+export default async function ReviewPage({ searchParams }: ReviewPageProps) {
+  const params = await searchParams;
   const [candidates, stats] = await Promise.all([
     getOpenReviewCandidates(),
     getPrototypeStats()
   ]);
+  const areaOptions = [
+    "All",
+    ...Array.from(new Set(candidates.map((candidate) => candidate.areaName || "Wilmington seeds"))).sort()
+  ];
+  const selectedArea = areaOptions.includes(params?.area ?? "All") ? params?.area ?? "All" : "All";
+  const visibleCandidates = candidates.filter((candidate) =>
+    selectedArea === "All" || (candidate.areaName || "Wilmington seeds") === selectedArea
+  );
+  const countForArea = (area: string) =>
+    area === "All"
+      ? candidates.length
+      : candidates.filter((candidate) => (candidate.areaName || "Wilmington seeds") === area).length;
 
   return (
     <main className="pageShell">
@@ -20,7 +51,7 @@ export default async function ReviewPage() {
             approves, rejects, or confirms newer evidence.
           </p>
           <p className="reviewMeta">
-            {stats.publicDealsPassingFilter} public prototype deals are approved.
+            {stats.publicDealsPassingFilter} public prototype deals are approved / {visibleCandidates.length} open rows in this view.
           </p>
         </div>
         <div className="headerActions">
@@ -36,10 +67,24 @@ export default async function ReviewPage() {
         </div>
       </section>
 
-      {candidates.length === 0 ? (
+      <nav className="segmentedNav compactFilters" aria-label="Filter review queue by intake area">
+        {areaOptions.map((area) => (
+          <Link
+            key={area}
+            href={queryFor(area) as Route}
+            className={area === selectedArea ? "active" : ""}
+            aria-current={area === selectedArea ? "page" : undefined}
+          >
+            <span>{area}</span>
+            <strong>{countForArea(area)}</strong>
+          </Link>
+        ))}
+      </nav>
+
+      {visibleCandidates.length === 0 ? (
         <section className="emptyState" aria-label="No open reviews">
           <p className="eyebrow">Review queue clear</p>
-          <h2>No source-backed candidates need review right now.</h2>
+          <h2>No source-backed candidates need review in this view.</h2>
           <p>
             Approved prototype deals remain visible in `/tonight`; new seed
             candidates will appear here when they need human review.
@@ -50,50 +95,69 @@ export default async function ReviewPage() {
         </section>
       ) : (
         <section className="candidateList" aria-label="Review candidates">
-          {candidates.map((candidate) => (
-          <article key={candidate.candidateId} className="candidateCard">
-            <div className="candidateMain">
-              <p className="eyebrow">{candidate.dealDay} / {candidate.timeWindow}</p>
-              <h2>{candidate.restaurantName}</h2>
-              <p className="dealTitle">{candidate.dealTitle}</p>
-              <p>{candidate.restrictions}</p>
-            </div>
+          {visibleCandidates.map((candidate) => {
+            const priority = candidate.reviewTask?.priority ?? "";
+            const riskFlags = candidate.reviewTask?.riskFlags
+              ? candidate.reviewTask.riskFlags.split(";").map((f) => f.trim()).filter(Boolean)
+              : [];
 
-            <dl className="factGrid">
-              <div>
-                <dt>Status</dt>
-                <dd>{candidate.status} / {candidate.confidence}</dd>
+            return (
+            <article key={candidate.candidateId} className={["candidateCard", priority].filter(Boolean).join(" ")}>
+              <div className="candidateMain">
+                <p className="eyebrow">
+                  {candidate.areaName || "Wilmington seeds"} / {candidate.dealDay} / {candidate.timeWindow}
+                  {priority === "critical" && <span className="priorityTag critical">Critical</span>}
+                  {priority === "high" && <span className="priorityTag high">High</span>}
+                </p>
+                <h2>{candidate.restaurantName}</h2>
+                <p className="dealTitle">{candidate.dealTitle}</p>
+                <p>{candidate.restrictions}</p>
               </div>
-              <div>
-                <dt>Price</dt>
-                <dd>{candidate.price || "See source"}</dd>
-              </div>
-              <div>
-                <dt>Last verified</dt>
-                <dd>{candidate.lastVerified}</dd>
-              </div>
-              <div>
-                <dt>Task</dt>
-                <dd>{candidate.reviewTask?.status ?? "Needs task"}</dd>
-              </div>
-            </dl>
 
-            <div className="reviewStrip">
-              <span>Copy: {candidate.reviewTask?.copyStatus ?? "missing"}</span>
-              <span>Food check: {candidate.reviewTask?.foodCopyCheck ?? "missing"}</span>
-              <span>Due: {candidate.reviewTask?.nextActionDue ?? "missing"}</span>
-            </div>
+              <dl className="factGrid">
+                <div>
+                  <dt>Status</dt>
+                  <dd>{candidate.status} / {candidate.confidence}</dd>
+                </div>
+                <div>
+                  <dt>Price</dt>
+                  <dd>{candidate.price || "See source"}</dd>
+                </div>
+                <div>
+                  <dt>Last verified</dt>
+                  <dd>{candidate.lastVerified || "Not verified"}</dd>
+                </div>
+                <div>
+                  <dt>Action due</dt>
+                  <dd>{candidate.reviewTask?.nextActionDue ?? "Missing"}</dd>
+                </div>
+              </dl>
 
-            <p className="notes">{candidate.notes}</p>
-            {candidate.sourceUrl ? (
-              <a href={candidate.sourceUrl} className="sourceLink">
-                Open source
-              </a>
-            ) : (
-              <span className="disabledLink">Source needed</span>
-            )}
-          </article>
-          ))}
+              <div className="reviewStrip">
+                <span>{candidate.origin === "research_intake" ? "Research intake" : "Seed backlog"}</span>
+                {candidate.intakeFolder ? <span>{candidate.intakeFolder}</span> : null}
+                {candidate.locationScopeStatus ? <span>Scope: {candidate.locationScopeStatus}</span> : null}
+                <span>Copy: {candidate.reviewTask?.copyStatus ?? "missing"}</span>
+                <span>Food check: {candidate.reviewTask?.foodCopyCheck ?? "missing"}</span>
+                {riskFlags.map((flag) => (
+                  <span key={flag} className="riskFlag">{flag.replace(/_/g, " ")}</span>
+                ))}
+              </div>
+
+              <p className="notes">{candidate.notes}</p>
+              {candidate.publishBlockReason ? (
+                <p className="notes">Public block: {candidate.publishBlockReason}</p>
+              ) : null}
+              {candidate.sourceUrl ? (
+                <a href={candidate.sourceUrl} className="sourceLink">
+                  Open source
+                </a>
+              ) : (
+                <span className="disabledLink">No source on file</span>
+              )}
+            </article>
+            );
+          })}
         </section>
       )}
     </main>

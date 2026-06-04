@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Route } from "next";
 import { PublicDealCard } from "../public-deal-card";
 import {
-  getPrototypeStats,
   getPublicDeals,
   getPublicTonightDeals,
   shortDate,
@@ -14,10 +13,9 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function TonightPage() {
-  const [deals, allDeals, stats] = await Promise.all([
+  const [deals, allDeals] = await Promise.all([
     getPublicTonightDeals(),
-    getPublicDeals(),
-    getPrototypeStats()
+    getPublicDeals()
   ]);
   const day = weekdayName();
   const dateLabel = shortDate();
@@ -35,20 +33,17 @@ export default async function TonightPage() {
     <main className="pageShell">
       <section className="heroBand">
         <div>
-          <p className="eyebrow">Today&apos;s forecast</p>
-          <h1>Today in Wilmington</h1>
-          <p className="lede">
-            Food specials listed for {day}, {dateLabel}.
-          </p>
+          <p className="eyebrow">{day}, {dateLabel}</p>
+          <h1>Today's forecast</h1>
+          <p className="lede">A quick read on food specials worth checking tonight.</p>
           <p className="notes">
-            Details can change. Check the restaurant&apos;s latest post or site
-            before you order.
+            Verify details before you order. Specials can change or sell out.
           </p>
         </div>
         <div className="statusPanel" aria-label="Deal status">
           <span className="statusLabel">Today</span>
           <strong>{deals.length}</strong>
-          <span>{stats.publicDealsPassingFilter} total listed deals</span>
+          <span>{deals.length === 1 ? "special listed" : "specials listed"}</span>
         </div>
       </section>
 
@@ -82,9 +77,6 @@ export default async function TonightPage() {
         <Link href={`/deals?day=${day}&quick=under-10` as Route}>
           <span>Under $10</span>
         </Link>
-        <Link href={`/deals?day=${day}&quick=time-listed` as Route}>
-          <span>Time listed</span>
-        </Link>
       </nav>
 
       {deals.length === 0 ? (
@@ -92,7 +84,7 @@ export default async function TonightPage() {
           <p className="eyebrow">Nothing listed for {day}</p>
           <h2>No specials are on the board for {day} yet.</h2>
           <p>
-            Try another day while we keep adding Wilmington specials.
+            Try another day while Forkcast keeps widening the local read.
           </p>
           <Link href="/deals" className="primaryLink">
             See all deals
@@ -103,10 +95,8 @@ export default async function TonightPage() {
           <section className="dealList" aria-label="Today specials">
             <div className="sectionTitleRow">
               <div>
-                <p className="eyebrow">Worth checking first</p>
-                <h2>Today&apos;s specials</h2>
+                <h2>Today's specials</h2>
               </div>
-              <span className="countPill">{singleDayDeals.length}</span>
             </div>
             {singleDayDeals.map((deal) => (
               <PublicDealCard key={deal.dealId} deal={deal} />
@@ -117,10 +107,9 @@ export default async function TonightPage() {
             <section className="secondaryDealSection" aria-label="More deals available today">
               <div className="sectionTitleRow">
                 <div>
-                  <p className="eyebrow">Available other days too</p>
-                  <h2>Also good today</h2>
+                  <p className="eyebrow">Also good today</p>
+                  <h2>Daily and multi-day specials</h2>
                 </div>
-                <span className="countPill">{recurringDeals.length}</span>
               </div>
               <div className="dealList compactSecondaryList">
                 {recurringDeals.map((deal) => (

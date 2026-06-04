@@ -11,10 +11,10 @@ const outputDir = process.env.DEAL_FINDER_MOBILE_SMOKE_DIR || path.join(repoRoot
 const viewport = { width: 390, height: 844, deviceScaleFactor: 3 };
 
 const pages = [
-  { path: "/tonight", name: "tonight", needles: ["Today in Wilmington", "Details can change"] },
-  { path: "/deals", name: "deals", needles: ["Wilmington food specials", "Under $10"] },
-  { path: "/deals/deal-beat-street-tuesday-2-tacos", name: "deal-detail", needles: ["$2 tacos at Beat Street", "Check restaurant source"] },
-  { path: "/restaurants", name: "restaurants", needles: ["Wilmington restaurants", "On our radar"] },
+  { path: "/tonight", name: "tonight", needles: ["Today's forecast", "Verify details before you order"] },
+  { path: "/deals", name: "deals", needles: ["Food specials worth knowing", "Under $10"] },
+  { path: "/deals/deal-beat-street-tuesday-2-tacos", name: "deal-detail", needles: ["$2 tacos", "Check official details"] },
+  { path: "/restaurants", name: "restaurants", needles: ["Restaurants Forkcast is watching", "On our radar"] },
   { path: "/report", name: "report", needles: ["Share a Forkcast update", "Send a special"] }
 ];
 

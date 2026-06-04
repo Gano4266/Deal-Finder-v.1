@@ -1,7 +1,7 @@
 {
   "fixture_data_class_default": "verified_static",
-  "fixture_generated_at": "2026-06-02T23:30:00-04:00",
-  "fixture_verification_scope": "Phase 1 static prototype dataset for Wilmington, NC only. Restaurants, primary sources, and reviewed public prototype deal claims are seeded. Data is not live.",
+  "fixture_generated_at": "2026-06-04T00:05:00-04:00",
+  "fixture_verification_scope": "Phase 1 static prototype dataset for the Wilmington, NC MVP market. Data is not live.",
   "is_live_data": false,
   "prototype_notice": "Static prototype data. Deal availability is not live and must be confirmed against the listed evidence date.",
   "minimum_seed_targets": {
@@ -10,12 +10,12 @@
     "successful_source_captures_or_manual_evidence_notes": 20
   },
   "current_seed_counts": {
-    "restaurants": 45,
-    "sources": 45,
-    "source_captures": 53,
-    "source_checks": 53,
-    "public_deals": 57,
-    "review_tasks": 71,
-    "audit_events": 72
+    "restaurants": 60,
+    "sources": 57,
+    "source_captures": 64,
+    "source_checks": 64,
+    "public_deals": 70,
+    "review_tasks": 84,
+    "audit_events": 85
   }
 }

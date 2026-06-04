@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { dirname } from "node:path";
 import { readCsv, type CsvRow } from "./csv";
@@ -61,6 +61,7 @@ const seedRestaurantSourcesPath = path.join(repoRoot, "ops/seeds/wilmington-rest
 const seedCandidatesPath = path.join(repoRoot, "ops/seeds/wilmington-deal-candidates.csv");
 const seedReviewTasksPath = path.join(repoRoot, "ops/seeds/wilmington-review-tasks.csv");
 const carryoutPlacesPath = path.join(repoRoot, "ops/seeds/wilmington-carryout-places.csv");
+const researchIntakeRootPath = path.join(repoRoot, "ops/research/intake");
 
 export type PublicDeal = {
   dealId: string;
@@ -89,6 +90,7 @@ export type PublicDeal = {
   evidenceUrlOrPath: string;
   freshnessLabel: string;
   lastVerifiedAt: string;
+  lastVerifiedLabel: string;
   nextCheckDue: string;
   expiresOn: string;
   archiveUrlOrPath: string;
@@ -132,13 +134,17 @@ export const publicAreaGroupOptions = [
   "College Rd / UNCW",
   "Mayfaire/Ogden",
   "South Wilmington",
+  "Carolina Beach",
   "Other Wilmington"
 ] as const;
 
-export type PublicAreaGroup = (typeof publicAreaGroupOptions)[number];
+export const southportAreaGroup = "Southport" as const;
+
+export type PublicAreaGroup = (typeof publicAreaGroupOptions)[number] | typeof southportAreaGroup;
 
 export const sourceGapAreaGroupOptions = [
   ...publicAreaGroupOptions,
+  southportAreaGroup,
   "Wrightsville / Boundary Review",
   "Porters Neck"
 ] as const;
@@ -183,6 +189,11 @@ export type ReviewCandidate = {
   lastVerified: string;
   restrictions: string;
   notes: string;
+  areaName?: string;
+  origin?: "seed" | "research_intake";
+  intakeFolder?: string;
+  publishBlockReason?: string;
+  locationScopeStatus?: string;
   reviewTask?: {
     taskId: string;
     priority: string;
@@ -209,6 +220,8 @@ export type SourceGap = {
   blockers: string[];
   priority: "critical" | "high" | "normal";
   notes: string;
+  origin?: "seed" | "research_intake";
+  intakeFolder?: string;
 };
 
 export type CarryoutPlace = {
@@ -271,6 +284,9 @@ export type OpsDashboard = {
     verifiedSeedCandidates: number;
     needsReviewSeedCandidates: number;
     terminalSeedCandidates: number;
+    researchIntakeBatches: number;
+    researchIntakeCandidates: number;
+    openResearchIntakeTasks: number;
     verifiedCarryoutPlaces: number;
     hiddenCarryoutPlaces: number;
     sourceGapRows: number;
@@ -374,7 +390,7 @@ function toTimeWindow(start: string, end: string): string {
     return `Until ${formatTime(end)}`;
   }
 
-  return "Time not listed";
+  return "N/A";
 }
 
 function formatTime(value: string): string {
@@ -535,7 +551,7 @@ export function summarizePublicDealsByArea(deals: PublicDeal[]): PublicDealAreaC
     counts.set(deal.areaGroup, (counts.get(deal.areaGroup) ?? 0) + 1);
   });
 
-  const rankByArea = new Map(publicAreaGroupOptions.map((area, index) => [area, index]));
+  const rankByArea = new Map([...publicAreaGroupOptions, southportAreaGroup].map((area, index) => [area, index]));
 
   return Array.from(counts.entries() as Iterable<[PublicAreaGroup, number]>)
     .map(([area, count]) => ({ area, count }))
@@ -591,15 +607,25 @@ function areaGroupForLocation(value: string, restaurantName = ""): PublicAreaGro
     return "Mayfaire/Ogden";
   }
 
+  if (normalized.includes("carolina beach")) {
+    return "Carolina Beach";
+  }
+
   if (
     normalized.includes("south wilmington") ||
     normalized.includes("independence") ||
     normalized.includes("shipyard") ||
     normalized.includes("long leaf mall") ||
-    normalized.includes("masonboro") ||
-    normalized.includes("carolina beach")
+    normalized.includes("masonboro")
   ) {
     return "South Wilmington";
+  }
+
+  if (
+    normalized.includes("southport") ||
+    normalized.includes("oak island")
+  ) {
+    return southportAreaGroup;
   }
 
   if (normalized.includes("islands fresh mex")) {
@@ -615,6 +641,10 @@ function areaGroupForLocation(value: string, restaurantName = ""): PublicAreaGro
 
 function sourceGapAreaGroupForLocation(value: string, restaurantName = ""): SourceGapAreaGroup {
   const normalized = `${value} ${restaurantName}`.toLowerCase();
+
+  if (normalized.includes("carolina beach")) {
+    return "Carolina Beach";
+  }
 
   if (normalized.includes("wrightsville beach")) {
     return "Wrightsville / Boundary Review";
@@ -681,6 +711,7 @@ function mapDeal(row: CsvRow, restaurantsById: Map<string, CsvRow>): PublicDeal 
     evidenceUrlOrPath: row.evidence_url_or_path,
     freshnessLabel: freshnessDate ? `Checked through ${formatDateLabel(freshnessDate)}` : "Check date missing",
     lastVerifiedAt: row.last_verified_at,
+    lastVerifiedLabel: formatDateLabel(row.last_verified_at),
     nextCheckDue: row.next_check_due,
     expiresOn: row.expires_on,
     archiveUrlOrPath: row.archive_url_or_path,
@@ -697,6 +728,10 @@ function mapDeal(row: CsvRow, restaurantsById: Map<string, CsvRow>): PublicDeal 
 }
 
 export async function getPublicDeals(): Promise<PublicDeal[]> {
+  return getPublicDealsForMarket("main");
+}
+
+async function getPublicDealsForMarket(market: "main" | "southport" | "all"): Promise<PublicDeal[]> {
   const [dealRows, restaurantRows] = await Promise.all([
     readCsv(publicDealsPath),
     readCsv(restaurantsPath)
@@ -705,8 +740,16 @@ export async function getPublicDeals(): Promise<PublicDeal[]> {
   const restaurantsById = new Map(restaurantRows.map((row) => [row.restaurant_id, row]));
 
   return dealRows
-    .filter((row) => passesPublicDealRuntimeFilter(row, restaurantsById))
+    .filter((row) => passesPublicDealRuntimeFilter(row, restaurantsById, undefined, market))
     .map((row) => mapDeal(row, restaurantsById));
+}
+
+export async function getSouthportDeals(): Promise<PublicDeal[]> {
+  return getPublicDealsForMarket("southport");
+}
+
+export async function getAllReviewedPrototypeDeals(): Promise<PublicDeal[]> {
+  return getPublicDealsForMarket("all");
 }
 
 export async function getPublicTonightDeals(date = getOperatingDate()): Promise<PublicDeal[]> {
@@ -717,14 +760,14 @@ export async function getPublicTonightDeals(date = getOperatingDate()): Promise<
 
   return rows
     .filter((row) =>
-      passesPublicDealRuntimeFilter(row, restaurantsById, date) &&
+      passesPublicDealRuntimeFilter(row, restaurantsById, date, "main") &&
       valueRunsOnDay(row.days_available ?? "", day)
     )
     .map((row) => mapDeal(row, restaurantsById));
 }
 
 export async function getPublicDealById(dealId: string): Promise<PublicDeal | undefined> {
-  const deals = await getPublicDeals();
+  const deals = await getAllReviewedPrototypeDeals();
   return deals.find((deal) => deal.dealId === dealId);
 }
 
@@ -795,9 +838,21 @@ function mapRestaurant(row: CsvRow, deals: PublicDeal[], restaurantIds = [row.re
   };
 }
 
-function passesPublicRestaurantFilter(row: CsvRow): boolean {
+function restaurantMatchesMarket(row: CsvRow, market: "main" | "southport" | "all"): boolean {
+  if (market === "main") {
+    return row.city === "Wilmington" || row.city === "Carolina Beach";
+  }
+
+  if (market === "southport") {
+    return row.city === "Southport" || row.city === "Oak Island";
+  }
+
+  return row.city === "Wilmington" || row.city === "Carolina Beach" || row.city === "Southport" || row.city === "Oak Island";
+}
+
+function passesPublicRestaurantFilter(row: CsvRow, market: "main" | "southport" | "all" = "main"): boolean {
   return (
-    row.city === "Wilmington" &&
+    restaurantMatchesMarket(row, market) &&
     row.state === "NC" &&
     row.status === "active" &&
     row.fixture_data_class === "verified_static" &&
@@ -817,7 +872,8 @@ function isPublicRestaurantHold(row: CsvRow): boolean {
 function passesPublicDealRuntimeFilter(
   row: CsvRow,
   restaurantsById: Map<string, CsvRow>,
-  date?: Date
+  date?: Date,
+  market: "main" | "southport" | "all" = "main"
 ): boolean {
   const restaurant = restaurantsById.get(row.restaurant_id);
   const dealPasses = date ? passesPublicDealFilter(row, date) : passesPublicDealFilter(row);
@@ -825,7 +881,7 @@ function passesPublicDealRuntimeFilter(
   return Boolean(
     dealPasses &&
     restaurant &&
-    passesPublicRestaurantFilter(restaurant) &&
+    passesPublicRestaurantFilter(restaurant, market) &&
     !isPublicRestaurantHold(restaurant)
   );
 }
@@ -855,7 +911,7 @@ export async function getRestaurants(): Promise<RestaurantSummary[]> {
     getPublicDeals()
   ]);
 
-  const publicRows = restaurantRows.filter((row) => passesPublicRestaurantFilter(row) && !isPublicRestaurantHold(row));
+  const publicRows = restaurantRows.filter((row) => passesPublicRestaurantFilter(row, "main") && !isPublicRestaurantHold(row));
 
   return groupRestaurantRows(publicRows)
     .map((rows) => mapRestaurant(rows[0], deals, rows.map((row) => row.restaurant_id)))
@@ -871,7 +927,7 @@ export async function getRestaurantById(restaurantId: string): Promise<Restauran
     readCsv(restaurantsPath),
     getPublicDeals()
   ]);
-  const publicRows = restaurantRows.filter((row) => passesPublicRestaurantFilter(row) && !isPublicRestaurantHold(row));
+  const publicRows = restaurantRows.filter((row) => passesPublicRestaurantFilter(row, "all") && !isPublicRestaurantHold(row));
   const group = groupRestaurantRows(publicRows).find((rows) =>
     rows.some((restaurant) => restaurant.restaurant_id === restaurantId)
   );
@@ -896,6 +952,69 @@ function slug(value: string): string {
     .replace(/&/g, "and")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
+}
+
+function titleFromSlug(value: string): string {
+  return value
+    .replace(/-\d{4}-\d{2}-\d{2}$/, "")
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function researchIntakeDirectories(): string[] {
+  if (!existsSync(researchIntakeRootPath)) {
+    return [];
+  }
+
+  return readdirSync(researchIntakeRootPath, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && entry.name !== "example-area")
+    .map((entry) => path.join(researchIntakeRootPath, entry.name))
+    .filter((directory) => existsSync(path.join(directory, "deal-intake.csv")))
+    .sort((left, right) => path.basename(left).localeCompare(path.basename(right)));
+}
+
+function researchIntakeAreaName(directory: string): string {
+  const fallback = titleFromSlug(path.basename(directory));
+  const areaBriefPath = path.join(directory, "area_brief.json");
+
+  if (!existsSync(areaBriefPath)) {
+    return fallback;
+  }
+
+  try {
+    const brief = JSON.parse(readFileSync(areaBriefPath, "utf8")) as { area_name?: string };
+    return brief.area_name || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function isTerminalResearchStatus(row: CsvRow): boolean {
+  return ["rejected", "expired", "superseded"].includes(row.workflow_status ?? "") ||
+    ["rejected", "approved"].includes(row.review_decision ?? "");
+}
+
+function researchCandidateId(directory: string, row: CsvRow, index: number): string {
+  return row.candidate_id || `intake-${slug(path.basename(directory))}-${index + 2}`;
+}
+
+async function readResearchIntakeRows(fileName: string): Promise<Array<{ directory: string; areaName: string; rows: CsvRow[] }>> {
+  const directories = researchIntakeDirectories();
+
+  return Promise.all(
+    directories.map(async (directory) => {
+      const filePath = path.join(directory, fileName);
+      const rows = existsSync(filePath) ? await readCsv(filePath) : [];
+
+      return {
+        directory,
+        areaName: researchIntakeAreaName(directory),
+        rows
+      };
+    })
+  );
 }
 
 function candidateId(row: CsvRow): string {
@@ -977,11 +1096,94 @@ export async function getReviewCandidates(): Promise<ReviewCandidate[]> {
     });
 }
 
+export async function getResearchReviewCandidates(): Promise<ReviewCandidate[]> {
+  const [dealIntakes, reviewTaskIntakes] = await Promise.all([
+    readResearchIntakeRows("deal-intake.csv"),
+    readResearchIntakeRows("review-tasks.csv")
+  ]);
+  const tasksByCandidate = new Map<string, CsvRow>();
+
+  reviewTaskIntakes.forEach((intake) => {
+    intake.rows.forEach((task) => {
+      const folder = path.basename(intake.directory);
+      tasksByCandidate.set(`${folder}:${task.related_id}`, task);
+    });
+  });
+
+  return dealIntakes
+    .flatMap((intake) => {
+      const folder = path.basename(intake.directory);
+
+      return intake.rows
+        .filter((row) => !isTerminalResearchStatus(row))
+        .map((row, index) => {
+          const id = researchCandidateId(intake.directory, row, index);
+          const task = tasksByCandidate.get(`${folder}:${id}`);
+
+          return {
+            candidateId: id,
+            restaurantName: row.restaurant_name,
+            dealTitle: row.deal_title,
+            dealDay: row.days_available || "Schedule needs review",
+            timeWindow: toTimeWindow(row.start_time, row.end_time),
+            price: row.price || row.discount,
+            category: row.deal_type,
+            status: row.workflow_status || "needs_review",
+            confidence: row.confidence_status || "unverified",
+            needsAttention: true,
+            sourceName: row.source_name || row.source_tier || "Research intake source",
+            sourceUrl: row.source_url,
+            lastVerified: row.last_verified_at || row.evidence_captured_at || row.updated_at || row.created_at,
+            restrictions: row.publish_block_reason || row.restriction_notes || row.uncertainty_flags || "Review required before public use.",
+            notes: row.validation_notes || row.evidence_summary || row.deal_description,
+            areaName: intake.areaName,
+            origin: "research_intake" as const,
+            intakeFolder: folder,
+            publishBlockReason: row.publish_block_reason,
+            locationScopeStatus: row.location_scope_status,
+            reviewTask: task
+              ? {
+                  taskId: task.review_task_id,
+                  priority: task.priority,
+                  status: task.status,
+                  nextAction: task.next_action,
+                  nextActionDue: task.next_action_due,
+                  copyStatus: task.public_copy_approval_status,
+                  foodCopyCheck: task.food_alcohol_copy_check,
+                  riskFlags: task.risk_flags
+                }
+              : undefined
+          };
+        });
+    })
+    .sort((left, right) => {
+      const priorityRank: Record<string, number> = { critical: 0, high: 1, normal: 2, low: 3 };
+      const leftRank = priorityRank[left.reviewTask?.priority ?? "normal"] ?? 2;
+      const rightRank = priorityRank[right.reviewTask?.priority ?? "normal"] ?? 2;
+
+      return leftRank - rightRank ||
+        (left.areaName ?? "").localeCompare(right.areaName ?? "") ||
+        left.restaurantName.localeCompare(right.restaurantName);
+    });
+}
+
 export async function getOpenReviewCandidates(): Promise<ReviewCandidate[]> {
-  const candidates = await getReviewCandidates();
-  return candidates.filter(
-    (candidate) => candidate.needsAttention || candidate.reviewTask?.status === "open"
-  );
+  const [seedCandidates, researchCandidates] = await Promise.all([
+    getReviewCandidates(),
+    getResearchReviewCandidates()
+  ]);
+  const candidates = [...seedCandidates, ...researchCandidates];
+  const priorityRank: Record<string, number> = { critical: 0, high: 1, normal: 2, low: 3 };
+
+  return candidates
+    .filter(
+      (candidate) => candidate.needsAttention || candidate.reviewTask?.status === "open"
+    )
+    .sort((left, right) => {
+      const leftRank = priorityRank[left.reviewTask?.priority ?? "normal"] ?? 2;
+      const rightRank = priorityRank[right.reviewTask?.priority ?? "normal"] ?? 2;
+      return leftRank - rightRank || left.restaurantName.localeCompare(right.restaurantName);
+    });
 }
 
 export async function getPrototypeStats() {
@@ -1007,7 +1209,7 @@ export async function getSourceGaps(): Promise<SourceGap[]> {
     readCsv(seedCandidatesPath)
   ]);
 
-  return sourceRows
+  const seedGaps = sourceRows
     .map((source) => {
       const candidates = candidateRows.filter(
         (candidate) => candidate.restaurant_name === source.restaurant_name
@@ -1060,13 +1262,104 @@ export async function getSourceGaps(): Promise<SourceGap[]> {
         verifiedCandidateCount: verified.length,
         blockers,
         priority,
-        notes: source.notes
+        notes: source.notes,
+        origin: "seed" as const
       };
     })
     .sort((left, right) => {
       const rank: Record<SourceGap["priority"], number> = { critical: 0, high: 1, normal: 2 };
       return rank[left.priority] - rank[right.priority] || right.needsReviewCount - left.needsReviewCount;
     });
+
+  const researchGaps = await getResearchSourceGaps();
+
+  return [...seedGaps, ...researchGaps].sort((left, right) => {
+    const rank: Record<SourceGap["priority"], number> = { critical: 0, high: 1, normal: 2 };
+    return rank[left.priority] - rank[right.priority] ||
+      right.needsReviewCount - left.needsReviewCount ||
+      left.restaurantName.localeCompare(right.restaurantName);
+  });
+}
+
+export async function getResearchSourceGaps(): Promise<SourceGap[]> {
+  const [restaurantIntakes, dealIntakes] = await Promise.all([
+    readResearchIntakeRows("restaurant-source-list.csv"),
+    readResearchIntakeRows("deal-intake.csv")
+  ]);
+  const dealsByFolderAndRestaurant = new Map<string, CsvRow[]>();
+
+  dealIntakes.forEach((intake) => {
+    const folder = path.basename(intake.directory);
+
+    intake.rows.forEach((row) => {
+      const key = `${folder}:${row.restaurant_id || row.restaurant_name}`;
+      const rows = dealsByFolderAndRestaurant.get(key) ?? [];
+      rows.push(row);
+      dealsByFolderAndRestaurant.set(key, rows);
+    });
+  });
+
+  return restaurantIntakes.flatMap((intake) => {
+    const folder = path.basename(intake.directory);
+
+    return intake.rows.map((restaurant) => {
+      const key = `${folder}:${restaurant.restaurant_id || restaurant.name}`;
+      const candidates = dealsByFolderAndRestaurant.get(key) ?? [];
+      const openCandidates = candidates.filter((candidate) => !isTerminalResearchStatus(candidate));
+      const verifiedCandidates = candidates.filter((candidate) => candidate.confidence_status === "verified");
+      const sourceUrl = restaurant.official_website ||
+        restaurant.official_instagram ||
+        restaurant.official_facebook ||
+        restaurant.ordering_url ||
+        restaurant.google_business_url;
+      const blockers: string[] = [];
+
+      if (!sourceUrl) {
+        blockers.push("missing source URL");
+      }
+
+      if (restaurant.status !== "verified") {
+        blockers.push(`source status ${restaurant.status || "needs_review"}`);
+      }
+
+      if (openCandidates.length > 0) {
+        blockers.push(`${openCandidates.length} intake candidate${openCandidates.length === 1 ? "" : "s"} need review`);
+      }
+
+      if (candidates.some((candidate) => candidate.location_scope_status === "out_of_scope")) {
+        blockers.push("outside current public prototype scope");
+      }
+
+      if (candidates.some((candidate) => candidate.publish_block_reason?.includes("no durable capture"))) {
+        blockers.push("needs durable capture");
+      }
+
+      const priority: SourceGap["priority"] =
+        openCandidates.some((candidate) => candidate.workflow_status === "needs_review" && candidate.confidence_status === "probable")
+          ? "critical"
+          : openCandidates.length > 0
+            ? "high"
+            : "normal";
+
+      return {
+        restaurantName: restaurant.name,
+        locationArea: `${restaurant.city || intake.areaName}${restaurant.state ? `, ${restaurant.state}` : ""}`,
+        areaGroup: sourceGapAreaGroupForLocation(intake.areaName, restaurant.name),
+        primarySourceUrl: sourceUrl,
+        sourceStatus: restaurant.status || "needs_review",
+        authorityRank: "",
+        scanFrequency: "",
+        candidateCount: candidates.length,
+        needsReviewCount: openCandidates.length,
+        verifiedCandidateCount: verifiedCandidates.length,
+        blockers,
+        priority,
+        notes: restaurant.notes || `Research intake from ${intake.areaName}; not public until reviewed fixtures are promoted.`,
+        origin: "research_intake" as const,
+        intakeFolder: folder
+      };
+    });
+  });
 }
 
 function isoDateInWilmington(date: Date): string {
@@ -1204,6 +1497,8 @@ export async function getOpsDashboard(date = getOperatingDate(), horizonDays = 1
     seedCandidateRows,
     seedReviewTaskRows,
     carryoutRows,
+    researchDealIntakes,
+    researchReviewTaskIntakes,
     sourceGaps,
     openReviewCandidates
   ] = await Promise.all([
@@ -1218,6 +1513,8 @@ export async function getOpsDashboard(date = getOperatingDate(), horizonDays = 1
     readCsv(seedCandidatesPath),
     readCsv(seedReviewTasksPath),
     readCsv(carryoutPlacesPath),
+    readResearchIntakeRows("deal-intake.csv"),
+    readResearchIntakeRows("review-tasks.csv"),
     getSourceGaps(),
     getOpenReviewCandidates()
   ]);
@@ -1227,6 +1524,8 @@ export async function getOpsDashboard(date = getOperatingDate(), horizonDays = 1
   const publicRows = dealRows.filter((row) => passesPublicDealRuntimeFilter(row, restaurantsById, date));
   const reviewedOpsRows = dealRows.filter(passesReviewedDealOpsGate);
   const seedCounts = seedCandidateStatusCounts(seedCandidateRows);
+  const researchCandidateRows = researchDealIntakes.flatMap((intake) => intake.rows);
+  const researchReviewTaskRows = researchReviewTaskIntakes.flatMap((intake) => intake.rows);
   const day = weekdayName(date);
   const recheckQueue = reviewedOpsRows
     .map((row) => mapOpsRecheckItem(row, restaurantsById, sourcesById, date, horizonDays))
@@ -1270,6 +1569,9 @@ export async function getOpsDashboard(date = getOperatingDate(), horizonDays = 1
       verifiedSeedCandidates: seedCounts.verified,
       needsReviewSeedCandidates: seedCounts.needsReview,
       terminalSeedCandidates: seedCounts.terminal,
+      researchIntakeBatches: researchDealIntakes.length,
+      researchIntakeCandidates: researchCandidateRows.length,
+      openResearchIntakeTasks: researchReviewTaskRows.filter((row) => row.status === "open").length,
       verifiedCarryoutPlaces: carryoutRows.filter((row) => row.source_status === "verified").length,
       hiddenCarryoutPlaces: carryoutRows.filter((row) => row.source_status !== "verified").length,
       sourceGapRows: sourceGaps.length,
@@ -1299,6 +1601,101 @@ export async function getOpsDashboard(date = getOperatingDate(), horizonDays = 1
         evidenceRef: row.evidence_ref
       })),
     manifestDrift: manifestDrift(actualCounts)
+  };
+}
+
+export type IntakeCandidateSummary = {
+  candidateId: string;
+  restaurantName: string;
+  dealTitle: string;
+  schedule: string;
+  timeWindow: string;
+  price: string;
+  sourceUrl: string;
+  screenshotPath: string;
+  workflowStatus: string;
+  confidenceStatus: string;
+  publishBlockReason: string;
+  restrictionNotes: string;
+  uncertaintyFlags: string;
+  nextAction: string;
+  statusGroup: "source_backed" | "lead" | "rejected";
+};
+
+export type IntakeAreaSummary = {
+  folderName: string;
+  sourceBacked: IntakeCandidateSummary[];
+  leads: IntakeCandidateSummary[];
+  rejected: IntakeCandidateSummary[];
+};
+
+export async function getSouthportIntakeSummary(): Promise<IntakeAreaSummary | null> {
+  if (!existsSync(researchIntakeRootPath)) {
+    return null;
+  }
+
+  const southportDirs = readdirSync(researchIntakeRootPath, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith("southport-"))
+    .map((entry) => path.join(researchIntakeRootPath, entry.name))
+    .sort((a, b) => path.basename(b).localeCompare(path.basename(a)));
+
+  if (southportDirs.length === 0) {
+    return null;
+  }
+
+  const dir = southportDirs[0];
+  const folderName = path.basename(dir);
+  const intakePath = path.join(dir, "deal-intake.csv");
+
+  if (!existsSync(intakePath)) {
+    return null;
+  }
+
+  const rows = await readCsv(intakePath);
+
+  function classifyRow(row: CsvRow): "source_backed" | "lead" | "rejected" {
+    const ws = row.workflow_status ?? "";
+    if (ws === "rejected") return "rejected";
+    if (ws === "approved" || ws === "approved_with_uncertainty") return "source_backed";
+    return "lead";
+  }
+
+  function mapIntakeRow(row: CsvRow): IntakeCandidateSummary {
+    const group = classifyRow(row);
+    const notes = row.validation_notes ?? "";
+    const actionMatch = notes.match(/Next manual action:\s*(.+)/s);
+    const nextAction = actionMatch
+      ? actionMatch[1].replace(/\s+/g, " ").trim()
+      : group === "source_backed"
+        ? "Open source, verify evidence screenshot, then approve or reject for Southport fixtures."
+        : "No specific next action recorded.";
+
+    return {
+      candidateId: row.candidate_id || row.deal_id || row.restaurant_name,
+      restaurantName: row.restaurant_name,
+      dealTitle: row.deal_title,
+      schedule: formatDaysAvailableLabel(row.days_available || ""),
+      timeWindow: toTimeWindow(row.start_time || "", row.end_time || ""),
+      price: row.price || row.discount || "See source",
+      sourceUrl: row.source_url,
+      screenshotPath: row.screenshot_path,
+      workflowStatus: row.workflow_status,
+      confidenceStatus: row.confidence_status,
+      publishBlockReason: row.publish_block_reason,
+      restrictionNotes: row.restriction_notes,
+      uncertaintyFlags: row.uncertainty_flags,
+      nextAction,
+      statusGroup: group
+    };
+  }
+
+  const all = rows.map(mapIntakeRow);
+
+  return {
+    folderName,
+    sourceBacked: all.filter((r) => r.statusGroup === "source_backed"),
+    leads: all.filter((r) => r.statusGroup === "lead"),
+    rejected: all.filter((r) => r.statusGroup === "rejected")
   };
 }
 

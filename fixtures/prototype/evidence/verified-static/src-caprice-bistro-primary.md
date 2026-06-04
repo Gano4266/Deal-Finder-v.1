@@ -5,16 +5,6 @@
 - Fixture status: verified_static, not live data
 - Note: Official site has weekly specials / petit plates source pages. Exact public deal claims require later review before publication.
 
-## Phase 1e Reviewed Capture
-
-- Source: https://www.capricebistro.com/weekly-specials
-- Observed: 2026-06-02
-- Capture ID: cap-caprice-bistro-2026-06-02
-- Source check ID: chk-caprice-bistro-2026-06-02
-- Reviewed public deal: deal-caprice-bistro-tuesday-coq-au-vin
-- Evidence summary: Official weekly-specials page lists Caprice Bistro at 10 Market St, Wilmington, NC 28401 and identifies Coq au Vin Tuesday as an every-Tuesday food special. Public copy suppresses beer/wine/drink-adjacent page language.
-- Content hash: sha256:067daef1f60e7332bff2a55085b587037afa63cf46bc623d98b55956e7876f25
-
 ## Phase 1j Expanded Reviewed Capture
 
 - Source: https://www.capricebistro.com/weekly-specials

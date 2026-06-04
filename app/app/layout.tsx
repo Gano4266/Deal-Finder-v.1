@@ -5,8 +5,8 @@ import { PrimaryNav } from "./primary-nav";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Forkcast Wilmington",
-  description: "Today's forecast for Wilmington, NC food specials.",
+  title: "Forkcast",
+  description: "Today's forecast for food specials worth knowing.",
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },

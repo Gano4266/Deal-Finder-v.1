@@ -77,7 +77,7 @@ Source failure, conflict, credible public report, or restaurant correction route
 - Missing source evidence.
 - Source is too old.
 - Restaurant location is unclear or out of scope.
-- Deal is a standard menu item, not a special.
+- Deal is a standard menu item, routine menu availability, or low-value daily item rather than a meaningful special.
 - Price, time, or restrictions are unsupported.
 - Source contradicts a newer official record.
 - Restaurant reports the deal is wrong.

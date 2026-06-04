@@ -39,11 +39,11 @@ export default async function SourceGapsPage({ searchParams }: SourceGapsPagePro
       <section className="sectionHeader">
         <div>
           <p className="eyebrow">Source ops</p>
-          <h1>Wilmington source gaps</h1>
+          <h1>Source gaps</h1>
           <p>
-            Static report for the Wilmington seed/source set. Use this to decide
-            which restaurants need source capture, direct confirmation, or deal
-            review before more public rows are promoted.
+            Static report for Wilmington seeds plus research intake batches. Use
+            this to decide which restaurants need source capture, direct
+            confirmation, or deal review before public rows are promoted.
           </p>
           <p className="reviewMeta">
             {criticalCount} critical rows / {needsReviewTotal} candidates need review.
@@ -103,6 +103,9 @@ export default async function SourceGapsPage({ searchParams }: SourceGapsPagePro
             </dl>
 
             <div className="badgeRow">
+              {gap.origin === "research_intake" ? (
+                <span>{gap.intakeFolder}</span>
+              ) : null}
               {gap.blockers.length === 0 ? (
                 <span>No blockers logged</span>
               ) : (

@@ -32,6 +32,12 @@ export default async function RestaurantsPage({ searchParams }: RestaurantsPageP
   );
   const withDeals = visibleRestaurants.filter((restaurant) => restaurant.publicDealCount > 0);
   const sourceOnly = visibleRestaurants.filter((restaurant) => restaurant.publicDealCount === 0);
+  const emptyHeading = selectedArea === "All"
+    ? "No restaurants match this area yet."
+    : `No ${selectedArea} restaurants match this area yet.`;
+  const emptyCopy = selectedArea === "All"
+    ? "Try another area while Forkcast keeps expanding coverage."
+    : "Try another area or check back as the local read fills in.";
   const countForArea = (area: (typeof areaOptions)[number]) => {
     if (area === "All") {
       return restaurants.length;
@@ -45,10 +51,10 @@ export default async function RestaurantsPage({ searchParams }: RestaurantsPageP
       <section className="sectionHeader">
         <div>
           <p className="eyebrow">Restaurant coverage</p>
-          <h1>Wilmington restaurants</h1>
+          <h1>Restaurants Forkcast is watching</h1>
           <p>
-            Browse Wilmington restaurants Forkcast is tracking for food
-            specials.
+            Browse restaurants Forkcast is tracking for food specials across
+            the local coverage area.
           </p>
           <p className="notes">
             Details can change. Check the restaurant&apos;s latest post or site
@@ -97,12 +103,12 @@ export default async function RestaurantsPage({ searchParams }: RestaurantsPageP
               <h2>{restaurant.name}</h2>
               <div className="badgeRow" aria-label="Restaurant status">
                 <span>{restaurant.publicDealCount} deal{restaurant.publicDealCount === 1 ? "" : "s"}</span>
-                <span>Last confirmed {restaurant.lastChecked}</span>
+                <span>Checked {restaurant.lastChecked}</span>
                 {restaurant.publicDealDays.length > 0 ? (
                   <span>{restaurant.publicDealDays.join(" / ")}</span>
                 ) : null}
               </div>
-              <p>{restaurant.cuisine || restaurant.tags || "Wilmington restaurant in the pilot set."}</p>
+              <p>{restaurant.cuisine || restaurant.tags || "Restaurant in the Forkcast set."}</p>
               <p className="locationLine">{restaurant.address}</p>
             </div>
             <div className="cardActions">
@@ -124,27 +130,35 @@ export default async function RestaurantsPage({ searchParams }: RestaurantsPageP
         ))}
       </section>
 
-      <section className="restaurantList compactList" aria-label="Restaurants without deals yet">
-        <h2>On our radar</h2>
-        {sourceOnly.map((restaurant) => (
-          <article key={restaurant.restaurantId} className="restaurantCard compactRestaurantCard">
-            <div>
-              <h3>{restaurant.name}</h3>
-              <p>{restaurant.neighborhood || "Wilmington"} / last confirmed {restaurant.lastChecked}</p>
-            </div>
-            <div className="cardActions">
-              {phoneHref(restaurant.phone) ? (
-                <a href={phoneHref(restaurant.phone)} className="secondaryLink">
-                  Call
-                </a>
-              ) : null}
-              <Link href={`/restaurants/${restaurant.restaurantId}` as Route} className="secondaryLink">
-                Details
-              </Link>
-            </div>
-          </article>
-        ))}
-      </section>
+      {visibleRestaurants.length === 0 ? (
+        <section className="emptyState" aria-label="No restaurants for selected area">
+          <p className="eyebrow">No matches yet</p>
+          <h2>{emptyHeading}</h2>
+          <p>{emptyCopy}</p>
+        </section>
+      ) : (
+        <section className="restaurantList compactList" aria-label="Restaurants without deals yet">
+          <h2>On our radar</h2>
+          {sourceOnly.map((restaurant) => (
+            <article key={restaurant.restaurantId} className="restaurantCard compactRestaurantCard">
+              <div>
+                <h3>{restaurant.name}</h3>
+                <p>{restaurant.neighborhood || "Wilmington"} / checked {restaurant.lastChecked}</p>
+              </div>
+              <div className="cardActions">
+                {phoneHref(restaurant.phone) ? (
+                  <a href={phoneHref(restaurant.phone)} className="secondaryLink">
+                    Call
+                  </a>
+                ) : null}
+                <Link href={`/restaurants/${restaurant.restaurantId}` as Route} className="secondaryLink">
+                  Details
+                </Link>
+              </div>
+            </article>
+          ))}
+        </section>
+      )}
     </main>
   );
 }

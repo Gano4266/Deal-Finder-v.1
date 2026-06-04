@@ -1,10 +1,10 @@
 # Prototype Data Contract
 
-This contract defines what the Phase 1 static `/tonight` prototype may display before live data, automation, auth, or database work exists.
+This contract defines what the Phase 1 static `/tonight` prototype and separate Southport prototype may display before live data, automation, auth, or database work exists.
 
 ## Public `/tonight` Source
 
-The public `/tonight` route must read public deal rows from `fixtures/prototype/deals.csv` only.
+The public `/tonight` route must read reviewed Wilmington broad-market deal rows from `fixtures/prototype/deals.csv` only. Wilmington broad market currently means Wilmington, NC plus Carolina Beach, NC.
 
 Do not hydrate public `/tonight` from:
 
@@ -28,7 +28,7 @@ The `/restaurants` and `/restaurants/[restaurantId]` routes may read restaurant 
 
 Public restaurant pages are a static source directory, not a claim that a restaurant currently has an available deal. They should show only rows that are:
 
-- `city=Wilmington`
+- `city=Wilmington` or `city=Carolina Beach`
 - `state=NC`
 - `status=active`
 - `fixture_data_class=verified_static`
@@ -36,6 +36,12 @@ Public restaurant pages are a static source directory, not a claim that a restau
 - labeled with the static prototype notice
 
 Do not hydrate public restaurant pages from seed candidates, review tasks, source-gap notes, research notes, or raw operator notes. Restaurant profiles may show reviewed public deals for that restaurant, but only after those deals pass the public deal filter.
+
+## Separate Southport Prototype
+
+Southport/Oak Island rows may exist in `fixtures/prototype/` only for the separate `/southport` prototype. They must not appear in the main Wilmington `/tonight`, `/deals`, or `/restaurants` surfaces unless a later scope decision explicitly merges Southport into the main feed.
+
+The `/southport` route may read reviewed Southport/Oak Island prototype rows from `fixtures/prototype/deals.csv`. It must keep prototype language clear and must not hydrate from raw intake rows directly.
 
 ## Public `/report` Source
 
@@ -103,6 +109,14 @@ The MVP is food-first. Suppress:
 - mixed food/alcohol claims where food-safe public copy has not been approved
 
 Mixed specials may publish only when `public_description` omits alcohol claims and accurately describes the verified food component.
+
+## Deal Value Gate
+
+Public deal rows should represent a recognizable special, discount, prix fixe, combo, limited-day food offer, or recurring meal deal that helps someone decide where to eat and save money.
+
+Do not publish generic standing menu items or routine menu availability as deals. Examples include daily soup, soup du jour, fish of the day, fresh catch, dessert of the day, or other rotating menu items unless the official source clearly frames the item as a special with meaningful value, schedule, price, and restrictions that fit the MVP mission.
+
+If a source-backed item is real but weak on deal value, keep it in research or review notes and do not promote it to `fixtures/prototype/deals.csv`.
 
 ## Empty State
 

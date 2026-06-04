@@ -20,3 +20,11 @@ app/out/
 # Local smoke-test artifacts
 artifacts/
 .vercel
+
+# Private/local research artifacts
+ops/evidence/**
+ops/research/intake/**/screenshots/*
+!ops/research/intake/**/screenshots/.gitkeep
+ops/research/intake/**/raw/*
+!ops/research/intake/**/raw/.gitkeep
+*.webarchive

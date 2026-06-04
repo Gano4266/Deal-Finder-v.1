@@ -213,6 +213,24 @@ const checkIds = new Set(checks.map((row) => row.source_check_id));
 const reviewTaskIds = new Set(reviewTasks.map((row) => row.review_task_id));
 const auditEventIds = new Set(auditEvents.map((row) => row.audit_event_id));
 const candidateIds = new Set(candidates.map(candidateId));
+const researchIntakeRoot = path.join(repoRoot, "ops/research/intake");
+if (fs.existsSync(researchIntakeRoot)) {
+  for (const entry of fs.readdirSync(researchIntakeRoot, { withFileTypes: true })) {
+    if (!entry.isDirectory() || entry.name === "example-area") {
+      continue;
+    }
+
+    const dealIntakePath = path.join(researchIntakeRoot, entry.name, "deal-intake.csv");
+    if (!fs.existsSync(dealIntakePath)) {
+      continue;
+    }
+
+    readCsv(path.relative(repoRoot, dealIntakePath)).rows
+      .map((row) => row.candidate_id)
+      .filter(Boolean)
+      .forEach((id) => candidateIds.add(id));
+  }
+}
 const restaurantsById = new Map(restaurants.map((row) => [row.restaurant_id, row]));
 const sourcesById = new Map(sources.map((row) => [row.source_id, row]));
 const capturesById = new Map(captures.map((row) => [row.source_capture_id, row]));
@@ -228,10 +246,13 @@ const allowedSeedCandidateStatuses = new Set(["needs_review", "verified", ...ter
 const allowedSeedSourceStatuses = new Set(["verified", "likely", "needs_review"]);
 const sha256Pattern = /^sha256:[a-f0-9]{64}$/;
 const today = todayInWilmington();
+const wilmingtonBroadFixtureCities = new Set(["Wilmington", "Carolina Beach"]);
+const southportPilotFixtureCities = new Set(["Southport", "Oak Island"]);
+const publicFixtureCities = new Set([...wilmingtonBroadFixtureCities, ...southportPilotFixtureCities]);
 
 function passesPublicRestaurantFilter(row) {
   return (
-    row.city === "Wilmington" &&
+    publicFixtureCities.has(row.city) &&
     row.state === "NC" &&
     row.status === "active" &&
     row.fixture_data_class === "verified_static" &&
@@ -260,7 +281,7 @@ for (const restaurant of restaurants) {
     "prototype_notice"
   ].forEach((field) => requireValue(restaurant, field, label));
 
-  assert(restaurant.city === "Wilmington", `${label}: fixture restaurant city must be Wilmington`);
+  assert(publicFixtureCities.has(restaurant.city), `${label}: fixture restaurant city is outside approved pilot markets`);
   assert(restaurant.state === "NC", `${label}: fixture restaurant state must be NC`);
   assert(
     allowedFixtureRestaurantStatuses.has(restaurant.status),
@@ -300,7 +321,18 @@ for (const deal of deals) {
 
   assert(candidateIds.has(deal.candidate_id), `${label}: candidate_id is not a promoted seed candidate`);
   assert(restaurantIds.has(deal.restaurant_id), `${label}: missing restaurant row ${deal.restaurant_id}`);
-  assert(passesPublicRestaurantFilter(restaurantsById.get(deal.restaurant_id)), `${label}: restaurant row does not pass public restaurant filter`);
+  const dealRestaurant = restaurantsById.get(deal.restaurant_id);
+  assert(passesPublicRestaurantFilter(dealRestaurant), `${label}: restaurant row does not pass public restaurant filter`);
+  assert(
+    wilmingtonBroadFixtureCities.has(dealRestaurant.city) || southportPilotFixtureCities.has(dealRestaurant.city),
+    `${label}: restaurant city is not in the Wilmington broad or Southport pilot scopes`
+  );
+  if (dealRestaurant.city === "Carolina Beach") {
+    assert(deal.location_scope_status === "pilot_market_confirmed", `${label}: Carolina Beach deal must use pilot_market_confirmed scope`);
+  }
+  if (southportPilotFixtureCities.has(dealRestaurant.city)) {
+    assert(deal.location_scope_status === "pilot_market_confirmed", `${label}: Southport pilot deal must use pilot_market_confirmed scope`);
+  }
   assert(sourceIds.has(deal.source_id), `${label}: missing source row ${deal.source_id}`);
   assert(captureIds.has(deal.source_capture_id), `${label}: missing capture row ${deal.source_capture_id}`);
   assert(checkIds.has(deal.source_check_id), `${label}: missing source check row ${deal.source_check_id}`);
@@ -330,7 +362,11 @@ for (const deal of deals) {
   assert(source.restaurant_id === deal.restaurant_id, `${label}: source restaurant does not match deal restaurant`);
   assert(source.source_tier === deal.source_tier, `${label}: source_tier does not match source inventory`);
   assert(source.source_status === "active", `${label}: source row is not active`);
-  assert(source.wilmington_location_match === "true", `${label}: source row does not confirm Wilmington location`);
+  const sourceRestaurant = restaurantsById.get(deal.restaurant_id);
+  assert(
+    source.wilmington_location_match === "true" || publicFixtureCities.has(sourceRestaurant?.city),
+    `${label}: source row does not confirm pilot market location`
+  );
   assert(capture.restaurant_id === deal.restaurant_id, `${label}: capture restaurant does not match deal restaurant`);
   assert(capture.source_id === deal.source_id, `${label}: capture source does not match deal source`);
   assert(deal.source_url === capture.source_final_url, `${label}: deal source_url does not match capture source_final_url`);

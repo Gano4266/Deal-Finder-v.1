@@ -11,7 +11,7 @@
 
 - Maintain the mobile-first Next.js/PWA static app.
 - Load reviewed static data from repo-managed fixtures.
-- Keep `/tonight`, `/deals`, `/deals/[dealId]`, `/carryout`, `/admin/review`, and `/admin/source-gaps` guarded by validation.
+- Keep `/tonight`, `/deals`, `/deals/[dealId]`, `/admin/review`, and `/admin/source-gaps` guarded by validation. (`/carryout` is suppressed — see `DECISIONS.md`.)
 - Clearly label static prototype data so it is never confused with live deals.
 - Next Phase 1 work: durable screenshots/archive captures and resolution of open seed review tasks.
 

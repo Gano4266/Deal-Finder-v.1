@@ -71,7 +71,7 @@ export default async function RestaurantDetailPage({ params }: RestaurantPagePro
               <dd>{restaurant.cuisine || restaurant.tags || "Not listed"}</dd>
             </div>
             <div>
-              <dt>Last confirmed</dt>
+              <dt>Checked</dt>
               <dd>{restaurant.lastChecked || "Not listed"}</dd>
             </div>
           </dl>
@@ -87,7 +87,7 @@ export default async function RestaurantDetailPage({ params }: RestaurantPagePro
               </a>
             ) : null}
             <Link href={`/report?restaurantId=${restaurant.restaurantId}` as Route} className="secondaryLink">
-              Send update
+              Report an issue
             </Link>
           </div>
         </article>
@@ -103,7 +103,7 @@ export default async function RestaurantDetailPage({ params }: RestaurantPagePro
               {restaurant.deals.map((deal) => (
                 <Link key={deal.dealId} href={`/deals/${deal.dealId}`} className="miniDeal">
                   <span>{deal.publicTitle}</span>
-                  <small>{deal.scheduleLabel} / {deal.daysAvailableLabel} / {deal.timeWindow}</small>
+                  <small>{deal.scheduleLabel} / {deal.timeWindow}</small>
                 </Link>
               ))}
             </div>

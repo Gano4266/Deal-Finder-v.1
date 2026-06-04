@@ -1,0 +1,31 @@
+# Agent Instructions (Codex and Claude)
+
+- The runnable app lives in `app/`.
+- Standard verification commands:
+  - `cd app`
+  - `npm run validate:data`
+  - `npm run lint`
+  - `npm run build`
+- Follow the canonical operating docs before changing research, evidence, review, or publish behavior:
+  - `README.md`
+  - `docs/data-model.md`
+  - `docs/data-sources.md`
+  - `docs/review-workflow.md`
+  - `docs/deal-validation-policy.md`
+  - `docs/prototype-data-contract.md`
+  - `docs/anti-staleness-policy.md`
+  - `ops/templates/deal-intake-template.csv`
+  - `ops/templates/source-captures-template.csv`
+  - `ops/templates/source-checks-template.csv`
+  - `ops/templates/review-tasks-template.csv`
+  - `ops/templates/audit-events-template.csv`
+- Do not create competing `source_tier`, `confidence_status`, or `workflow_status` values.
+- Do not research restaurants, scrape websites, call external APIs, or promote deals unless explicitly asked.
+- It is acceptable to create docs, prompts, templates, compatibility checkers, and review tooling that map back to the existing model.
+- Preserve the public-data gate: `/tonight` reads only reviewed public rows from `fixtures/prototype/deals.csv`.
+- AI output is never evidence.
+- Third-party, social, and user-note inputs are leads until official evidence or direct confirmation supports them.
+- Do not commit credentials, API keys, personal info, raw screenshots, raw captures, or sensitive evidence artifacts.
+- Market scope: Wilmington, NC and Carolina Beach, NC (authorized as Wilmington broad scope — see `DECISIONS.md`). Southport, NC is an authorized soft-pilot with its own `/southport` route. Kure Beach, Wrightsville Beach, Leland, and Hampstead are future-market only — do not add them without an explicit entry in `DECISIONS.md`. Monkey Junction is boundary-sensitive and requires confirmed Wilmington relevance, acceptable official evidence, review approval, public copy approval, freshness metadata, and the full public fixture filter before any public publication.
+- Do not revive `/carryout`. The public MVP does not expose it. See `DECISIONS.md` for the suppression record.
+- Deep Research intake must use `ops/research/intake/<area>-YYYY-MM-DD/`. Do not create intake or sweep directories outside this path. Validate with `npm run research:validate -- ops/research/intake/<area>-YYYY-MM-DD`. The dry-run promotion guard has no `--write` mode and must not be given one.

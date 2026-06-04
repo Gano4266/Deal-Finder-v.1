@@ -3,6 +3,7 @@ import type { Route } from "next";
 import { notFound } from "next/navigation";
 import { getPublicDealById, getPublicDeals, getRestaurantById } from "../../../lib/data";
 import { phoneHref } from "../../phone-link";
+import { displayDescription } from "../../public-copy";
 
 type DealPageProps = {
   params: Promise<{
@@ -25,6 +26,7 @@ export default async function DealDetailPage({ params }: DealPageProps) {
 
   const restaurant = await getRestaurantById(deal.restaurantId);
   const restaurantPhoneHref = restaurant ? phoneHref(restaurant.phone) : undefined;
+  const description = displayDescription(deal.publicDescription);
 
   return (
     <main className="pageShell detailShell">
@@ -32,7 +34,7 @@ export default async function DealDetailPage({ params }: DealPageProps) {
         <div>
           <p className="eyebrow">{deal.restaurantName}</p>
           <h1>{deal.publicTitle}</h1>
-          <p>{deal.publicDescription}</p>
+          {description ? <p>{description}</p> : null}
         </div>
         <Link href="/deals" className="secondaryLink">
           All deals
@@ -45,11 +47,11 @@ export default async function DealDetailPage({ params }: DealPageProps) {
           <dl className="factGrid">
             <div>
               <dt>Price</dt>
-              <dd>{deal.price || "See source"}</dd>
+              <dd>{deal.price || "See details"}</dd>
             </div>
             <div>
-              <dt>When</dt>
-              <dd>{deal.daysAvailableLabel} {deal.timeWindow}</dd>
+              <dt>Time</dt>
+              <dd>{deal.timeWindow}</dd>
             </div>
             <div>
               <dt>Location</dt>
@@ -76,18 +78,18 @@ export default async function DealDetailPage({ params }: DealPageProps) {
         </article>
 
         <article className="detailPanel">
-          <h2>Where this came from</h2>
+          <h2>Official details</h2>
           <dl className="factGrid">
             <div>
-              <dt>Restaurant source</dt>
+              <dt>Restaurant post</dt>
               <dd>{deal.sourceDisplayName}</dd>
             </div>
             <div>
-              <dt>Last confirmed</dt>
-              <dd>{deal.lastVerifiedAt}</dd>
+              <dt>Checked</dt>
+              <dd>{deal.lastVerifiedLabel}</dd>
             </div>
             <div>
-              <dt>Restaurant wording</dt>
+              <dt>Original wording</dt>
               <dd>{deal.sourceQuote ? "Shown below" : "Check the restaurant page"}</dd>
             </div>
           </dl>
@@ -109,12 +111,12 @@ export default async function DealDetailPage({ params }: DealPageProps) {
             <blockquote className="proofQuote">
               {deal.sourceQuote || "Check the restaurant page for the latest details."}
             </blockquote>
-            <p className="proofCaption">Last confirmed {deal.lastVerifiedAt}.</p>
+            <p className="proofCaption">Details checked {deal.lastVerifiedLabel}.</p>
           </section>
 
           <div className="cardActions">
             <a href={deal.sourceUrl} className="primaryLink">
-              Check restaurant source
+              Check official details
             </a>
             <Link href={`/restaurants/${deal.restaurantId}` as Route} className="secondaryLink">
               View restaurant
@@ -125,7 +127,7 @@ export default async function DealDetailPage({ params }: DealPageProps) {
               </a>
             ) : null}
             <Link href={`/report?dealId=${deal.dealId}` as Route} className="secondaryLink">
-              Send update
+              Report an issue
             </Link>
           </div>
           <p className="notes">
