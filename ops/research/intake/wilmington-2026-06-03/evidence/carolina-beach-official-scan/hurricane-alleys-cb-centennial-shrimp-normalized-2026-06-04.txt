@@ -1,0 +1,25 @@
+source_url: https://hurricanealleyscb.com/hurricane-alleys-restaurant-menu/
+source_name: Hurricane Alley's official restaurant menu
+restaurant: Hurricane Alley's
+location: 5 Boardwalk, Carolina Beach, NC
+captured_at: 2026-06-04T09:59:04-04:00
+capture_method: manual_web_review
+evidence_type: official_website_menu_text
+
+normalized_evidence:
+Hurricane Alley's official menu page is titled "Hurricane Alleys | Restaurant Menu" and describes the page as the online menu for Hurricane Alley's Oceanfront Bar & Grill at Carolina Beach, NC.
+
+The official menu section "From the Sea" lists "Chilled Peel & Eat Shrimp" with a base 1/2 lb item at $12.00 and source text indicating a "CB Centenial special with over a pound $19.95."
+
+The source supports:
+- restaurant and Carolina Beach location
+- item: chilled peel and eat shrimp
+- named/special marker: CB Centennial special
+- quantity: over a pound
+- price: $19.95
+
+review_blockers:
+- Confirm whether "CB Centenial" is an active current special or a menu label that should be treated as a standard menu item.
+- Confirm spelling if public copy is ever drafted; source text uses "Centenial."
+- No day, time window, or explicit recurrence is shown on the menu page.
+- No human review or public copy approval.

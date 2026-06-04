@@ -1,0 +1,17 @@
+Source: Prost Biergarten official specials page
+URL: https://prostilm.com/wilmington-downtown-prost-biergarten-happy-hours-specials
+Captured by: Codex official discovery round 2
+Captured at: 2026-06-04
+Market/location evidence: 115 South Front Street, Wilmington, NC 28401
+Source tier: tier_1_official
+
+Normalized official evidence:
+- Thursday June 4: Lunch special from 11:00 AM to 04:00 PM for potato and cheese pierogies with caramelized onions, bacon, chive cream, and arugula salad. No price visible.
+- Friday June 5: Flounder Sandwich Lunch Special served with chips or fries, price $15, source text says 11-4 and page time block shows 11:00 PM - 04:00 PM.
+- Tuesday June 9: Smash Burger Lunch Special, price $10, from 11:00 AM to 04:00 PM.
+- Alcohol specials are present on the source and must be suppressed.
+
+Extraction notes:
+- Intake-ready proposed candidates: June 5 flounder sandwich lunch special and June 9 smash burger lunch special.
+- Hold June 4 pierogies: no price visible.
+- Review caution: source time block for June 5 appears internally malformed; source text still says 11-4, so reviewer should verify before any publication.

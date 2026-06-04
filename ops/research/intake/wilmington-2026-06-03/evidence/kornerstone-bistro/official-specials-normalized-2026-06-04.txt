@@ -1,0 +1,15 @@
+Source: Kornerstone Bistro official website
+URL: https://www.kornerstonebistro.com/
+Captured by: Codex official discovery round 2
+Captured at: 2026-06-04
+Market/location evidence: 8262 Market Street, Wilmington, NC 28411
+Source tier: tier_1_official
+
+Normalized official evidence:
+- Weekly Specials section lists Monday kids eat free.
+- Restriction visible on source: dine in only.
+- Weekly Specials section also lists Tuesday half-price mussels, which already exists in the public static prototype and should not be treated as a new round-2 intake candidate.
+
+Extraction notes:
+- Proposed lead/candidate: Monday kids eat free, dine-in only.
+- Review caution: exact child age, adult entree requirement, and time window are not visible in captured official text; route to review/direct confirmation before publication.

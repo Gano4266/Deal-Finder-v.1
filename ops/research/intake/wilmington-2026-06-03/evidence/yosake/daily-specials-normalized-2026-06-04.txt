@@ -1,0 +1,43 @@
+Source URL: https://yosake.com/wp-content/static/documents/24-2-16-daily.pdf
+Restaurant: YoSake
+Location signal: YoSake official site lists 33 S Front, Wilmington, NC 28401.
+Captured: 2026-06-04
+HTTP last-modified observed: 2024-10-19 22:09:02 GMT
+PDF SHA-256: f7492dea3a86621cf02ec730f85275ade3d03716455b25102c995b9508f1afe9
+
+Normalized exact food-special terms visible in official PDF:
+
+- Tuesday: Two For Tuesday; two specialty rolls for $25.
+- Thursday: Noodle Night Thursday; noodle dishes for $12.
+- Sunday: buy one get one, up to $10 per person, applies to entrees, curries, and specialty rolls.
+- Daily happy hour food specials: 5 PM to 7 PM.
+- Friday and Saturday late happy hour: 10 PM to midnight.
+- Happy hour restrictions: not available for takeout or select holidays.
+
+Normalized daily happy-hour food items visible:
+
+- Spicy tuna or spicy salmon roll: $5.
+- Shelly roll: $5.
+- Alaskan roll or Philly roll: $5.
+- Crunchy spicy tuna or salmon roll: $5.
+- Sashimi appetizer: $9.
+- CARP roll: $4.
+- Cucumber avocado roll: $4.
+- Salmon asparagus roll: $4; tuna asparagus roll: $5.
+- California roll: $5.
+- Generoll: $11.
+- Tekamaki: $5; Sake Make: $4.
+- Steamed edamame: $3.
+- Chicken jalapeno eggrolls: $6.
+- Firecracker shrimp: $9.
+- Edamame hummus: $5.
+- Crispy brussel sprouts: $7.
+- Tempura chicken with sweet and sour sauce: $7.
+- Coconut lemongrass soup, miso, or tomato ginger: $2.
+- House salad: $3.
+- Seaweed salad: $4.
+- Squid salad: $4.
+
+Readiness note:
+
+Exact terms are visible, but this should not be converted to CSV without reviewer/direct confirmation because the PDF is an older official static document, the current YoSake live menu has newer pricing, and the current menu page checked on 2026-06-04 did not clearly surface this daily-specials PDF.

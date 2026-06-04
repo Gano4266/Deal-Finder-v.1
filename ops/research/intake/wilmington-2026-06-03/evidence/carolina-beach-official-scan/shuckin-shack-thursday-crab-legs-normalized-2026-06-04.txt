@@ -1,0 +1,31 @@
+Normalized official evidence capture
+Captured at: 2026-06-04T10:25:43-04:00
+Captured by: codex_agent_handoff
+Source tier: tier_1_official
+Source URL: https://www.theshuckinshack.com/events/thursday-5db408fd
+Source final URL: https://www.theshuckinshack.com/events/thursday-5db408fd
+Source title: Thursday - Shuckin' Shack Oyster Bar
+Restaurant: Shuckin' Shack Oyster Bar
+Location evidence URL checked: https://www.theshuckinshack.com/location-carolina-beach
+Location evidence observed: Carolina Beach location page lists 6A North Lake Park Blvd, Carolina Beach, NC 28428.
+
+Official extracted text:
+
+Thursday
+Weekly Thursday
+$29.99 a lb. Crab Legs
+$3 Domestic Bottles
+$7 Lunazul Ranch Waters
+
+Location page extracted text:
+
+Carolina Beach
+6A North Lake Park Blvd Carolina Beach, NC 28428
+Monday - Sunday: 11:00 am - 12:00 am
+
+Normalization notes:
+
+- Official event page supports a weekly Thursday crab-leg price.
+- The event page itself does not visibly restate the Carolina Beach location in the text capture, so location applicability requires reviewer confirmation before CSV import.
+- Public copy should be food-only and should not mention the drink specials.
+- The event page does not state a start or end time for the crab-leg special.

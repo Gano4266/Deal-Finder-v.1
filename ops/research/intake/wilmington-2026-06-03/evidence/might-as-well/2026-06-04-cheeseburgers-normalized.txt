@@ -1,0 +1,11 @@
+source_url: https://wilmington.mightaswellbarandgrill.com/wilmington-might-as-well-bar-and-grill-wilmington-happy-hours-specials
+source_observed_at: 2026-06-04T13:00:00-04:00
+source_title: Might As Well Bar & Grill Wilmington official specials
+restaurant_id: might-as-well-wilmington
+restaurant_name: Might As Well Bar & Grill - Wilmington
+official_location_text: 250 Racine Dr. Unit 15, Wilmington
+special_date: Thursday June 4th
+source_special_text: Thursday Game Night! $5.99 cheese burgers &$3.50 domestic beers all day
+source_time_window: 12:00 PM - 02:00 AM
+food_safe_candidate_extraction: $5.99 cheese burgers
+suppression_note: domestic beer text is present in the source and excluded from food-only candidate copy

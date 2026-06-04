@@ -1,0 +1,28 @@
+Normalized official evidence capture
+Captured at: 2026-06-04T10:25:43-04:00
+Captured by: codex_agent_handoff
+Source tier: tier_1_official
+Source URL: https://fentonispizza.com/daily-specials
+Source final URL: https://fentonispizza.com/daily-specials
+Source title: Daily Specials
+Restaurant: Fentoni's Pizza
+Location evidence URL: https://fentonispizza.com/
+Location evidence observed: Fentoni's Pizzeria at Publix, 1018 North Lake Park Boulevard, Carolina Beach, North Carolina 28428, United States.
+
+Official extracted text:
+
+Daily Specials
+Lunch Special
+Monday Thru Friday 11am-2pm
+Dine in only
+Any 2 slices and a fountain drink.
+$8.41 plus tax
+Available at Publix location only.
+Dine in only.
+
+Normalization notes:
+
+- Official restaurant website supports a weekday lunch special.
+- The deal item, price, time window, weekday range, dine-in restriction, and Publix-location restriction are explicit.
+- Carolina Beach relevance is supported by the restaurant home page location text for the Publix location.
+- Public copy still requires human review before publication.

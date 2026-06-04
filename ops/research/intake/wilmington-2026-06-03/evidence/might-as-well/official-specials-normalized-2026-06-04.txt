@@ -1,0 +1,39 @@
+Capture date: 2026-06-04
+Capture timezone: America/New_York
+Source URL: https://wilmington.mightaswellbarandgrill.com/wilmington-might-as-well-bar-and-grill-wilmington-happy-hours-specials
+Source type: Official restaurant website specials page
+Restaurant: Might As Well Bar & Grill - Wilmington
+Location evidence visible on page: 250 Racine Dr. Unit 15, Wilmington
+
+Normalized food-special evidence:
+
+Thursday June 4th
+- Food text: $5.99 cheese burgers
+- Suppressed adjacent text: domestic beer language
+- Time visible: 12:00 PM - 02:00 AM
+
+Friday June 5th
+- Food text: 99 cent wings
+- Suppressed adjacent text: mug specials language
+- Time visible: 12:00 AM - 02:00 AM
+- Source copy also says all day; review should resolve the displayed time conflict.
+
+Sunday June 7th
+- Food text: $15.99 Sunday Buffett
+- Food text: $5 Off Large Pizza's
+- Time visible: 12:30 PM - 02:00 AM
+- Review should resolve whether the late ending time applies to food service.
+
+Monday June 8th
+- Food text: $5 appetizer menu
+- Suppressed adjacent text: song bingo, Corona bucket, and adult bingo language
+- Time visible: 12:00 PM - 02:00 PM
+
+Tuesday June 9th
+- Food text: $1 cheese quesadilla
+- Suppressed adjacent text: margarita language
+- Time visible: 12:00 PM - 02:00 AM
+- Review should resolve whether the late ending time applies to food service.
+
+Wednesday June 10th
+- No food deal terms visible on the official specials page in this capture.

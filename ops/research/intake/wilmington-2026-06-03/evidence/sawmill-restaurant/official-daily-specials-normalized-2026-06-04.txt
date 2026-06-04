@@ -1,0 +1,63 @@
+Capture date: 2026-06-04
+Capture timezone: America/New_York
+Source URL: https://thesawmillrestaurant.com/daily-specials/
+Source type: Official restaurant website daily specials page
+Restaurant: Sawmill Restaurant
+Location evidence from existing source record: 5611 Carolina Beach Rd, Wilmington, NC 28412
+Boundary note: Monkey Junction / Wilmington boundary-sensitive handling still required before publication.
+
+Normalized food-special evidence:
+
+Thursday June 4th
+- Food text: 2 eggs, 2 bacon, 2 pancakes
+- Price visible: none
+- Time visible: 06:00 AM - 11:00 AM
+- Food text: Daily Special: Pasta Night
+- Price visible: none
+- Time visible: 07:00 AM - 08:00 PM
+
+Friday June 5th
+- Food text: 2 eggs, 2 bacon, 2 pancakes
+- Price visible: none
+- Time visible: 06:00 AM - 11:00 AM
+- Food text: Daily Special: Prime Rib, Stew Beef
+- Price visible: none
+- Time visible: 07:00 PM - 08:00 PM
+
+Saturday June 6th
+- Suppressed non-food text: Rose Sangria - $8
+- Food text: Cup of Coffee and Slice of Coffee Cake - $6
+- Time visible: 10:00 AM - 02:00 PM
+- Food text: Avocado Toast $11 with bread choice, avocado, house aioli, sprouts, mini tomatoes, egg your way; bacon add-on for $2
+- Time visible: 10:00 AM - 02:00 PM
+
+Sunday June 7th
+- Suppressed non-food text: Rose Sangria - $8
+- Food text: Avocado Toast $11 with bread choice, avocado, house aioli, sprouts, mini tomatoes, egg your way; bacon add-on for $2
+- Time visible: 11:00 AM - 02:00 PM
+- Food text: Cup of Coffee and Slice of Coffee Cake - $6
+- Time visible: 11:00 AM - 02:00 PM
+
+Monday June 8th
+- Food text: 2 eggs, 2 bacon, 2 pancakes
+- Price visible: none
+- Time visible: 06:00 AM - 11:00 AM
+- Food text: Daily Special: Meatloaf
+- Price visible: none
+- Time visible: 07:00 AM - 08:00 PM
+
+Tuesday June 9th
+- Food text: 2 eggs, 2 bacon, 2 pancakes
+- Price visible: none
+- Time visible: 06:00 AM - 11:00 AM
+- Food text: Daily Special: Chicken & Pastry
+- Price visible: none
+- Time visible: 07:00 AM - 08:00 PM
+
+Wednesday June 10th
+- Food text: 2 eggs, 2 bacon, 2 pancakes
+- Price visible: none
+- Time visible: 06:00 AM - 11:00 AM
+- Food text: Daily Special: Country Style Steak
+- Price visible: none
+- Time visible: 07:00 AM - 08:00 PM

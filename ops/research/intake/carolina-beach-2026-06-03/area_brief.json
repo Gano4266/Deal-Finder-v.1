@@ -1,0 +1,10 @@
+{
+  "area_name": "Carolina Beach, NC",
+  "intake_source": "user-provided GPT/manual audit table pasted into Codex",
+  "created_at": "2026-06-03",
+  "notes": [
+    "This intake records user-provided research output only.",
+    "No restaurant research, scraping, external API calls, screenshots, archives, or direct confirmations were performed by Codex.",
+    "AI/GPT output is not evidence. Rows must remain leads or review candidates until official evidence or direct confirmation is captured and human reviewed."
+  ]
+}

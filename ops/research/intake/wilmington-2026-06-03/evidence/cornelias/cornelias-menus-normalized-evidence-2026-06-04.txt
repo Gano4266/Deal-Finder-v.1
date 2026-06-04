@@ -1,0 +1,18 @@
+source_url: https://corneliasrestaurant.com/menus/
+source_name: Cornelia's official menus
+observed_date: 2026-06-04
+restaurant_identity:
+  name: Cornelia's
+  address: 980 Roundhouse Circle, Wilmington, NC 28411
+deal_evidence:
+  weekly_specials_time_window: 4 - 9 pm
+  day: Thursday
+  source_heading: Wings, Burgers, and Brews
+  food_terms:
+    - 6 for $10 wings
+    - $10 smashburgers
+  alcohol_adjacent_text_present: true
+review_constraints:
+  - suppress alcohol-only or alcohol-adjacent terms in public copy
+  - public access at The Davis Community remains unconfirmed
+  - keep workflow_status=needs_review until human review

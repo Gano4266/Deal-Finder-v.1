@@ -1,0 +1,30 @@
+Source: https://wilmington.mightaswellbarandgrill.com/wilmington-might-as-well-bar-and-grill-wilmington-happy-hours-specials
+Restaurant: Might As Well Bar & Grill - Wilmington
+Captured at: 2026-06-04T15:00:00-04:00
+Capture method: manual official website text review
+
+Official source identity/location text:
+- 250 Racine Dr. Unit 15, Wilmington
+
+Future/non-expired food-special text observed for internal review:
+
+Friday June 5th
+- 99 CENT WINGS AND MUG SPECIALS ALL DAY LONG!
+- 12:00 AM - 02:00 AM
+
+Sunday June 7th
+- $15.99 Sunday Buffett and $5 Off Large Pizza's
+- 12:30 PM - 02:00 AM
+
+Monday June 8th
+- Song Bingo at 8pm, $5 appetizer menu and $15 Corona Buckets Adult Bingo at 10 pm!
+- 12:00 PM - 02:00 PM
+
+Tuesday June 9th
+- Tex-Mex Tuesday! $3 margaritas, $1 cheese quesadilla
+- 12:00 PM - 02:00 AM
+
+Normalization notes:
+- Alcohol, mug, margarita, Corona bucket, and event copy are source-adjacent only and must be suppressed from any food-only candidate copy.
+- Friday wings have price language but the displayed time window conflicts with "all day long" wording and requires human review.
+- Sunday buffet spelling is captured as shown in source; any public copy should normalize only after review.

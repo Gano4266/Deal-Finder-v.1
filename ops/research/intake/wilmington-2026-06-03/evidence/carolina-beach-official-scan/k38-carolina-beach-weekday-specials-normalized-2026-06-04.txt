@@ -1,0 +1,35 @@
+Normalized official evidence capture
+Captured at: 2026-06-04T10:25:43-04:00
+Captured by: codex_agent_handoff
+Source tier: tier_1_official
+Source URL: https://k38bajagrill.com/locations/carolina-beach/
+Source final URL: https://k38bajagrill.com/locations/carolina-beach/
+Source title: K38 Carolina Beach
+Restaurant: K38 Baja Grill
+Location evidence observed: 1000 N. Lake Park Blvd Suite 101, Carolina Beach, NC 28428.
+
+Official extracted text:
+
+K38 Carolina Beach
+1000 N. Lake Park Blvd Suite 101 Carolina Beach, NC 28428
+
+Cinco de Monday (Everything $5)
+Baja Fish Tacos, Wannabe Margaritas, Large Queso, Large Guac, Large Elote, Poor Surfer, Chicken Elote Rolls
+
+Fajita Tuesday's
+Special Priced Fajitas, Includes Shrimp, Chicken or Veggie Fajitas
+$3 Dos XX Draft
+
+Quesadilla Wednesday's
+1/2 Off De La Casa Quesadilla, Includes Chicken, Cheese or Veggie
+$3 Miller Lite Draft
+
+Food Specials start at 5:00pm & Drink Specials are all day. All Specials are Dine In only.
+
+Normalization notes:
+
+- Official restaurant location page supports the Carolina Beach location and recurring weekday specials.
+- The Monday food items are exact enough for a food-only candidate if public copy excludes the drink item.
+- The Wednesday quesadilla discount is exact enough as a discount candidate.
+- Tuesday fajitas remain blocked because the official page says "Special Priced" but does not show a food price or discount.
+- All food specials are dine-in only and start at 5:00pm. The page does not state a food-special end time.

@@ -1,0 +1,17 @@
+Source: K38 Baja Grill official Forum location page
+URL: https://k38bajagrill.com/locations/forum/
+Captured by: Codex official discovery round 2
+Captured at: 2026-06-04
+Market/location evidence: 1127 Military Cutoff Road, Wilmington, NC 28405
+Source tier: tier_1_official
+
+Normalized official evidence:
+- K38 Forum lists "Cinco de Monday (Everything $5)".
+- Food items shown for Monday include Baja Fish Tacos, Large Queso, Large Guac, Large Elote, Poor Surfer, and Chicken Elote Rolls. Alcohol item language is present on the source and must be suppressed.
+- K38 Forum lists "Quesadilla Wednesday's" with "1/2 Off De La Casa Quesadilla" and included choices of chicken, cheese, or veggie.
+- Source notes: food specials start at 5:00pm; all specials are dine-in only.
+
+Extraction notes:
+- Intake-ready proposed candidates: Monday $5 food items and Wednesday half-off De La Casa quesadilla.
+- Hold Tuesday fajita row: source says special-priced fajitas but does not show exact food price/discount.
+- Public-copy caution: suppress drink copy and keep dine-in-only restriction.

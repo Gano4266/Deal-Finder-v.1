@@ -1,0 +1,28 @@
+Source: https://thesawmillrestaurant.com/daily-specials/
+Restaurant: Sawmill Restaurant
+Captured at: 2026-06-04T15:00:00-04:00
+Capture method: manual official website text review
+
+Future/non-expired priced food-special text observed for internal review:
+
+Saturday June 6th
+- Cup of Coffee and Slice of Coffee Cake - $6
+- 10:00 AM - 02:00 PM
+- Avocado Toast $11 - toasted sourdough or whole grain bread, avocado, house aioli, sprouts, mini tomatoes, and egg your way +bacon for $2
+- 10:00 AM - 02:00 PM
+
+Sunday June 7th
+- *Avocado Toast $11 - toasted sourdough or whole grain bread, avocado, house aioli, sprouts, mini tomatoes, and egg your way +bacon for $2
+- 11:00 AM - 02:00 PM
+- Cup of Coffee and Slice of Coffee Cake - $6
+- 11:00 AM - 02:00 PM
+
+Excluded lower-detail food text:
+- Friday June 5th Daily Special: Prime Rib, Stew Beef, 07:00 PM - 08:00 PM. Excluded because price is missing.
+- Monday June 8th Daily Special: Meatloaf, 07:00 AM - 08:00 PM. Excluded because price is missing.
+- Tuesday June 9th Daily Special: Chicken & Pastry, 07:00 AM - 08:00 PM. Excluded because price is missing.
+- 222 breakfast entries are excluded because price is missing.
+
+Normalization notes:
+- Rose Sangria rows from June 6 and June 7 are alcohol-only and excluded.
+- Sawmill is Monkey Junction boundary-sensitive; no publication path without full boundary review and all public gates.

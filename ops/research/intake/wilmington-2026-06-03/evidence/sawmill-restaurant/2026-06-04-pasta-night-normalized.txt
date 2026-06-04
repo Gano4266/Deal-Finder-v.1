@@ -1,0 +1,11 @@
+source_url: https://thesawmillrestaurant.com/daily-specials/
+source_observed_at: 2026-06-04T13:00:00-04:00
+source_title: Sawmill Restaurant official daily specials
+restaurant_id: sawmill-restaurant
+restaurant_name: Sawmill Restaurant
+special_date: Thursday June 4th
+source_special_text: Daily Special: Pasta Night
+source_time_window: 07:00 AM - 08:00 PM
+food_safe_candidate_extraction: Pasta Night
+blocking_note: source does not show price or exact pasta dish details
+boundary_note: Monkey Junction/Wilmington boundary review remains required before any public promotion

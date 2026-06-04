@@ -1,0 +1,16 @@
+Capture date: 2026-06-04
+Capture timezone: America/New_York
+Source URL: https://roosterandthecrow.com/wilmington-downtown-rooster-and-the-crow-happy-hours-specials
+Source type: Official restaurant website specials page
+Restaurant: Rooster & The Crow
+Location signal: Wilmington Downtown in source URL and page routing.
+
+Normalized food-special evidence:
+
+Wednesday June 10th
+- Food text: Meatloaf just like grandma made it; comes with two sides.
+- Price visible: none
+- Time visible: 04:30 PM - 08:30 PM
+
+Review note:
+- The official page supports a future-dated food special, but it is not a sharp priced deal candidate because no price is visible.

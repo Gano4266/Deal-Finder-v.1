@@ -1,0 +1,9 @@
+source: https://www.michaelangelosmj.com/specials
+image_asset: https://static6.mysiteserver.net/Images/michaelangelos/site/images/specials/2-cheese-slices-and-fountain-drink.png
+restaurant: Michaelangelo's Pizza - Monkey Junction
+location: Village at Myrtle Grove, 5617 Carolina Beach Rd #110, Wilmington, NC 28412
+observed_special: 2 cheese slices + fountain drink
+price: only $6.99
+service_mode_restriction: dine in or pick up only
+page_restrictions: cannot combine offers; offers available for limited time; premium toppings may be an additional charge; prices are subject to change
+normalization_note: Manual OCR from official image asset plus official page-level restriction text. AI output is not evidence; reviewer must verify against saved artifacts.

@@ -1,0 +1,18 @@
+Source: Block Taco official website
+URL: https://blocktaco.com/
+Captured by: Codex official discovery round 2
+Captured at: 2026-06-04
+Market/location evidence: 120 Greenfield St #B, Wilmington, NC 28401
+Source tier: tier_1_official
+
+Normalized official evidence:
+- Current Specials section includes "Pizza Box!".
+- Special details: mini catered 10 taco event on the fly; any 10 tacos except fish; includes chips with all 3 dips.
+- Days: Everyday.
+- Time: Open hours.
+- Price/special offer: $55.
+- Existing public/static prototype already represents Block Taco's Taco Monday & Tuesdays and Weekend Brunch Special; this Pizza Box special is new to the Wilmington intake deal rows.
+
+Extraction notes:
+- Intake-ready proposed candidate: Pizza Box, everyday/open-hours, $55.
+- Review caution: catering/group-pack special may need deal qualification review before CSV import.

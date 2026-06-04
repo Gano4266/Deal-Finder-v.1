@@ -1,0 +1,11 @@
+restaurant_id,name,city,state,neighborhood,address,phone,official_website,official_instagram,official_facebook,google_business_url,ordering_url,cuisine,tags,status,last_checked,notes
+fentonis-pizza,Fentoni's Pizza,Carolina Beach,NC,,,,https://fentonispizza.com/daily-specials,,,,,pizza,lunch specials,needs_review,,User-provided GPT intake; not independently verified by Codex.
+k38-baja-grill,K38 Baja Grill,Carolina Beach,NC,,,,https://k38bajagrill.com/locations/carolina-beach/,,,,,mexican,weekday specials,needs_review,,User-provided GPT intake; not independently verified by Codex.
+hoplite-irish-pub-restaurant,HopLite Irish Pub & Restaurant,Carolina Beach,NC,,,,https://hopliterestaurant.com/brunch-menu/,,,,,irish pub,brunch,needs_review,,User-provided GPT intake; not independently verified by Codex.
+lazy-pirate-sports-grill,Lazy Pirate Sports Grill,Carolina Beach,NC,,,,https://lazypiratesportsgrill.com/,,,,,sports grill,seafood,needs_review,,User-provided GPT intake; not independently verified by Codex.
+shuckin-shack-oyster-bar,Shuckin' Shack Oyster Bar,Carolina Beach,NC,,,,https://www.theshuckinshack.com/events/thursday-5db408fd,,,,,seafood,crab legs,needs_review,,User-provided GPT intake; not independently verified by Codex.
+michaels-seafood-restaurant,Michael's Seafood Restaurant,Carolina Beach,NC,,,,https://mikescfood.com/menu,,,,,seafood,lunch menu,needs_review,,User-provided GPT intake; not independently verified by Codex.
+seaworthy-kitchen-bar,Seaworthy Kitchen + Bar,Carolina Beach,NC,,,,https://seaworthycb.com/,,,,,seafood,happy hour,needs_review,,User-provided GPT intake; not independently verified by Codex.
+stoked-restaurant,Stoked Restaurant,Carolina Beach,NC,,,,,,,,https://order.toasttab.com/online/stoked-restaurant/item-bacon-jam-and-gouda-burger-lunch-special_f73ec7b6-4187-43e5-87a2-a4ec1286cbd,restaurant,lunch special discovery,needs_review,,User-provided GPT intake; Toast is discovery only.
+bella-vita,Bella Vita,Carolina Beach,NC,,,,https://bellavitancb.com/,,,,,italian,lunch specials discovery,needs_review,,User-provided GPT intake; formerly Uncle Vinny's according to pasted notes.
+nollies-taco-joint,Nollie's Taco Joint,Carolina Beach,NC,,,,,,https://www.facebook.com/nolliescb/,,,tacos,taco tuesday discovery,needs_review,,User-provided GPT intake; Facebook snippet only.

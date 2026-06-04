@@ -1,0 +1,23 @@
+source_url: https://lazypiratesportsgrill.com/
+source_name: Lazy Pirate Sports Grill official website
+restaurant: Lazy Pirate Sports Grill
+location: 701 N Lake Park Blvd, Carolina Beach, NC
+captured_at: 2026-06-04T09:59:04-04:00
+capture_method: manual_web_review
+evidence_type: official_website_page_text
+
+normalized_evidence:
+Lazy Pirate Sports Grill's official homepage lists the restaurant address as 701 N Lake Park Blvd, Carolina Beach, NC and describes weekly food and entertainment.
+
+The official page includes an "All You Can Eat Crab Legs | 4:00-8:00 PM" section and describes unlimited seasoned crab legs served hot and fresh.
+
+The source supports:
+- restaurant and Carolina Beach location
+- item: all you can eat crab legs
+- time window: 4:00 PM to 8:00 PM
+
+review_blockers:
+- Price is not visible on the official page.
+- Applicable day or recurrence needs confirmation; the page says "Food, Fun, and Entertainment All Week Long" but does not unambiguously assign crab legs to a specific day in visible text.
+- Confirm whether this is current and food-only before any publication.
+- No human review or public copy approval.
