@@ -273,6 +273,10 @@ if (adminMode === "enabled") {
   await check("admin", () => assertPage("/admin", ["Ops dashboard"]));
   await check("admin ops", () => assertPage("/admin/ops", ["Ops dashboard"]));
   await check("admin review", () => assertPage("/admin/review", ["Review queue"]));
+  await check("admin review packet", () => assertPage("/admin/review/cand-cb-fentonis-lunch-special", ["Fentoni", "Admin review packet"]));
+  await check("admin review worksheet", () => assertPage("/admin/review/cand-cb-fentonis-lunch-special/worksheet", ["Fentoni", "Admin review worksheet", "Publication blockers"]));
+  await check("admin review dry-run diff", () => assertPage("/admin/review/cand-cb-fentonis-lunch-special/dry-run-diff", ["Fentoni", "Admin dry-run diff", "No-write dry run"]));
+  await check("admin review fixture preview", () => assertPage("/admin/review/cand-cb-fentonis-lunch-special/fixture-preview", ["Fentoni", "Admin fixture preview", "Future promotion packet"]));
   await check("admin source gaps", () => assertPage("/admin/source-gaps", ["Source gap report"]));
 } else if (adminMode === "disabled") {
   await check("admin disabled", () => assertAdminDisabled("/admin"));

@@ -14,11 +14,11 @@ The app currently reads repo-managed CSV data only. It does not scrape, crawl, u
 - `/report`: lightweight in-app correction and lead intake. It submits JSON to `/api/reports`; HubSpot Forms API is the primary delivery path when configured.
 - `/admin` and `/admin/ops`: read-only ops dashboard for public-feed health, rechecks, evidence hardening, source gaps, and seed backlog.
 - `/admin/source-gaps`: static source-gap report.
-- `/admin/review`: internal review queue. Reads source-backed seed candidates and review tasks from `../ops/seeds/`.
+- `/admin/review`: internal review queue. Reads source-backed seed candidates from `../ops/seeds/` plus gated research intake rows from `../ops/research/intake/`.
 
 ## Current Behavior
 
-The current prototype has reviewed static public deals in `../fixtures/prototype/deals.csv`. `/tonight` filters those rows by the current Wilmington weekday and freshness gates. Source-backed or conflicted candidates that still need human work appear in `/admin/review`. Carryout rows remain ops-only seed backlog.
+The current prototype has reviewed static public deals in `../fixtures/prototype/deals.csv`. `/tonight` filters those rows by the current Wilmington weekday and freshness gates. Source-backed or conflicted seed candidates and gated research-intake rows that still need human work appear in `/admin/review`. Carryout rows remain ops-only seed backlog.
 
 ## Local Development
 

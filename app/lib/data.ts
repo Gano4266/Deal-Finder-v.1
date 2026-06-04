@@ -176,9 +176,14 @@ export type RestaurantDetail = RestaurantSummary & {
 };
 
 export type ReviewCandidate = {
+  dealId?: string;
   candidateId: string;
+  restaurantId?: string;
   restaurantName: string;
   dealTitle: string;
+  dealDescription?: string;
+  publicTitle?: string;
+  publicDescription?: string;
   dealDay: string;
   timeWindow: string;
   price: string;
@@ -186,8 +191,15 @@ export type ReviewCandidate = {
   status: string;
   confidence: string;
   needsAttention: boolean;
+  sourceId?: string;
   sourceName: string;
   sourceUrl: string;
+  sourceTier?: string;
+  evidenceType?: string;
+  evidenceCapturedAt?: string;
+  evidenceSummary?: string;
+  sourceQuote?: string;
+  contentHash?: string;
   lastVerified: string;
   restrictions: string;
   notes: string;
@@ -196,6 +208,33 @@ export type ReviewCandidate = {
   intakeFolder?: string;
   publishBlockReason?: string;
   locationScopeStatus?: string;
+  locationEvidence?: string;
+  sourceCaptureId?: string;
+  sourceCheckId?: string;
+  directConfirmationId?: string;
+  evidencePath?: string;
+  archivePath?: string;
+  screenshotPath?: string;
+  nextCheckDue?: string;
+  expiresOn?: string;
+  reviewReason?: string;
+  reviewDecision?: string;
+  decisionReason?: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  uncertaintyFlags?: string;
+  validationNotes?: string;
+  alcoholClassification?: string;
+  fixtureDataClass?: string;
+  isLiveData?: string;
+  prototypeNotice?: string;
+  mvpPublishEligible?: string;
+  publicCopyApproved?: string;
+  conflictDetected?: string;
+  serviceModeSummary?: string;
+  publicGateSummary?: string;
+  promotionBlockers?: string[];
+  promotionFieldsNeeded?: string[];
   reviewTask?: {
     taskId: string;
     priority: string;
@@ -206,6 +245,10 @@ export type ReviewCandidate = {
     foodCopyCheck: string;
     riskFlags: string;
   };
+};
+
+export type ReviewCandidateDetail = ReviewCandidate & {
+  manualMappingDecisions: string[];
 };
 
 export type SourceGap = {
@@ -315,6 +358,250 @@ function isTrue(value: string): boolean {
 function isBlank(value: string): boolean {
   return value.trim().length === 0;
 }
+
+function serviceModeSummary(row: CsvRow): string {
+  const labels = [
+    ["dine_in", "Dine-in"],
+    ["takeout", "Takeout"],
+    ["delivery", "Delivery"]
+  ] as const;
+  const modes = labels
+    .map(([field, label]) => {
+      const value = (row[field] ?? "").toLowerCase();
+
+      if (value === "true") {
+        return label;
+      }
+
+      if (value === "unknown") {
+        return `${label} unknown`;
+      }
+
+      return "";
+    })
+    .filter(Boolean);
+
+  return modes.length > 0 ? modes.join(" / ") : "Service mode missing";
+}
+
+function publicGateSummary(row: CsvRow): string {
+  const blockers = [];
+
+  if (row.workflow_status !== "approved" && row.workflow_status !== "approved_with_uncertainty") {
+    blockers.push(row.workflow_status || "status missing");
+  }
+
+  if (!isTrue(row.mvp_publish_eligible ?? "")) {
+    blockers.push("not MVP eligible");
+  }
+
+  if (!isTrue(row.public_copy_approved ?? "")) {
+    blockers.push("copy not approved");
+  }
+
+  if (row.review_decision !== "approved") {
+    blockers.push("no approval decision");
+  }
+
+  return blockers.length > 0 ? blockers.join(" / ") : "Public gate ready";
+}
+
+const approvedWorkflowStatuses = new Set(["approved", "approved_with_uncertainty"]);
+const officialSourceTiers = new Set(["tier_1_official", "tier_2_official_social"]);
+const knownSourceTiers = new Set([
+  "tier_1_official",
+  "tier_2_official_social",
+  "tier_3_partner",
+  "tier_4_secondary",
+  "tier_5_user_reported"
+]);
+const aiEvidencePattern = /\b(gpt|chatgpt|deep research|ai|llm|language model|openai|claude|gemini|copilot)\b/i;
+const sha256Pattern = /^sha256:[a-f0-9]{64}$/;
+
+function hasAny(row: CsvRow, fields: string[]): boolean {
+  return fields.some((field) => !isBlank(row[field] ?? ""));
+}
+
+function promotionReadiness(row: CsvRow, date = new Date()): { blockers: string[]; fieldsNeeded: string[] } {
+  const blockers: string[] = [];
+  const fieldsNeeded = new Set<string>();
+  const today = startOfWilmingtonDay(date);
+
+  function requireField(field: string, reason = `missing ${field}`) {
+    if (isBlank(row[field] ?? "")) {
+      blockers.push(reason);
+      fieldsNeeded.add(field);
+    }
+  }
+
+  function requireAny(fields: string[], reason: string) {
+    if (!hasAny(row, fields)) {
+      blockers.push(reason);
+      fields.forEach((field) => fieldsNeeded.add(field));
+    }
+  }
+
+  if (!approvedWorkflowStatuses.has(row.workflow_status ?? "")) {
+    blockers.push("workflow_status is not approved or approved_with_uncertainty");
+    fieldsNeeded.add("workflow_status");
+  }
+
+  if (row.confidence_status !== "verified") {
+    blockers.push("confidence_status is not verified");
+    fieldsNeeded.add("confidence_status");
+  }
+
+  if (row.review_decision !== "approved") {
+    blockers.push("review_decision is not approved");
+    fieldsNeeded.add("review_decision");
+  }
+
+  requireField("reviewed_by");
+  requireField("reviewed_at");
+  requireField("deal_id", "missing deal_id required by current fixture validator");
+  requireField("candidate_id", "missing candidate_id required by current fixture validator");
+  requireField("restaurant_id");
+  requireField("source_id");
+  requireAny(["source_capture_id", "direct_confirmation_id"], "missing source_capture_id or direct_confirmation_id");
+  requireField("source_capture_id", "missing source_capture_id required by current fixture validator");
+  requireField("source_check_id", "missing source_check_id required by current fixture validator");
+  requireAny(["source_url", "direct_confirmation_id"], "missing source_url or direct-confirmation evidence pointer");
+  requireField("public_title", "missing public_title required by current fixture validator");
+  requireField("public_description", "missing public_description required by current fixture validator");
+  requireField("source_quote");
+  requireField("evidence_summary");
+  requireField("content_hash");
+  requireAny(["next_check_due", "expires_on"], "missing next_check_due or expires_on");
+  requireField("next_check_due", "missing next_check_due required by current fixture validator");
+  requireField("review_task_id");
+  requireField("evidence_captured_at");
+  requireField("last_verified_at", "missing last_verified_at required by current fixture validator");
+  requireField("decision_reason");
+  requireField("published_at");
+  requireField("dine_in", "missing explicit dine_in applicability");
+  requireField("takeout", "missing explicit takeout/carryout applicability");
+  requireField("delivery", "missing explicit delivery applicability");
+
+  if (row.conflict_detected !== "false") {
+    blockers.push("conflict_detected must be exactly false");
+    fieldsNeeded.add("conflict_detected");
+  }
+
+  if (!isTrue(row.public_copy_approved ?? "")) {
+    blockers.push("public_copy_approved is not true");
+    fieldsNeeded.add("public_copy_approved");
+  }
+
+  if (!isTrue(row.mvp_publish_eligible ?? "")) {
+    blockers.push("mvp_publish_eligible is not true");
+    fieldsNeeded.add("mvp_publish_eligible");
+  }
+
+  if (isBlank(row.source_tier ?? "")) {
+    blockers.push("missing source_tier");
+    fieldsNeeded.add("source_tier");
+  } else if (!knownSourceTiers.has(row.source_tier ?? "")) {
+    blockers.push(`source_tier is non-canonical: ${row.source_tier}`);
+    fieldsNeeded.add("source_tier");
+  } else if (!officialSourceTiers.has(row.source_tier ?? "")) {
+    blockers.push(`${row.source_tier} is not accepted by the current public fixture validator`);
+    fieldsNeeded.add("source_tier");
+  }
+
+  if (!hasAny(row, ["screenshot_path", "archive_url_or_path", "evidence_url_or_path", "direct_confirmation_id"])) {
+    blockers.push("missing durable evidence path or direct_confirmation_id");
+    fieldsNeeded.add("screenshot_path");
+    fieldsNeeded.add("archive_url_or_path");
+    fieldsNeeded.add("evidence_url_or_path");
+    fieldsNeeded.add("direct_confirmation_id");
+  }
+
+  if (isBlank(row.screenshot_path ?? "")) {
+    blockers.push("missing screenshot_path required by current fixture validator");
+    fieldsNeeded.add("screenshot_path");
+  }
+
+  if (!isBlank(row.content_hash ?? "") && !sha256Pattern.test(row.content_hash ?? "")) {
+    blockers.push("content_hash is not sha256:<64 hex chars>");
+    fieldsNeeded.add("content_hash");
+  }
+
+  if (!isBlank(row.hidden_at ?? "")) {
+    blockers.push("hidden_at must be blank");
+    fieldsNeeded.add("hidden_at");
+  }
+
+  if (row.is_live_data !== "false") {
+    blockers.push("is_live_data must be false for public prototype fixtures");
+    fieldsNeeded.add("is_live_data");
+  }
+
+  if (row.fixture_data_class !== "verified_static") {
+    blockers.push("fixture_data_class must be verified_static for public prototype fixtures");
+    fieldsNeeded.add("fixture_data_class");
+  }
+
+  if (isBlank(row.prototype_notice ?? "")) {
+    blockers.push("missing prototype_notice required by current fixture validator");
+    fieldsNeeded.add("prototype_notice");
+  }
+
+  if (row.alcohol_classification !== "food_only") {
+    blockers.push("alcohol_classification must be food_only for public prototype deals");
+    fieldsNeeded.add("alcohol_classification");
+  }
+
+  const allowedLocationScopes = new Set(["wilmington_confirmed", "pilot_market_confirmed"]);
+  if (!isBlank(row.location_scope_status ?? "") && !allowedLocationScopes.has(row.location_scope_status ?? "")) {
+    blockers.push("location_scope_status is not an approved Wilmington or pilot market scope");
+    fieldsNeeded.add("location_scope_status");
+  }
+
+  const expiresOn = parseLocalDate(row.expires_on ?? "");
+  if (!isBlank(row.expires_on ?? "") && !expiresOn) {
+    blockers.push("expires_on is not an ISO date");
+    fieldsNeeded.add("expires_on");
+  } else if (expiresOn && expiresOn < today) {
+    blockers.push("expires_on is expired");
+    fieldsNeeded.add("expires_on");
+  }
+
+  const nextCheckDue = parseLocalDate(row.next_check_due ?? "");
+  if (!isBlank(row.next_check_due ?? "") && !nextCheckDue) {
+    blockers.push("next_check_due is not an ISO date");
+    fieldsNeeded.add("next_check_due");
+  } else if (nextCheckDue && nextCheckDue < today) {
+    blockers.push("next_check_due is overdue");
+    fieldsNeeded.add("next_check_due");
+  }
+
+  const evidenceText = [
+    row.source_name,
+    row.source_url,
+    row.evidence_type,
+    row.evidence_summary,
+    row.source_quote
+  ].join(" ");
+
+  if (aiEvidencePattern.test(evidenceText)) {
+    blockers.push("row appears to rely on AI/GPT output as evidence");
+    fieldsNeeded.add("source_name");
+    fieldsNeeded.add("source_quote");
+  }
+
+  return {
+    blockers,
+    fieldsNeeded: [...fieldsNeeded].sort()
+  };
+}
+
+const manualMappingDecisions = [
+  "Confirm the restaurant row exists or define the reviewed restaurant fixture mapping.",
+  "Map source_id and evidence pointers to public fixture source, capture, source check, review task, and audit event rows.",
+  "Confirm public copy, food-only copy, dates, recurrence, restrictions, and freshness.",
+  "Assign published_at only in a separate reviewed promotion task and keep hidden_at empty.",
+  "Run the existing fixture validator after any future manual fixture edits."
+];
 
 function hasEvidence(row: CsvRow): boolean {
   return !isBlank(row.source_capture_id ?? "") || !isBlank(row.direct_confirmation_id ?? "");
@@ -1003,9 +1290,11 @@ function researchIntakeAreaName(directory: string): string {
   }
 }
 
-function isTerminalResearchStatus(row: CsvRow): boolean {
+function isClosedResearchReviewRow(row: CsvRow): boolean {
+  // Approved intake rows stay open until a separate reviewed promotion task maps
+  // them into public fixtures and assigns published_at.
   return ["rejected", "expired", "superseded"].includes(row.workflow_status ?? "") ||
-    ["rejected", "approved"].includes(row.review_decision ?? "");
+    row.review_decision === "rejected";
 }
 
 function researchCandidateId(directory: string, row: CsvRow, index: number): string {
@@ -1127,15 +1416,21 @@ export async function getResearchReviewCandidates(): Promise<ReviewCandidate[]> 
       const folder = path.basename(intake.directory);
 
       return intake.rows
-        .filter((row) => !isTerminalResearchStatus(row))
+        .filter((row) => !isClosedResearchReviewRow(row))
         .map((row, index) => {
           const id = researchCandidateId(intake.directory, row, index);
           const task = tasksByCandidate.get(`${folder}:${id}`);
+          const readiness = promotionReadiness(row);
 
           return {
+            dealId: row.deal_id,
             candidateId: id,
+            restaurantId: row.restaurant_id,
             restaurantName: row.restaurant_name,
             dealTitle: row.deal_title,
+            dealDescription: row.deal_description,
+            publicTitle: row.public_title,
+            publicDescription: row.public_description,
             dealDay: row.days_available || "Schedule needs review",
             timeWindow: toTimeWindow(row.start_time, row.end_time),
             price: row.price || row.discount,
@@ -1143,8 +1438,15 @@ export async function getResearchReviewCandidates(): Promise<ReviewCandidate[]> 
             status: row.workflow_status || "needs_review",
             confidence: row.confidence_status || "unverified",
             needsAttention: true,
+            sourceId: row.source_id,
             sourceName: row.source_name || row.source_tier || "Research intake source",
             sourceUrl: row.source_url,
+            sourceTier: row.source_tier,
+            evidenceType: row.evidence_type,
+            evidenceCapturedAt: row.evidence_captured_at,
+            evidenceSummary: row.evidence_summary,
+            sourceQuote: row.source_quote,
+            contentHash: row.content_hash,
             lastVerified: row.last_verified_at || row.evidence_captured_at || row.updated_at || row.created_at,
             restrictions: row.publish_block_reason || row.restriction_notes || row.uncertainty_flags || "Review required before public use.",
             notes: row.validation_notes || row.evidence_summary || row.deal_description,
@@ -1153,6 +1455,33 @@ export async function getResearchReviewCandidates(): Promise<ReviewCandidate[]> 
             intakeFolder: folder,
             publishBlockReason: row.publish_block_reason,
             locationScopeStatus: row.location_scope_status,
+            locationEvidence: row.location_evidence,
+            sourceCaptureId: row.source_capture_id || row.direct_confirmation_id,
+            sourceCheckId: row.source_check_id,
+            directConfirmationId: row.direct_confirmation_id,
+            evidencePath: row.evidence_url_or_path || row.archive_url_or_path || row.screenshot_path,
+            archivePath: row.archive_url_or_path,
+            screenshotPath: row.screenshot_path,
+            nextCheckDue: row.next_check_due,
+            expiresOn: row.expires_on,
+            reviewReason: row.review_reason,
+            reviewDecision: row.review_decision,
+            decisionReason: row.decision_reason,
+            reviewedBy: row.reviewed_by,
+            reviewedAt: row.reviewed_at,
+            uncertaintyFlags: row.uncertainty_flags,
+            validationNotes: row.validation_notes,
+            alcoholClassification: row.alcohol_classification,
+            fixtureDataClass: row.fixture_data_class,
+            isLiveData: row.is_live_data,
+            prototypeNotice: row.prototype_notice,
+            mvpPublishEligible: row.mvp_publish_eligible,
+            publicCopyApproved: row.public_copy_approved,
+            conflictDetected: row.conflict_detected,
+            serviceModeSummary: serviceModeSummary(row),
+            publicGateSummary: publicGateSummary(row),
+            promotionBlockers: readiness.blockers,
+            promotionFieldsNeeded: readiness.fieldsNeeded,
             reviewTask: task
               ? {
                   taskId: task.review_task_id,
@@ -1196,6 +1525,24 @@ export async function getOpenReviewCandidates(): Promise<ReviewCandidate[]> {
       const rightRank = priorityRank[right.reviewTask?.priority ?? "normal"] ?? 2;
       return leftRank - rightRank || left.restaurantName.localeCompare(right.restaurantName);
     });
+}
+
+export async function getOpenReviewCandidateById(candidateIdToFind: string): Promise<ReviewCandidate | undefined> {
+  const candidates = await getOpenReviewCandidates();
+  return candidates.find((candidate) => candidate.candidateId === candidateIdToFind);
+}
+
+export async function getReviewCandidateDetail(candidateIdToFind: string): Promise<ReviewCandidateDetail | undefined> {
+  const candidate = await getOpenReviewCandidateById(candidateIdToFind);
+
+  if (!candidate) {
+    return undefined;
+  }
+
+  return {
+    ...candidate,
+    manualMappingDecisions
+  };
 }
 
 export async function getPrototypeStats() {
@@ -1317,7 +1664,7 @@ export async function getResearchSourceGaps(): Promise<SourceGap[]> {
     return intake.rows.map((restaurant) => {
       const key = `${folder}:${restaurant.restaurant_id || restaurant.name}`;
       const candidates = dealsByFolderAndRestaurant.get(key) ?? [];
-      const openCandidates = candidates.filter((candidate) => !isTerminalResearchStatus(candidate));
+      const openCandidates = candidates.filter((candidate) => !isClosedResearchReviewRow(candidate));
       const verifiedCandidates = candidates.filter((candidate) => candidate.confidence_status === "verified");
       const sourceUrl = restaurant.official_website ||
         restaurant.official_instagram ||
@@ -1613,101 +1960,6 @@ export async function getOpsDashboard(date = getOperatingDate(), horizonDays = 1
         evidenceRef: row.evidence_ref
       })),
     manifestDrift: manifestDrift(actualCounts)
-  };
-}
-
-export type IntakeCandidateSummary = {
-  candidateId: string;
-  restaurantName: string;
-  dealTitle: string;
-  schedule: string;
-  timeWindow: string;
-  price: string;
-  sourceUrl: string;
-  screenshotPath: string;
-  workflowStatus: string;
-  confidenceStatus: string;
-  publishBlockReason: string;
-  restrictionNotes: string;
-  uncertaintyFlags: string;
-  nextAction: string;
-  statusGroup: "source_backed" | "lead" | "rejected";
-};
-
-export type IntakeAreaSummary = {
-  folderName: string;
-  sourceBacked: IntakeCandidateSummary[];
-  leads: IntakeCandidateSummary[];
-  rejected: IntakeCandidateSummary[];
-};
-
-export async function getSouthportIntakeSummary(): Promise<IntakeAreaSummary | null> {
-  if (!existsSync(researchIntakeRootPath)) {
-    return null;
-  }
-
-  const southportDirs = readdirSync(researchIntakeRootPath, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && entry.name.startsWith("southport-"))
-    .map((entry) => path.join(researchIntakeRootPath, entry.name))
-    .sort((a, b) => path.basename(b).localeCompare(path.basename(a)));
-
-  if (southportDirs.length === 0) {
-    return null;
-  }
-
-  const dir = southportDirs[0];
-  const folderName = path.basename(dir);
-  const intakePath = path.join(dir, "deal-intake.csv");
-
-  if (!existsSync(intakePath)) {
-    return null;
-  }
-
-  const rows = await readCsv(intakePath);
-
-  function classifyRow(row: CsvRow): "source_backed" | "lead" | "rejected" {
-    const ws = row.workflow_status ?? "";
-    if (ws === "rejected") return "rejected";
-    if (ws === "approved" || ws === "approved_with_uncertainty") return "source_backed";
-    return "lead";
-  }
-
-  function mapIntakeRow(row: CsvRow): IntakeCandidateSummary {
-    const group = classifyRow(row);
-    const notes = row.validation_notes ?? "";
-    const actionMatch = notes.match(/Next manual action:\s*(.+)/s);
-    const nextAction = actionMatch
-      ? actionMatch[1].replace(/\s+/g, " ").trim()
-      : group === "source_backed"
-        ? "Open source, verify evidence screenshot, then approve or reject for Southport fixtures."
-        : "No specific next action recorded.";
-
-    return {
-      candidateId: row.candidate_id || row.deal_id || row.restaurant_name,
-      restaurantName: row.restaurant_name,
-      dealTitle: row.deal_title,
-      schedule: formatDaysAvailableLabel(row.days_available || ""),
-      timeWindow: toTimeWindow(row.start_time || "", row.end_time || ""),
-      price: row.price || row.discount || "See source",
-      sourceUrl: row.source_url,
-      screenshotPath: row.screenshot_path,
-      workflowStatus: row.workflow_status,
-      confidenceStatus: row.confidence_status,
-      publishBlockReason: row.publish_block_reason,
-      restrictionNotes: row.restriction_notes,
-      uncertaintyFlags: row.uncertainty_flags,
-      nextAction,
-      statusGroup: group
-    };
-  }
-
-  const all = rows.map(mapIntakeRow);
-
-  return {
-    folderName,
-    sourceBacked: all.filter((r) => r.statusGroup === "source_backed"),
-    leads: all.filter((r) => r.statusGroup === "lead"),
-    rejected: all.filter((r) => r.statusGroup === "rejected")
   };
 }
 
