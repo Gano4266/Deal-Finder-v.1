@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import type { PublicDeal } from "../lib/data";
 import { displayDescription } from "./public-copy";
+import { QuickConfirmButton } from "./quick-confirm-button";
 
 type PublicDealCardProps = {
   deal: PublicDeal;
@@ -60,6 +61,13 @@ export function PublicDealCard({ deal, variant = "standard" }: PublicDealCardPro
         <a href={deal.sourceUrl} className="secondaryLink">
           Check official details
         </a>
+        <QuickConfirmButton
+          contextPath={`/deals/${deal.dealId}`}
+          dealId={deal.dealId}
+          dealTitle={deal.publicTitle}
+          restaurantId={deal.restaurantId}
+          restaurantName={deal.restaurantName}
+        />
         {!isSecondary ? (
           <Link href={`/report?dealId=${deal.dealId}` as Route} className="secondaryLink">
             Report an issue

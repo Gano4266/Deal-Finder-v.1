@@ -13,7 +13,15 @@ const ownerFeedbackOption = {
   label: "Submit feedback to owner"
 } as const;
 
-type SubmissionType = (typeof submissionOptions)[number]["value"] | typeof ownerFeedbackOption.value;
+const dealConfirmationOption = {
+  value: "confirm_in_person",
+  label: "Confirm in person"
+} as const;
+
+type SubmissionType =
+  | (typeof submissionOptions)[number]["value"]
+  | typeof ownerFeedbackOption.value
+  | typeof dealConfirmationOption.value;
 
 type ReportFormProps = {
   contextLabel: string;
@@ -50,6 +58,14 @@ export function ReportForm({
   const [errorMessage, setErrorMessage] = useState("");
   const formDisabled = !intakeAvailable || status === "sending";
   const isOwnerFeedbackMode = initialSubmissionType === ownerFeedbackOption.value;
+  const itemSubmissionOptions = contextType === "deal"
+    ? [dealConfirmationOption, ...submissionOptions]
+    : submissionOptions;
+  const messagePlaceholder = isOwnerFeedbackMode
+    ? "Share a thought, request, or idea for the Forkcast owner."
+    : submissionType === dealConfirmationOption.value
+      ? "Example: I checked in person tonight and this special was still honored."
+      : "Example: This special is now Thursdays, or I found a new taco special.";
 
   useEffect(() => {
     setSubmissionType(initialSubmissionType);
@@ -152,7 +168,7 @@ export function ReportForm({
           <fieldset disabled={formDisabled}>
             <legend>Item-specific update</legend>
             <div className="choiceStack">
-              {submissionOptions.map((option) => (
+              {itemSubmissionOptions.map((option) => (
                 <label key={option.value} className="radioChoice">
                   <input
                     type="radio"
@@ -200,7 +216,7 @@ export function ReportForm({
           name="message"
           value={message}
           onChange={textChange(setMessage)}
-          placeholder={isOwnerFeedbackMode ? "Share a thought, request, or idea for the Forkcast owner." : "Example: This special is now Thursdays, or I found a new taco special."}
+          placeholder={messagePlaceholder}
           rows={4}
           required
           disabled={formDisabled}

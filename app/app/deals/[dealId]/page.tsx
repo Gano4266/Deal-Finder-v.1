@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getPublicDealById, getPublicDeals, getRestaurantById } from "../../../lib/data";
 import { phoneHref } from "../../phone-link";
 import { displayDescription } from "../../public-copy";
+import { QuickConfirmButton } from "../../quick-confirm-button";
 
 type DealPageProps = {
   params: Promise<{
@@ -126,6 +127,13 @@ export default async function DealDetailPage({ params }: DealPageProps) {
                 Call restaurant
               </a>
             ) : null}
+            <QuickConfirmButton
+              contextPath={`/deals/${deal.dealId}`}
+              dealId={deal.dealId}
+              dealTitle={deal.publicTitle}
+              restaurantId={deal.restaurantId}
+              restaurantName={deal.restaurantName}
+            />
             <Link href={`/report?dealId=${deal.dealId}` as Route} className="secondaryLink">
               Report an issue
             </Link>

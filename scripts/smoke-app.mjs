@@ -158,11 +158,13 @@ await check("pwa icon 192", () => assertAsset("/icon-192.png"));
 await check("pwa icon 512", () => assertAsset("/icon-512.png"));
 await check("pwa apple touch icon", () => assertAsset("/apple-touch-icon.png"));
 await check("tonight", () => assertPage("/tonight", ["Today's forecast", "Verify details before you order"]));
+await check("tonight quick confirm", () => assertPage("/tonight", ["I checked this"]));
 await check("tonight keyword search", () => assertPage("/tonight?q=taco", ["Search today's deals", "$1.99 tacos"]));
 await check("tonight breakfast filter", () => assertPage("/tonight?quick=breakfast", ["Breakfast", "Katy's Grill & Bar"]));
 await check("tonight lunch filter", () => assertPage("/tonight?quick=lunch", ["Lunch", "Hell's Kitchen"]));
 await check("tonight dinner filter", () => assertPage("/tonight?quick=dinner", ["Dinner", "Blue Surf Cafe"]));
 await check("deals filters", () => assertPage("/deals?area=Downtown&day=Tuesday&quick=under-10&sort=area", ["Under $10", "Food specials worth knowing"]));
+await check("deals quick confirm", () => assertPage("/deals", ["Food specials worth knowing", "I checked this"]));
 await check("deals keyword search", () => assertPage("/deals?q=taco", ["Search deals", "$2 tacos"]));
 await check("deals keyword no match", () => assertPage("/deals?q=notarealdeal", ["No specials match \"notarealdeal\" yet."]));
 await check("deals breakfast filter", () => assertPage("/deals?quick=breakfast", ["Breakfast", "Katy's Grill & Bar"]));
@@ -247,11 +249,44 @@ if (process.env.DEAL_FINDER_SMOKE_SKIP_REPORT_POST === "1") {
       "/api/reports owner_feedback: unexpected success copy"
     );
   });
+  await check("deal confirmation submit api", async () => {
+    const response = await fetch(`${baseUrl}/api/reports`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Forkcast-Smoke-Test": "true"
+      },
+      body: JSON.stringify({
+        deal_id: "smoke-deal-id",
+        deal_title: "Smoke confirmed special",
+        message: "Smoke test user confirmed this deal in person.",
+        page_url: `${baseUrl}/deals/smoke-deal-id`,
+        restaurant_id: "smoke-restaurant-id",
+        restaurant_name: "Smoke test",
+        source_context: "confirm_in_person | Smoke confirmed special | /deals/smoke-deal-id",
+        submission_type: "confirm_in_person"
+      })
+    });
+    const body = await response.json();
+    assert(response.status === 200, `/api/reports confirm_in_person: expected 200, got ${response.status}`);
+    assert(
+      body.message === "Thanks. This will be reviewed before anything changes on the site." ||
+        body.message === "Local test received. Add HubSpot settings before sharing this form." ||
+        body.message === "Smoke test received. Report intake dry-run is enabled.",
+      "/api/reports confirm_in_person: unexpected success copy"
+    );
+  });
 }
 await check("report with deal context", () => assertPage("/report?dealId=deal-beat-street-tuesday-2-tacos", [
   "Share a Forkcast update",
   "$2 tacos",
+  "Confirm in person",
   "Submit feedback to owner"
+]));
+await check("report confirmation type", () => assertPage("/report?dealId=deal-beat-street-tuesday-2-tacos&type=confirm_in_person", [
+  "Share a Forkcast update",
+  "Confirm in person",
+  "$2 tacos"
 ]));
 await check("report with restaurant context", () => assertPage("/report?restaurantId=beat-street", [
   "Share a Forkcast update",
@@ -306,6 +341,7 @@ await check("restaurants keyword search", async () => {
   assert(!body.includes("Provision Company"), "/restaurants?q=K38: Southport rows should stay out of main restaurants");
 });
 await check("southport prototype", () => assertPage("/southport", ["Today's forecast", "Provision Company", "Southport is a separate soft-pilot market"]));
+await check("southport quick confirm", () => assertPage("/southport", ["Today's forecast", "I checked this"]));
 await check("southport all deals", () => assertPage("/southport/deals", ["All Southport deals", "Provision Company", "Southport preview"]));
 await check("southport restaurants", () => assertPage("/southport/restaurants", ["Southport restaurants", "View Southport deals", "Southport preview"]));
 await check("southport deals keyword search", () => assertPage("/southport/deals?q=lunch", ["Search Southport deals", "Provision Company", "Southport preview"]));
@@ -324,6 +360,11 @@ await check("sample deal proof UI", () => assertPage("/deals/deal-beat-street-tu
   "Shown below",
   "Check official details",
   "/evidence/source-screenshots/src-beat-street-primary.png"
+]));
+await check("sample deal quick confirm", () => assertPage("/deals/deal-whiskey-trail-thursday-3-off-burgers", [
+  "Whiskey Trail",
+  "$3 off burgers",
+  "I checked this"
 ]));
 await check("sample restaurant deals", () => assertPage("/restaurants/beat-street", [
   "beat-street",

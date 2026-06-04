@@ -544,7 +544,8 @@ a {
 }
 
 .dealCard .cardActions,
-.dealCard .cardActions a {
+.dealCard .cardActions a,
+.dealCard .cardActions button {
   z-index: 3;
 }
 
@@ -781,6 +782,19 @@ a {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.quickConfirm {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quickConfirm .successMessage,
+.quickConfirm .errorMessage {
+  margin: 0;
+  font-size: 0.86rem;
 }
 
 .checkList {

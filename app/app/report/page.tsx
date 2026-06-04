@@ -33,7 +33,11 @@ export default async function ReportPage({ searchParams }: ReportPageProps) {
       ? `/restaurants/${restaurant.restaurantId}`
       : "";
   const contextType = deal ? "deal" : restaurant ? "restaurant" : "general";
-  const initialSubmissionType = params?.type === "owner_feedback" ? "owner_feedback" : "report_issue";
+  const initialSubmissionType = params?.type === "owner_feedback"
+    ? "owner_feedback"
+    : params?.type === "confirm_in_person" && deal
+      ? "confirm_in_person"
+      : "report_issue";
   const ownerFeedbackMode = initialSubmissionType === "owner_feedback";
   const intakeAvailable = reportIntakeAvailable();
   const emergencyEmail = process.env.NEXT_PUBLIC_REPORT_EMAIL;
