@@ -178,6 +178,7 @@ await check("report", async () => {
     "Correct info",
     "Suggest a restaurant",
     "Send a special",
+    "Submit feedback to owner",
     "Send update"
   ]);
   assert(!body.includes("mailto:"), "/report: should not rely on mailto handoff");
@@ -216,16 +217,58 @@ if (process.env.DEAL_FINDER_SMOKE_SKIP_REPORT_POST === "1") {
       "/api/reports: unexpected success copy"
     );
   });
+  await check("owner feedback submit api", async () => {
+    const response = await fetch(`${baseUrl}/api/reports`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Forkcast-Smoke-Test": "true"
+      },
+      body: JSON.stringify({
+        message: "Smoke test owner feedback",
+        page_url: `${baseUrl}/report?type=owner_feedback`,
+        preferred_contact: "no follow-up",
+        reporter_email: "owner-smoke@example.com",
+        reporter_name: "Owner Smoke Tester",
+        source_context: "owner_feedback | Forkcast owner feedback",
+        submission_type: "owner_feedback"
+      })
+    });
+    const body = await response.json();
+    assert(response.status === 200, `/api/reports owner_feedback: expected 200, got ${response.status}`);
+    assert(
+      body.message === "Thanks. This will be reviewed before anything changes on the site." ||
+        body.message === "Local test received. Add HubSpot settings before sharing this form." ||
+        body.message === "Smoke test received. Report intake dry-run is enabled.",
+      "/api/reports owner_feedback: unexpected success copy"
+    );
+  });
 }
 await check("report with deal context", () => assertPage("/report?dealId=deal-beat-street-tuesday-2-tacos", [
   "Share a Forkcast update",
-  "$2 tacos"
+  "$2 tacos",
+  "Submit feedback to owner"
 ]));
 await check("report with restaurant context", () => assertPage("/report?restaurantId=beat-street", [
   "Share a Forkcast update",
   "Beat Street",
-  "Restaurant"
+  "Restaurant",
+  "Submit feedback to owner"
 ]));
+await check("owner feedback report", async () => {
+  const body = await assertPage("/report?type=owner_feedback", [
+    "Submit feedback to owner",
+    "Forkcast owner feedback",
+    "Not item-specific",
+    "This message is not attached to a deal or restaurant."
+  ]);
+  assert(!body.includes("Item-specific update"), "/report?type=owner_feedback: should not show item-specific choices");
+  assert(!body.includes("Correct info"), "/report?type=owner_feedback: should not show correction choice");
+  assert(!body.includes("Suggest a restaurant"), "/report?type=owner_feedback: should not show restaurant suggestion choice");
+  assert(!body.includes("Send a special"), "/report?type=owner_feedback: should not show deal submission choice");
+  assert(!body.includes("Restaurant name"), "/report?type=owner_feedback: should not show restaurant field");
+  assert(!body.includes("Deal or special"), "/report?type=owner_feedback: should not show deal field");
+});
 if (adminMode === "enabled") {
   await check("admin", () => assertPage("/admin", ["Ops dashboard"]));
   await check("admin ops", () => assertPage("/admin/ops", ["Ops dashboard"]));

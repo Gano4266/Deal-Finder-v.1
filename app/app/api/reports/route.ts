@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-const allowedSubmissionTypes = new Set(["report_issue", "suggest_restaurant", "submit_deal"]);
+const allowedSubmissionTypes = new Set(["report_issue", "suggest_restaurant", "submit_deal", "owner_feedback"]);
 const forwardTimeoutMs = 12_000;
 
 type ReportPayload = {

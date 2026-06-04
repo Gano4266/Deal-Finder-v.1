@@ -1001,6 +1001,35 @@ a {
   accent-color: var(--forest);
 }
 
+.ownerFeedbackChoice {
+  border-style: dashed;
+  background: var(--surface);
+}
+
+.ownerFeedbackNotice {
+  display: grid;
+  gap: 4px;
+  padding: 12px 13px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.ownerFeedbackNotice p,
+.ownerFeedbackNotice span {
+  margin: 0;
+}
+
+.ownerFeedbackNotice p {
+  color: var(--forest);
+  font-weight: 800;
+}
+
+.ownerFeedbackNotice span {
+  color: var(--muted);
+  font-weight: 700;
+}
+
 .formField {
   display: grid;
   gap: 0;

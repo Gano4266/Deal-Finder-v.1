@@ -129,6 +129,9 @@ export default async function DealDetailPage({ params }: DealPageProps) {
             <Link href={`/report?dealId=${deal.dealId}` as Route} className="secondaryLink">
               Report an issue
             </Link>
+            <Link href={"/report?type=owner_feedback" as Route} className="secondaryLink">
+              Feedback to owner
+            </Link>
           </div>
           <p className="notes">
             Details can change. Check the restaurant&apos;s latest post or site before you order.

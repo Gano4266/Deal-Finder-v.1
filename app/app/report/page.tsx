@@ -7,6 +7,7 @@ type ReportPageProps = {
   searchParams?: Promise<{
     dealId?: string;
     restaurantId?: string;
+    type?: string;
   }>;
 };
 
@@ -32,6 +33,8 @@ export default async function ReportPage({ searchParams }: ReportPageProps) {
       ? `/restaurants/${restaurant.restaurantId}`
       : "";
   const contextType = deal ? "deal" : restaurant ? "restaurant" : "general";
+  const initialSubmissionType = params?.type === "owner_feedback" ? "owner_feedback" : "report_issue";
+  const ownerFeedbackMode = initialSubmissionType === "owner_feedback";
   const intakeAvailable = reportIntakeAvailable();
   const emergencyEmail = process.env.NEXT_PUBLIC_REPORT_EMAIL;
 
@@ -39,11 +42,12 @@ export default async function ReportPage({ searchParams }: ReportPageProps) {
     <main className="pageShell detailShell">
       <section className="sectionHeader">
         <div>
-          <p className="eyebrow">Send an update</p>
-          <h1>Share a Forkcast update</h1>
+          <p className="eyebrow">{ownerFeedbackMode ? "Owner feedback" : "Send an update"}</p>
+          <h1>{ownerFeedbackMode ? "Submit feedback to owner" : "Share a Forkcast update"}</h1>
           <p>
-            Spotted a change, missing restaurant, or special worth adding?
-            Send it our way.
+            {ownerFeedbackMode
+              ? "Have a thought about Forkcast itself? Send it directly to the owner queue."
+              : "Spotted a change, missing restaurant, or special worth adding? Send it our way."}
           </p>
           {!intakeAvailable ? (
             <p className="notes">
@@ -68,21 +72,28 @@ export default async function ReportPage({ searchParams }: ReportPageProps) {
           <dl className="factGrid">
             <div>
               <dt>Item</dt>
-              <dd>{contextLabel}</dd>
+              <dd>{ownerFeedbackMode ? "Forkcast owner feedback" : contextLabel}</dd>
             </div>
             <div>
               <dt>Restaurant</dt>
-              <dd>{restaurant?.name ?? deal?.restaurantName ?? "Not specified"}</dd>
+              <dd>{ownerFeedbackMode ? "Not item-specific" : restaurant?.name ?? deal?.restaurantName ?? "Not specified"}</dd>
             </div>
             <div>
               <dt>Type</dt>
-              <dd>{deal ? "Deal" : restaurant ? "Restaurant" : "General report"}</dd>
+              <dd>{ownerFeedbackMode ? "Owner feedback" : deal ? "Deal" : restaurant ? "Restaurant" : "General report"}</dd>
             </div>
             <div>
               <dt>Next step</dt>
               <dd>Thanks. This will be reviewed before anything changes on the site.</dd>
             </div>
           </dl>
+          {!ownerFeedbackMode ? (
+            <div className="cardActions">
+              <Link href={"/report?type=owner_feedback" as Route} className="secondaryLink">
+                Submit feedback to owner
+              </Link>
+            </div>
+          ) : null}
         </article>
 
         <article className="detailPanel">
@@ -93,6 +104,7 @@ export default async function ReportPage({ searchParams }: ReportPageProps) {
             contextType={contextType}
             dealId={deal?.dealId}
             dealTitle={deal?.publicTitle}
+            initialSubmissionType={initialSubmissionType}
             intakeAvailable={intakeAvailable}
             restaurantName={restaurant?.name ?? deal?.restaurantName}
             restaurantId={restaurant?.restaurantId}

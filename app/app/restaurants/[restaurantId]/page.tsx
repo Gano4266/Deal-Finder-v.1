@@ -89,6 +89,9 @@ export default async function RestaurantDetailPage({ params }: RestaurantPagePro
             <Link href={`/report?restaurantId=${restaurant.restaurantId}` as Route} className="secondaryLink">
               Report an issue
             </Link>
+            <Link href={"/report?type=owner_feedback" as Route} className="secondaryLink">
+              Feedback to owner
+            </Link>
           </div>
         </article>
 

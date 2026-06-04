@@ -8,7 +8,12 @@ const submissionOptions = [
   { value: "submit_deal", label: "Send a special" }
 ] as const;
 
-type SubmissionType = (typeof submissionOptions)[number]["value"];
+const ownerFeedbackOption = {
+  value: "owner_feedback",
+  label: "Submit feedback to owner"
+} as const;
+
+type SubmissionType = (typeof submissionOptions)[number]["value"] | typeof ownerFeedbackOption.value;
 
 type ReportFormProps = {
   contextLabel: string;
@@ -16,6 +21,7 @@ type ReportFormProps = {
   contextType: "deal" | "restaurant" | "general";
   dealId?: string;
   dealTitle?: string;
+  initialSubmissionType?: SubmissionType;
   intakeAvailable: boolean;
   restaurantId?: string;
   restaurantName?: string;
@@ -27,11 +33,12 @@ export function ReportForm({
   contextType,
   dealId,
   dealTitle,
+  initialSubmissionType = "report_issue",
   intakeAvailable,
   restaurantId,
   restaurantName
 }: ReportFormProps) {
-  const [submissionType, setSubmissionType] = useState<SubmissionType>("report_issue");
+  const [submissionType, setSubmissionType] = useState<SubmissionType>(initialSubmissionType);
   const [restaurantNameValue, setRestaurantNameValue] = useState(restaurantName ?? "");
   const [dealTitleValue, setDealTitleValue] = useState(dealTitle ?? "");
   const [dealUrl, setDealUrl] = useState("");
@@ -42,8 +49,10 @@ export function ReportForm({
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const formDisabled = !intakeAvailable || status === "sending";
+  const isOwnerFeedbackMode = initialSubmissionType === ownerFeedbackOption.value;
 
   useEffect(() => {
+    setSubmissionType(initialSubmissionType);
     setRestaurantNameValue(restaurantName ?? "");
     setDealTitleValue(dealTitle ?? "");
     setDealUrl("");
@@ -53,7 +62,7 @@ export function ReportForm({
     setPreferredContact("");
     setStatus("idle");
     setErrorMessage("");
-  }, [contextPath, dealId, dealTitle, restaurantId, restaurantName]);
+  }, [contextPath, dealId, dealTitle, initialSubmissionType, restaurantId, restaurantName]);
 
   function clearStatusForEdit() {
     if (status === "sent" || status === "error") {
@@ -88,17 +97,21 @@ export function ReportForm({
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          deal_id: dealId ?? "",
-          deal_title: dealTitleValue,
+          deal_id: isOwnerFeedbackMode ? "" : dealId ?? "",
+          deal_title: isOwnerFeedbackMode ? "" : dealTitleValue,
           deal_url: dealUrl,
           message,
           page_url: window.location.href,
           preferred_contact: preferredContact,
           reporter_email: reporterEmail,
           reporter_name: reporterName,
-          restaurant_id: restaurantId ?? "",
-          restaurant_name: restaurantNameValue,
-          source_context: [contextType, contextLabel, contextPath].filter(Boolean).join(" | "),
+          restaurant_id: isOwnerFeedbackMode ? "" : restaurantId ?? "",
+          restaurant_name: isOwnerFeedbackMode ? "" : restaurantNameValue,
+          source_context: [
+            isOwnerFeedbackMode ? "owner_feedback" : contextType,
+            isOwnerFeedbackMode ? "Forkcast owner feedback" : contextLabel,
+            contextPath
+          ].filter(Boolean).join(" | "),
           submission_type: submissionType
         })
       });
@@ -118,6 +131,10 @@ export function ReportForm({
     setStatus("sent");
     setMessage("");
     setDealUrl("");
+    if (isOwnerFeedbackMode) {
+      setRestaurantNameValue("");
+      setDealTitleValue("");
+    }
     setReporterName("");
     setReporterEmail("");
     setPreferredContact("");
@@ -125,48 +142,57 @@ export function ReportForm({
 
   return (
     <form className="reportForm" onSubmit={submitReport}>
-      <fieldset disabled={formDisabled}>
-        <legend>What kind of update is this?</legend>
-        <div className="choiceStack">
-          {submissionOptions.map((option) => (
-            <label key={option.value} className="radioChoice">
-              <input
-                type="radio"
-                name="submission_type"
-                value={option.value}
-                checked={submissionType === option.value}
-                onChange={() => {
-                  clearStatusForEdit();
-                  setSubmissionType(option.value);
-                }}
-              />
-              <span>{option.label}</span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      {isOwnerFeedbackMode ? (
+        <section className="ownerFeedbackNotice" aria-label="Owner feedback type">
+          <p>{ownerFeedbackOption.label}</p>
+          <span>This message is not attached to a deal or restaurant.</span>
+        </section>
+      ) : (
+        <>
+          <fieldset disabled={formDisabled}>
+            <legend>Item-specific update</legend>
+            <div className="choiceStack">
+              {submissionOptions.map((option) => (
+                <label key={option.value} className="radioChoice">
+                  <input
+                    type="radio"
+                    name="submission_type"
+                    value={option.value}
+                    checked={submissionType === option.value}
+                    onChange={() => {
+                      clearStatusForEdit();
+                      setSubmissionType(option.value);
+                    }}
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
 
-      <label className="formField">
-        <span>Restaurant name</span>
-        <input
-          name="restaurant_name"
-          value={restaurantNameValue}
-          onChange={textChange(setRestaurantNameValue)}
-          placeholder="Restaurant name"
-          disabled={formDisabled}
-        />
-      </label>
+          <label className="formField">
+            <span>Restaurant name</span>
+            <input
+              name="restaurant_name"
+              value={restaurantNameValue}
+              onChange={textChange(setRestaurantNameValue)}
+              placeholder="Restaurant name"
+              disabled={formDisabled}
+            />
+          </label>
 
-      <label className="formField">
-        <span>Deal or special</span>
-        <input
-          name="deal_title"
-          value={dealTitleValue}
-          onChange={textChange(setDealTitleValue)}
-          placeholder="Example: Tuesday tacos, wing night, kids eat free"
-          disabled={formDisabled}
-        />
-      </label>
+          <label className="formField">
+            <span>Deal or special</span>
+            <input
+              name="deal_title"
+              value={dealTitleValue}
+              onChange={textChange(setDealTitleValue)}
+              placeholder="Example: Tuesday tacos, wing night, kids eat free"
+              disabled={formDisabled}
+            />
+          </label>
+        </>
+      )}
 
       <label className="formField">
         <span>Message</span>
@@ -174,7 +200,7 @@ export function ReportForm({
           name="message"
           value={message}
           onChange={textChange(setMessage)}
-          placeholder="Example: This special is now Thursdays, or I found a new taco special."
+          placeholder={isOwnerFeedbackMode ? "Share a thought, request, or idea for the Forkcast owner." : "Example: This special is now Thursdays, or I found a new taco special."}
           rows={4}
           required
           disabled={formDisabled}
@@ -182,7 +208,7 @@ export function ReportForm({
       </label>
 
       <label className="formField">
-        <span>Link, optional</span>
+        <span>{isOwnerFeedbackMode ? "Relevant link, optional" : "Link, optional"}</span>
         <input
           name="deal_url"
           value={dealUrl}
