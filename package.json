@@ -2,7 +2,11 @@
   "name": "deal-finder-deploy-root",
   "private": true,
   "scripts": {
-    "build": "cd app && npm run build"
+    "build": "cd app && npm run build",
+    "research:validate": "node scripts/validate-research-intake.mjs",
+    "research:summary": "node scripts/summarize-research-intake.mjs",
+    "research:dry-run": "node scripts/dry-run-promote-research-intake.mjs",
+    "research:promotion-packet": "node scripts/prepare-fixture-promotion-packet.mjs"
   },
   "dependencies": {
     "next": "16.2.7",
