@@ -1,0 +1,468 @@
+{
+  "generated_at": "2026-06-13T12:30:00-04:00",
+  "scope": "Active Wilmington and Carolina Beach public prototype restaurants. Southport parked by prior product direction.",
+  "active_restaurants": 51,
+  "restaurants_without_public_deals": 20,
+  "restaurants_with_public_deals": 31,
+  "rows": [
+    {
+      "restaurant_id": "south-front-tavern",
+      "name": "South Front Tavern",
+      "city": "Wilmington",
+      "neighborhood": "South Front District",
+      "public_deal_count": 4,
+      "source_count": 1,
+      "website": "https://www.southfronttavern.com/"
+    },
+    {
+      "restaurant_id": "caprice-bistro",
+      "name": "Caprice Bistro",
+      "city": "Wilmington",
+      "neighborhood": "Downtown",
+      "public_deal_count": 2,
+      "source_count": 1,
+      "website": "https://www.capricebistro.com/"
+    },
+    {
+      "restaurant_id": "rx-chicken-oysters",
+      "name": "Rx Chicken & Oysters",
+      "city": "Wilmington",
+      "neighborhood": "Castle Street / Downtown",
+      "public_deal_count": 1,
+      "source_count": 1,
+      "website": "https://www.rxwilmington.com/"
+    },
+    {
+      "restaurant_id": "cornelias",
+      "name": "Cornelia's",
+      "city": "Wilmington",
+      "neighborhood": "Porters Neck / Davis Community",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://corneliasrestaurant.com/"
+    },
+    {
+      "restaurant_id": "the-cardinal",
+      "name": "The Cardinal",
+      "city": "Wilmington",
+      "neighborhood": "Masonboro",
+      "public_deal_count": 2,
+      "source_count": 1,
+      "website": "https://thecardinalilm.com/"
+    },
+    {
+      "restaurant_id": "kornerstone-bistro",
+      "name": "Kornerstone Bistro",
+      "city": "Wilmington",
+      "neighborhood": "Ogden / North Market",
+      "public_deal_count": 1,
+      "source_count": 1,
+      "website": "https://www.kornerstonebistro.com/"
+    },
+    {
+      "restaurant_id": "roko-italian-cuisine",
+      "name": "Roko Italian Cuisine",
+      "city": "Wilmington",
+      "neighborhood": "Mayfaire / Military Cutoff",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://www.rokoitalian.com/"
+    },
+    {
+      "restaurant_id": "winnies-tavern",
+      "name": "Winnie's Tavern",
+      "city": "Wilmington",
+      "neighborhood": "South Wilmington",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://www.wilmingtonsbestburger.com/"
+    },
+    {
+      "restaurant_id": "the-half-downtown",
+      "name": "The Half - Downtown",
+      "city": "Wilmington",
+      "neighborhood": "Downtown / Brooklyn Arts",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://www.thehalfbev.com/"
+    },
+    {
+      "restaurant_id": "c-street-mexican-grill",
+      "name": "C-Street Mexican Grill",
+      "city": "Wilmington",
+      "neighborhood": "Shipyard / Long Leaf Mall",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://www.cstreetmex.com/"
+    },
+    {
+      "restaurant_id": "beat-street",
+      "name": "Beat Street",
+      "city": "Wilmington",
+      "neighborhood": "Cargo District",
+      "public_deal_count": 2,
+      "source_count": 1,
+      "website": "https://www.beatstreetilm.com/"
+    },
+    {
+      "restaurant_id": "block-taco",
+      "name": "Block Taco",
+      "city": "Wilmington",
+      "neighborhood": "South Front / Greenfield",
+      "public_deal_count": 2,
+      "source_count": 1,
+      "website": "https://blocktaco.com/"
+    },
+    {
+      "restaurant_id": "hells-kitchen",
+      "name": "Hell's Kitchen",
+      "city": "Wilmington",
+      "neighborhood": "Downtown",
+      "public_deal_count": 5,
+      "source_count": 1,
+      "website": "https://hellskitchenbar.com/"
+    },
+    {
+      "restaurant_id": "castle-street-kitchen",
+      "name": "Castle Street Kitchen",
+      "city": "Wilmington",
+      "neighborhood": "Castle Street / Downtown",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://www.castlestkitchen.com/"
+    },
+    {
+      "restaurant_id": "fortunate-glass",
+      "name": "Fortunate Glass",
+      "city": "Wilmington",
+      "neighborhood": "Downtown",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://www.fortunateglass.com/"
+    },
+    {
+      "restaurant_id": "front-street-brewery",
+      "name": "Front Street Brewery",
+      "city": "Wilmington",
+      "neighborhood": "Downtown",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://www.frontstreetbrewery.com/"
+    },
+    {
+      "restaurant_id": "rooster-and-the-crow",
+      "name": "Rooster & The Crow",
+      "city": "Wilmington",
+      "neighborhood": "Downtown / Riverwalk",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://roosterandthecrow.com/"
+    },
+    {
+      "restaurant_id": "tacobaby",
+      "name": "Tacobaby",
+      "city": "Wilmington",
+      "neighborhood": "Downtown",
+      "public_deal_count": 1,
+      "source_count": 1,
+      "website": "https://tacobabyusa.com/"
+    },
+    {
+      "restaurant_id": "true-blue-butcher-table",
+      "name": "True Blue Butcher & Table",
+      "city": "Wilmington",
+      "neighborhood": "The Forum / Mayfaire",
+      "public_deal_count": 2,
+      "source_count": 1,
+      "website": "https://www.wearetrueblue.com/truebluebutcherandtable"
+    },
+    {
+      "restaurant_id": "za-pie-pizzeria",
+      "name": "Za Pie Pizzeria",
+      "city": "Wilmington",
+      "neighborhood": "Monkey Junction",
+      "public_deal_count": 2,
+      "source_count": 1,
+      "website": "https://www.zapie.com/"
+    },
+    {
+      "restaurant_id": "tomiko-san",
+      "name": "Tomiko-San",
+      "city": "Wilmington",
+      "neighborhood": "Eastwood / Wrightsville Beach Gateway",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://www.tomiko-san.com/"
+    },
+    {
+      "restaurant_id": "tidewater-oyster-bar",
+      "name": "Tidewater Oyster Bar",
+      "city": "Wilmington",
+      "neighborhood": "Ogden / North Market",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://tidewateroysterbar.com/"
+    },
+    {
+      "restaurant_id": "yosake",
+      "name": "YoSake",
+      "city": "Wilmington",
+      "neighborhood": "Downtown",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://yosake.com/"
+    },
+    {
+      "restaurant_id": "copper-penny",
+      "name": "Copper Penny",
+      "city": "Wilmington",
+      "neighborhood": "Downtown",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://www.copperpennync.com/"
+    },
+    {
+      "restaurant_id": "ponysaurus-wilmington",
+      "name": "Ponysaurus Brewing Co. Wilmington",
+      "city": "Wilmington",
+      "neighborhood": "Downtown",
+      "public_deal_count": 3,
+      "source_count": 1,
+      "website": "https://www.ponysaurusbrewing.com/ilm"
+    },
+    {
+      "restaurant_id": "islands-fresh-mex-monkey-junction",
+      "name": "Islands Fresh Mex Grill - Monkey Junction",
+      "city": "Wilmington",
+      "neighborhood": "Monkey Junction",
+      "public_deal_count": 2,
+      "source_count": 1,
+      "website": "https://www.islandsfreshmexgrill.com/monkey-junction"
+    },
+    {
+      "restaurant_id": "italian-bistro-monkey-junction",
+      "name": "Italian Bistro - Monkey Junction",
+      "city": "Wilmington",
+      "neighborhood": "Monkey Junction",
+      "public_deal_count": 2,
+      "source_count": 1,
+      "website": "https://www.italianbistronc.com/monkey-junction/"
+    },
+    {
+      "restaurant_id": "k38-independence",
+      "name": "K38 Independence",
+      "city": "Wilmington",
+      "neighborhood": "South Wilmington / Independence",
+      "public_deal_count": 2,
+      "source_count": 1,
+      "website": "https://k38bajagrill.com/locations/independence/"
+    },
+    {
+      "restaurant_id": "true-blue-butcher-barrel",
+      "name": "True Blue Butcher & Barrel",
+      "city": "Wilmington",
+      "neighborhood": "South Front District",
+      "public_deal_count": 3,
+      "source_count": 1,
+      "website": "https://www.wearetrueblue.com/butcherandbarrel"
+    },
+    {
+      "restaurant_id": "coquina-fishbar",
+      "name": "Coquina Fishbar",
+      "city": "Wilmington",
+      "neighborhood": "Mayfaire",
+      "public_deal_count": 1,
+      "source_count": 1,
+      "website": "https://coquinafishbar.com/"
+    },
+    {
+      "restaurant_id": "rebellion-nc",
+      "name": "Rebellion NC",
+      "city": "Wilmington",
+      "neighborhood": "Downtown",
+      "public_deal_count": 3,
+      "source_count": 1,
+      "website": "https://rebellionnc.com/"
+    },
+    {
+      "restaurant_id": "beer-barrio",
+      "name": "Beer Barrio",
+      "city": "Wilmington",
+      "neighborhood": "Downtown",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://beerbarrionc.com/"
+    },
+    {
+      "restaurant_id": "shuckin-shack-wilmington",
+      "name": "Shuckin' Shack Oyster Bar - Wilmington",
+      "city": "Wilmington",
+      "neighborhood": "Downtown",
+      "public_deal_count": 3,
+      "source_count": 1,
+      "website": "https://www.theshuckinshack.com/location-wilmington"
+    },
+    {
+      "restaurant_id": "katys-grill-bar",
+      "name": "Katy's Grill & Bar",
+      "city": "Wilmington",
+      "neighborhood": "South College Road",
+      "public_deal_count": 3,
+      "source_count": 1,
+      "website": "https://katysbarandgrill.com/"
+    },
+    {
+      "restaurant_id": "cape-fear-seafood-monkey-junction",
+      "name": "Cape Fear Seafood Company - Monkey Junction",
+      "city": "Wilmington",
+      "neighborhood": "Monkey Junction",
+      "public_deal_count": 1,
+      "source_count": 1,
+      "website": "https://capefearseafoodcompany.com/locations/monkey-junction/"
+    },
+    {
+      "restaurant_id": "blue-surf-cafe",
+      "name": "Blue Surf Cafe",
+      "city": "Wilmington",
+      "neighborhood": "UNCW / Racine Drive",
+      "public_deal_count": 4,
+      "source_count": 1,
+      "website": "https://bluesurfrestaurants.com/menu/"
+    },
+    {
+      "restaurant_id": "whiskey-trail",
+      "name": "Whiskey Trail",
+      "city": "Wilmington",
+      "neighborhood": "Masonboro / Midtown",
+      "public_deal_count": 2,
+      "source_count": 1,
+      "website": "https://whiskeytrailsportspub.com/wilmington-whiskey-trail-happy-hours-specials/"
+    },
+    {
+      "restaurant_id": "k38-oleander",
+      "name": "K38 Oleander",
+      "city": "Wilmington",
+      "neighborhood": "Oleander / College Road",
+      "public_deal_count": 2,
+      "source_count": 1,
+      "website": "https://k38bajagrill.com/locations/oleander/"
+    },
+    {
+      "restaurant_id": "sawmill-restaurant",
+      "name": "Sawmill Restaurant",
+      "city": "Wilmington",
+      "neighborhood": "Monkey Junction",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://thesawmillrestaurant.com/daily-specials/"
+    },
+    {
+      "restaurant_id": "pts-grille-monkey-junction",
+      "name": "P.T.'s Olde Fashioned Grille - Monkey Junction",
+      "city": "Wilmington",
+      "neighborhood": "Monkey Junction",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://ptsgrille.com/location/monkey-junction/"
+    },
+    {
+      "restaurant_id": "el-cerro-grande-monkey-junction",
+      "name": "El Cerro Grande - Monkey Junction",
+      "city": "Wilmington",
+      "neighborhood": "Monkey Junction",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://elcerrogranderestaurant.com/monkeyjunction"
+    },
+    {
+      "restaurant_id": "michaelangelos-pizza-monkey-junction",
+      "name": "Michaelangelo's Pizza - Monkey Junction",
+      "city": "Wilmington",
+      "neighborhood": "Monkey Junction",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://www.michaelangelosmj.com/specials"
+    },
+    {
+      "restaurant_id": "might-as-well-wilmington",
+      "name": "Might As Well Bar & Grill",
+      "city": "Wilmington",
+      "neighborhood": "UNCW / Racine Drive",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://wilmington.mightaswellbarandgrill.com/wilmington-might-as-well-bar-and-grill-wilmington-happy-hours-specials"
+    },
+    {
+      "restaurant_id": "flaming-amys-burrito-barn",
+      "name": "Flaming Amy's Burrito Barn",
+      "city": "Wilmington",
+      "neighborhood": "Oleander / UNCW",
+      "public_deal_count": 0,
+      "source_count": 1,
+      "website": "https://flamingamysburritobarn.com/"
+    },
+    {
+      "restaurant_id": "fentonis-pizza",
+      "name": "Fentoni's Pizza",
+      "city": "Carolina Beach",
+      "neighborhood": "Carolina Beach",
+      "public_deal_count": 1,
+      "source_count": 1,
+      "website": "https://fentonispizza.com/daily-specials"
+    },
+    {
+      "restaurant_id": "k38-baja-grill",
+      "name": "K38 Baja Grill",
+      "city": "Carolina Beach",
+      "neighborhood": "Carolina Beach",
+      "public_deal_count": 2,
+      "source_count": 1,
+      "website": "https://k38bajagrill.com/locations/carolina-beach/"
+    },
+    {
+      "restaurant_id": "hoplite-irish-pub-restaurant",
+      "name": "HopLite Irish Pub & Restaurant",
+      "city": "Carolina Beach",
+      "neighborhood": "Carolina Beach",
+      "public_deal_count": 1,
+      "source_count": 1,
+      "website": "https://hopliterestaurant.com/brunch-menu/"
+    },
+    {
+      "restaurant_id": "k38-porters-neck",
+      "name": "K38 Porters Neck",
+      "city": "Wilmington",
+      "neighborhood": "Porters Neck",
+      "public_deal_count": 2,
+      "source_count": 1,
+      "website": "https://k38bajagrill.com/locations/porters-neck/"
+    },
+    {
+      "restaurant_id": "k38-forum",
+      "name": "K38 Forum",
+      "city": "Wilmington",
+      "neighborhood": "Forum / Military Cutoff",
+      "public_deal_count": 2,
+      "source_count": 1,
+      "website": "https://k38bajagrill.com/locations/forum/"
+    },
+    {
+      "restaurant_id": "fire-bowl",
+      "name": "Fire Bowl Asian Cuisine",
+      "city": "Wilmington",
+      "neighborhood": "Ogden / Market Street",
+      "public_deal_count": 1,
+      "source_count": 1,
+      "website": "http://www.firebowlwilmington.com/"
+    },
+    {
+      "restaurant_id": "melting-pot-wilmington",
+      "name": "The Melting Pot - Wilmington",
+      "city": "Wilmington",
+      "neighborhood": "Mayfaire / Town Center",
+      "public_deal_count": 1,
+      "source_count": 1,
+      "website": "https://www.meltingpot.com/wilmington-nc/melting-pot-events.aspx"
+    }
+  ]
+}

@@ -27,6 +27,34 @@ function queryFor(area: string, q: string) {
   return queryText ? `/restaurants?${queryText}` : "/restaurants";
 }
 
+function displayTags(value: string) {
+  return value
+    .split(";")
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .join(", ");
+}
+
+function displayChecked(value: string) {
+  if (!value) {
+    return "recently";
+  }
+
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+  if (!match) {
+    return value;
+  }
+
+  const [, year, month, day] = match;
+  return new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+    timeZone: "America/New_York",
+    year: "numeric"
+  }).format(new Date(`${year}-${month}-${day}T12:00:00-04:00`));
+}
+
 export default async function RestaurantsPage({ searchParams }: RestaurantsPageProps) {
   const params = await searchParams;
   const selectedSearchQuery = normalizeSearchQuery(params?.q);
@@ -121,6 +149,10 @@ export default async function RestaurantsPage({ searchParams }: RestaurantsPageP
         query={selectedSearchQuery}
       />
 
+      <p className="resultSummary" aria-live="polite">
+        Showing {visibleRestaurants.length} of {restaurants.length} restaurants.
+      </p>
+
       <nav className="segmentedNav compactFilters" aria-label="Filter restaurants by area">
         {areaOptions.map((area) => (
           <Link
@@ -143,12 +175,12 @@ export default async function RestaurantsPage({ searchParams }: RestaurantsPageP
               <h2>{restaurant.name}</h2>
               <div className="badgeRow" aria-label="Restaurant status">
                 <span>{restaurant.publicDealCount} deal{restaurant.publicDealCount === 1 ? "" : "s"}</span>
-                <span>Checked {restaurant.lastChecked}</span>
+                <span>Checked {displayChecked(restaurant.lastChecked)}</span>
                 {restaurant.publicDealDays.length > 0 ? (
                   <span>{restaurant.publicDealDays.join(" / ")}</span>
                 ) : null}
               </div>
-              <p>{restaurant.cuisine || restaurant.tags || "Restaurant in the Forkcast set."}</p>
+              <p>{displayTags(restaurant.cuisine || restaurant.tags) || "Restaurant in the Forkcast set."}</p>
               <p className="locationLine">{restaurant.address}</p>
             </div>
             <div className="cardActions">
@@ -175,6 +207,11 @@ export default async function RestaurantsPage({ searchParams }: RestaurantsPageP
           <p className="eyebrow">No matches yet</p>
           <h2>{emptyHeading}</h2>
           <p>{emptyCopy}</p>
+          <div className="cardActions">
+            <Link href="/report" className="secondaryLink">
+              Report a missing restaurant
+            </Link>
+          </div>
         </section>
       ) : (
         <section className="restaurantList compactList" aria-label="Restaurants without deals yet">
@@ -183,7 +220,7 @@ export default async function RestaurantsPage({ searchParams }: RestaurantsPageP
             <article key={restaurant.restaurantId} className="restaurantCard compactRestaurantCard">
               <div>
                 <h3>{restaurant.name}</h3>
-                <p>{restaurant.neighborhood || "Wilmington"} / checked {restaurant.lastChecked}</p>
+                <p>{restaurant.neighborhood || "Wilmington"} / checked {displayChecked(restaurant.lastChecked)}</p>
               </div>
               <div className="cardActions">
                 {phoneHref(restaurant.phone) ? (

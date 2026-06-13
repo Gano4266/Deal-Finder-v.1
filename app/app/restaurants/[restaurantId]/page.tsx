@@ -1,19 +1,17 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { notFound } from "next/navigation";
-import { getRestaurantById, getRestaurants } from "../../../lib/data";
+import { getRestaurantById } from "../../../lib/data";
 import { phoneHref } from "../../phone-link";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 type RestaurantPageProps = {
   params: Promise<{
     restaurantId: string;
   }>;
 };
-
-export async function generateStaticParams() {
-  const restaurants = await getRestaurants();
-  return restaurants.map((restaurant) => ({ restaurantId: restaurant.restaurantId }));
-}
 
 export default async function RestaurantDetailPage({ params }: RestaurantPageProps) {
   const { restaurantId } = await params;

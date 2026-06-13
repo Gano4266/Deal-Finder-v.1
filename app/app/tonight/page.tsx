@@ -12,6 +12,7 @@ import {
   weekdayName
 } from "../../lib/data";
 import { dealMatchesMealFilter, mealFilterOptions } from "../../lib/meal-filter";
+import { firstDollarPriceValue } from "../../lib/price-filter";
 import { matchesSearchQuery, normalizeSearchQuery } from "../../lib/public-search";
 
 export const dynamic = "force-dynamic";
@@ -27,7 +28,7 @@ type TonightPageProps = {
 const quickFilterOptions = [
   { value: "all", label: "All" },
   ...mealFilterOptions.filter((option) => option.value !== "all"),
-  { value: "under-10", label: "Under $10" }
+  { value: "under-10", label: "$10 & under" }
 ] as const;
 
 function queryFor(params: { area: string; q: string; quick: string }) {
@@ -49,23 +50,13 @@ function queryFor(params: { area: string; q: string; quick: string }) {
   return queryText ? `/tonight?${queryText}` : "/tonight";
 }
 
-function firstPriceValue(price: string): number | undefined {
-  const match = price.match(/\$?\s*(\d+(?:\.\d{1,2})?)/);
-
-  if (!match) {
-    return undefined;
-  }
-
-  return Number(match[1]);
-}
-
 function matchesQuickFilter(deal: PublicDeal, quickFilter: string): boolean {
   if (quickFilter === "breakfast" || quickFilter === "lunch" || quickFilter === "dinner") {
     return dealMatchesMealFilter(deal, quickFilter);
   }
 
   if (quickFilter === "under-10") {
-    const value = firstPriceValue(deal.price);
+    const value = firstDollarPriceValue(deal.price);
     return typeof value === "number" && value <= 10;
   }
 
@@ -189,6 +180,10 @@ export default async function TonightPage({ searchParams }: TonightPageProps) {
         query={selectedSearchQuery}
       />
 
+      <p className="resultSummary" aria-live="polite">
+        Showing {visibleDeals.length} of {deals.length} specials for today.
+      </p>
+
       <section className="filterPanel" aria-label="Meal and quick filters for today">
         <div>
           <p className="eyebrow">Meal & quick</p>
@@ -221,6 +216,9 @@ export default async function TonightPage({ searchParams }: TonightPageProps) {
             </Link>
             <Link href="/deals" className="secondaryLink">
               See all deals
+            </Link>
+            <Link href="/report" className="secondaryLink">
+              Report a missing special
             </Link>
           </div>
         </section>

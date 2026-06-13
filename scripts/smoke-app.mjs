@@ -137,7 +137,68 @@ const restaurants = readCsv("fixtures/prototype/restaurants.csv").filter((row) =
   row.fixture_data_class === "verified_static" &&
   row.is_live_data === "false"
 );
-const proofAssets = Array.from(new Set(deals.map((deal) => publicAssetUrl(deal.screenshot_path)).filter(Boolean)));
+const restaurantsById = new Map(restaurants.map((restaurant) => [restaurant.restaurant_id, restaurant]));
+
+function easternDateString(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    day: "2-digit",
+    month: "2-digit",
+    timeZone: "America/New_York",
+    year: "numeric"
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function isTrue(value) {
+  return String(value ?? "").toLowerCase() === "true";
+}
+
+function dealIsFresh(deal) {
+  const today = easternDateString();
+  const nextCheckDue = deal.next_check_due || "";
+  const expiresOn = deal.expires_on || "";
+
+  if (!nextCheckDue && !expiresOn) {
+    return false;
+  }
+
+  if (nextCheckDue && nextCheckDue < today) {
+    return false;
+  }
+
+  if (expiresOn && expiresOn < today) {
+    return false;
+  }
+
+  return true;
+}
+
+function passesPublicRuntimeDealGate(deal) {
+  const restaurant = restaurantsById.get(deal.restaurant_id);
+
+  return Boolean(
+    restaurant &&
+    isTrue(deal.mvp_publish_eligible) &&
+    isTrue(deal.public_copy_approved) &&
+    ["approved", "approved_with_uncertainty"].includes(deal.workflow_status) &&
+    deal.confidence_status === "verified" &&
+    deal.review_decision === "approved" &&
+    deal.published_at &&
+    !deal.hidden_at &&
+    deal.conflict_detected === "false" &&
+    deal.is_live_data === "false" &&
+    deal.restaurant_id &&
+    deal.source_id &&
+    deal.review_task_id &&
+    (deal.source_capture_id || deal.direct_confirmation_id) &&
+    dealIsFresh(deal)
+  );
+}
+
+const visibleDeals = deals.filter(passesPublicRuntimeDealGate);
+const hiddenDeals = deals.filter((deal) => !passesPublicRuntimeDealGate(deal));
+const proofAssets = Array.from(new Set(visibleDeals.map((deal) => publicAssetUrl(deal.screenshot_path)).filter(Boolean)));
 
 const failures = [];
 
@@ -160,10 +221,10 @@ await check("pwa apple touch icon", () => assertAsset("/apple-touch-icon.png"));
 await check("tonight", () => assertPage("/tonight", ["Today's forecast", "Verify details before you order"]));
 await check("tonight quick confirm", () => assertPage("/tonight", ["I checked this"]));
 await check("tonight keyword search", () => assertPage("/tonight?q=taco", ["Search today's deals", "$1.99 tacos"]));
-await check("tonight breakfast filter", () => assertPage("/tonight?quick=breakfast", ["Breakfast", "Katy's Grill & Bar"]));
-await check("tonight lunch filter", () => assertPage("/tonight?quick=lunch", ["Lunch", "Hell's Kitchen"]));
-await check("tonight dinner filter", () => assertPage("/tonight?quick=dinner", ["Dinner", "Blue Surf Cafe"]));
-await check("deals filters", () => assertPage("/deals?area=Downtown&day=Tuesday&quick=under-10&sort=area", ["Under $10", "Food specials worth knowing"]));
+await check("tonight breakfast filter", () => assertPage("/tonight?quick=breakfast", ["Today's forecast", "Breakfast"]));
+await check("tonight lunch filter", () => assertPage("/tonight?quick=lunch", ["Today's forecast", "Lunch"]));
+await check("tonight dinner filter", () => assertPage("/tonight?quick=dinner", ["Today's forecast", "Dinner"]));
+await check("deals filters", () => assertPage("/deals?area=Downtown&day=Tuesday&quick=under-10&sort=area", ["$10 & under", "Food specials worth knowing"]));
 await check("deals quick confirm", () => assertPage("/deals", ["Food specials worth knowing", "I checked this"]));
 await check("deals keyword search", () => assertPage("/deals?q=taco", ["Search deals", "$2 tacos"]));
 await check("deals keyword no match", () => assertPage("/deals?q=notarealdeal", ["No specials match \"notarealdeal\" yet."]));
@@ -354,6 +415,14 @@ await check("invalid deal filters fallback", () => assertPage("/deals?area=Nope&
 await check("missing deal 404", () => assertMissingPage("/deals/not-a-real-deal"));
 await check("missing restaurant 404", () => assertMissingPage("/restaurants/not-a-real-restaurant"));
 await check("withheld restaurant 404", () => assertMissingPage("/restaurants/pinpoint-restaurant"));
+await check("stale deal detail hidden", () => assertMissingPage("/deals/deal-beer-barrio-tuesday-pork-tacos"));
+await check("stale restaurant deal omitted", async () => {
+  const body = await assertPage("/restaurants/beer-barrio", [
+    "Beer Barrio",
+    "/deals/deal-wilmington-beer-barrio-2026-06-16-pork-tacos"
+  ]);
+  assert(!body.includes("deal-beer-barrio-tuesday-pork-tacos"), "/restaurants/beer-barrio: stale deal link should not render");
+});
 await check("sample deal proof UI", () => assertPage("/deals/deal-beat-street-tuesday-2-tacos", [
   "$2 tacos",
   "Original wording",
@@ -372,11 +441,15 @@ await check("sample restaurant deals", () => assertPage("/restaurants/beat-stree
   "/deals/deal-beat-street-tuesday-2-tacos"
 ]));
 
-for (const deal of deals) {
+for (const deal of visibleDeals) {
   await check(`deal ${deal.deal_id}`, () => assertPage(`/deals/${deal.deal_id}`, [
     "Official details",
     publicAssetUrl(deal.screenshot_path)
   ]));
+}
+
+for (const deal of hiddenDeals) {
+  await check(`hidden deal ${deal.deal_id}`, () => assertMissingPage(`/deals/${deal.deal_id}`));
 }
 
 for (const restaurant of restaurants) {
@@ -393,4 +466,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`\nSmoke tests passed: ${deals.length} deals, ${restaurants.length} restaurants, ${proofAssets.length} proof assets.`);
+console.log(`\nSmoke tests passed: ${visibleDeals.length} visible deals, ${hiddenDeals.length} hidden deals, ${restaurants.length} restaurants, ${proofAssets.length} proof assets.`);

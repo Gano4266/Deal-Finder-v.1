@@ -70,8 +70,8 @@ export default async function ReportPage({ searchParams }: ReportPageProps) {
         </Link>
       </section>
 
-      <section className="detailGrid">
-        <article className="detailPanel">
+      <section className="detailGrid reportGrid">
+        <article className="detailPanel reportContextPanel">
           <h2>What you&apos;re updating</h2>
           <dl className="factGrid">
             <div>
@@ -100,7 +100,7 @@ export default async function ReportPage({ searchParams }: ReportPageProps) {
           ) : null}
         </article>
 
-        <article className="detailPanel">
+        <article className="detailPanel reportFormPanel">
           <h2>Send update</h2>
           <ReportForm
             contextLabel={contextLabel}

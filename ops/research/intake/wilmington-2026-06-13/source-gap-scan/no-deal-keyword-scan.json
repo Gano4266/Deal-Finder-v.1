@@ -1,0 +1,288 @@
+{
+  "generated_at": "2026-06-13T12:35:00-04:00",
+  "note": "One-request-per-official-site keyword scan. Leads only; not evidence and not approval.",
+  "out": [
+    {
+      "restaurant_id": "cornelias",
+      "name": "Cornelia's",
+      "url": "https://corneliasrestaurant.com/",
+      "status": 200,
+      "final_url": "https://corneliasrestaurant.com/",
+      "elapsed_ms": 3166,
+      "keyword_hits": [
+        "lunch:2"
+      ],
+      "snippets": [
+        "y the best of both while savoring the Chef’s signature dishes. View Our Menu Our Hours and Location Lunch: 11:00 am - 4:00 pm Dinner: 4:00 pm - 9:00 pm Closed Sunday and Monday The gates will open as you approach them. Cornelia&#8217;s entrance is on Futch Creek Road, just off Rt. 17 Porters Neck. Join in on the Fun! T"
+      ]
+    },
+    {
+      "restaurant_id": "roko-italian-cuisine",
+      "name": "Roko Italian Cuisine",
+      "url": "https://www.rokoitalian.com/",
+      "status": 200,
+      "final_url": "https://www.rokoitalian.com/",
+      "elapsed_ms": 702,
+      "keyword_hits": [
+        "specials?:2"
+      ],
+      "snippets": [
+        "Wilmington, NC italian cuisine Roko Italian Restaurant - Wilmington, NC About Menu Our Story Weekly Specials R Sauce Gift Cards Contact Us At Roko Italian Cuisine Chef Jadran Peros personally prepares unique Italian fare infused with fresh local ingredients. The dinner menu offers an array of seafood, steak, pasta and "
+      ]
+    },
+    {
+      "restaurant_id": "winnies-tavern",
+      "name": "Winnie's Tavern",
+      "url": "https://www.wilmingtonsbestburger.com/",
+      "status": 200,
+      "final_url": "https://www.wilmingtonsbestburger.com/",
+      "elapsed_ms": 387,
+      "keyword_hits": [
+        "specials?:2",
+        "burger:20"
+      ],
+      "snippets": [
+        "on! We have also been featured on the Cooking Channel&#39;s &quot;Best Thing I Ever Ate!&quot; With Special Thanks to Fanny Slater for highlighting our Trailer Park Burger! MENU APPETIZERS Cajun Fried Okra Fries Pickle Chips Crispy Onion Rings Fried Mozzarella&nbsp; WINNIE&#39;S SPECIALTY BURGERS ​ Trailer Park Burger "
+      ]
+    },
+    {
+      "restaurant_id": "the-half-downtown",
+      "name": "The Half - Downtown",
+      "url": "https://www.thehalfbev.com/",
+      "status": 200,
+      "final_url": "https://www.thehalfbev.com/",
+      "elapsed_ms": 395,
+      "keyword_hits": [
+        "specials?:1",
+        "wing:1"
+      ],
+      "snippets": [
+        "arted with one goal: serve quality food at a fair price. Then we added rotating beer taps, seasonal specials, and one million-ish sandwiches later, The Half has become a go-to for locals and visitors. It’s good food and good people. And yes, that includes the ones who don’t like pickle-sogged chips. We don’t judge. @nc"
+      ]
+    },
+    {
+      "restaurant_id": "c-street-mexican-grill",
+      "name": "C-Street Mexican Grill",
+      "url": "https://www.cstreetmex.com/",
+      "status": 200,
+      "final_url": "https://www.cstreetmex.com/",
+      "elapsed_ms": 383,
+      "keyword_hits": [
+        "taco:1"
+      ],
+      "snippets": []
+    },
+    {
+      "restaurant_id": "castle-street-kitchen",
+      "name": "Castle Street Kitchen",
+      "url": "https://www.castlestkitchen.com/",
+      "status": 200,
+      "final_url": "https://www.castlestkitchen.com/",
+      "elapsed_ms": 509,
+      "keyword_hits": [
+        "specials?:1",
+        "brunch:2",
+        "taco:2"
+      ],
+      "snippets": [
+        " Events Upcoming Trivia ft. MT Bottles - Every Monday Brunch Every Saturday and Sunday Weekly Drink Specials Weekly Feature Rotating tacos for the win! Feel free to give us a call to see what yummy selection of tacos we are offering! see you soon Hours of Operation Monday 11:00-9:00 Tuesday Closed Wednesday 11:00-9:00 ",
+        "ant that features a distinctive menu of American style food with a unique twist. The menu Main Menu Brunch menu The lounge Whether you&#39;re meeting weekly for a book club, hosting a company event, or sipping on a cocktail with friends, The Lounge is available for all to enjoy! Click here to reserve the space for your"
+      ]
+    },
+    {
+      "restaurant_id": "fortunate-glass",
+      "name": "Fortunate Glass",
+      "url": "https://www.fortunateglass.com/",
+      "status": 200,
+      "final_url": "https://www.fortunateglass.com/",
+      "elapsed_ms": 279,
+      "keyword_hits": [
+        "specials?:4"
+      ],
+      "snippets": [
+        "Fortunate Glass PH: (910) 399-4292 View our Specials Weekly Specials WEEKLy FOOD SPECIALS OUR MENUS Wine Beer Food WEEKLy FOOD SPECIALS WILMINGTON&#x27;S PREMIER WINE BAR Over 400 bottles of wine and 70 wine pours over 30 craft beers! ‍ Wilmington&#x27;s top-rated"
+      ]
+    },
+    {
+      "restaurant_id": "front-street-brewery",
+      "name": "Front Street Brewery",
+      "url": "https://www.frontstreetbrewery.com/",
+      "status": 200,
+      "final_url": "https://www.frontstreetbrewery.com/",
+      "elapsed_ms": 458,
+      "keyword_hits": [
+        "specials?:1"
+      ],
+      "snippets": [
+        "ed service make us the perfect venue for weddings, rehearsal dinners, birthdays, anniversaries, and special gatherings. Private Events &amp; Parties Skip Gallery Carousel Start stop gallery carousel Interior, Seating area with patrons Interior space with people sitting at the bar and a view of upstairs&#8230; Upstairs "
+      ]
+    },
+    {
+      "restaurant_id": "rooster-and-the-crow",
+      "name": "Rooster & The Crow",
+      "url": "https://roosterandthecrow.com/",
+      "status": 200,
+      "final_url": "https://roosterandthecrow.com/",
+      "elapsed_ms": 371,
+      "keyword_hits": [
+        "specials?:3",
+        "brunch:1"
+      ],
+      "snippets": [
+        "ourbon Day! June 14th - Sit back, relax and sip on your favorite bourbon! Skip to main content Menu Specials Jobs Gift Cards About Info about location, hours, and parking Cryptid Den Arcade Beer Garden Events Facebook page Instagram page Google page Facebook page Instagram page Google page Toggle navigation Menu Specia",
+        "beer list is all local drafts, and the food is fabulous. This will be a regular haunt. Great Sunday brunch menu too! stay in the loop Location 225 South Water Street Wilmington, NC 28401 Hours Rooster &amp; The Crow Mon-Tues Closed Wed-Fri 4:30-8:30 pm Sat-11 am-9 pm Sunday 10:30 am-3 pm Cryptid Den Mon-Tues Closed Wed"
+      ]
+    },
+    {
+      "restaurant_id": "tomiko-san",
+      "name": "Tomiko-San",
+      "url": "https://www.tomiko-san.com/",
+      "status": 200,
+      "final_url": "https://www.tomiko-san.com/",
+      "elapsed_ms": 1200,
+      "keyword_hits": [],
+      "snippets": []
+    },
+    {
+      "restaurant_id": "tidewater-oyster-bar",
+      "name": "Tidewater Oyster Bar",
+      "url": "https://tidewateroysterbar.com/",
+      "error": "fetch failed",
+      "elapsed_ms": 10212,
+      "keyword_hits": [],
+      "snippets": []
+    },
+    {
+      "restaurant_id": "yosake",
+      "name": "YoSake",
+      "url": "https://yosake.com/",
+      "status": 200,
+      "final_url": "https://yosake.com/",
+      "elapsed_ms": 155,
+      "keyword_hits": [
+        "specials?:9",
+        "\\$\\d:140",
+        "wing:1",
+        "burger:1"
+      ],
+      "snippets": [
+        "erved amid modern Tokyo vogue décor. The bar boasts an eclectic collection of wine, sake, beer, and specialty cocktails. YoSake is proud to support local Wilmington organic sustainable agriculture and feature local farms in our specials throughout the menu. --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --"
+      ]
+    },
+    {
+      "restaurant_id": "copper-penny",
+      "name": "Copper Penny",
+      "url": "https://www.copperpennync.com/",
+      "status": 200,
+      "final_url": "https://www.copperpennync.com/",
+      "elapsed_ms": 372,
+      "keyword_hits": [
+        "lunch:1",
+        "daily:1"
+      ],
+      "snippets": [
+        "dable food and drinks in Wilmington, the Copper Penny’s relaxed atmosphere is the perfect place for lunch, dinner, or drinks with friends. Order Online Purchase Gift Card As featured on Food Network ’s Diners, Drive-Ins and Dives. When Guy Fieri visited Wilmington in early 2018, he made a visit to the Copper Penny. Dur",
+        "lity of all of our food, and we take every measure to uphold our standards. We change our fryer oil daily, sometimes even twice a day. During our peak hours, we may be changing our oil, resulting in a delay of preparing your fried items. We appreciate your patience during these time periods. 109 Chestnut St. Wilmington"
+      ]
+    },
+    {
+      "restaurant_id": "beer-barrio",
+      "name": "Beer Barrio",
+      "url": "https://beerbarrionc.com/",
+      "status": 200,
+      "final_url": "https://beerbarrionc.com/",
+      "elapsed_ms": 444,
+      "keyword_hits": [
+        "specials?:8",
+        "wing:1",
+        "taco:6"
+      ],
+      "snippets": [
+        "your favorite dishes in seconds! Order Online × Turn moments into memories! Choose us for your next special occasion or get-together. Got a birthday party, rehearsal dinner, corporate or other event coming up? We&apos;re a great option for your gathering! Inquire today and let us know how we can make your special occas"
+      ]
+    },
+    {
+      "restaurant_id": "sawmill-restaurant",
+      "name": "Sawmill Restaurant",
+      "url": "https://thesawmillrestaurant.com/daily-specials/",
+      "status": 200,
+      "final_url": "https://thesawmillrestaurant.com/daily-specials/",
+      "elapsed_ms": 336,
+      "keyword_hits": [
+        "specials?:8",
+        "daily:5",
+        "\\$\\d:8"
+      ],
+      "snippets": [
+        "Sawmill Restaurant - Specials Skip to main content Facebook page Instagram page Google page Toggle navigation Menu Drinks Specials Events Order Parties Catering Jobs Facebook page Instagram page Google page Specials Friday June 12th *222 - 2",
+        "m page Google page Specials Friday June 12th *222 - 2 eggs, 2 bacon, 2 pancakes 06:00 AM - 11:00 AM Daily Special: Prime Rib, Stew Beef 07:00 PM - 08:00 PM Saturday June 13th Rose Sangria - $8 07:00 AM - 08:00 PM Cup of Coffee and Slice of Coffee Cake - $6 10:00 AM - 02:00 PM Avocado Toast $11 - toasted sourdough or wh"
+      ]
+    },
+    {
+      "restaurant_id": "pts-grille-monkey-junction",
+      "name": "P.T.'s Olde Fashioned Grille - Monkey Junction",
+      "url": "https://ptsgrille.com/location/monkey-junction/",
+      "status": 200,
+      "final_url": "https://ptsgrille.com/location/monkey-junction/",
+      "elapsed_ms": 341,
+      "keyword_hits": [
+        "lunch:2",
+        "burger:2"
+      ],
+      "snippets": [
+        "he right hand side of Carolina Beach Road, as you head towards Snow&#8217;s Cut Bridge. Join us for lunch or dinner for a delicious, cooked to order 8 oz. Olde Fashioned burger, B.L.T., grilled chicken sandwich, or your favorite of choice. We even have vegetarian options! Address 5916 Carolina Beach Rd, Wilmington, NC "
+      ]
+    },
+    {
+      "restaurant_id": "el-cerro-grande-monkey-junction",
+      "name": "El Cerro Grande - Monkey Junction",
+      "url": "https://elcerrogranderestaurant.com/monkeyjunction",
+      "status": 403,
+      "final_url": "https://elcerrogranderestaurant.com/monkeyjunction",
+      "elapsed_ms": 232,
+      "keyword_hits": [],
+      "snippets": []
+    },
+    {
+      "restaurant_id": "michaelangelos-pizza-monkey-junction",
+      "name": "Michaelangelo's Pizza - Monkey Junction",
+      "url": "https://www.michaelangelosmj.com/specials",
+      "status": 200,
+      "final_url": "https://www.michaelangelosmj.com/specials",
+      "elapsed_ms": 366,
+      "keyword_hits": [
+        "specials?:5"
+      ],
+      "snippets": [
+        "Michaelangelo&#39;s Pizza - Monkey Junction - Specials Dine In, Carryout or Delivery! MENU &nbsp; Our Specials Try out some of our special deals - Low Prices, High Quality! Check back regularly for updates! --> *Cannot combine offers. Offers available for limited ti"
+      ]
+    },
+    {
+      "restaurant_id": "might-as-well-wilmington",
+      "name": "Might As Well Bar & Grill",
+      "url": "https://wilmington.mightaswellbarandgrill.com/wilmington-might-as-well-bar-and-grill-wilmington-happy-hours-specials",
+      "status": 200,
+      "final_url": "https://wilmington.mightaswellbarandgrill.com/wilmington-might-as-well-bar-and-grill-wilmington-happy-hours-specials",
+      "elapsed_ms": 457,
+      "keyword_hits": [
+        "specials?:5",
+        "\\$\\d:8",
+        "wing:1",
+        "burger:1"
+      ],
+      "snippets": [
+        "Might As Well Bar &amp; Grill - Wilmington - all specials Skip to Main Content (910)-228-5365 mawbar@live.com 250 Racine Dr. Unit 15 , Wilmington Merchandise Menu Food Drinks Specials Catering Events Parties Gift Cards Jobs Order Reserve Facebook page Instagram page Go"
+      ]
+    },
+    {
+      "restaurant_id": "flaming-amys-burrito-barn",
+      "name": "Flaming Amy's Burrito Barn",
+      "url": "https://flamingamysburritobarn.com/",
+      "status": 403,
+      "final_url": "https://flamingamysburritobarn.com/",
+      "elapsed_ms": 1711,
+      "keyword_hits": [],
+      "snippets": []
+    }
+  ]
+}

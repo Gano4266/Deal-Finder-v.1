@@ -12,6 +12,7 @@ import {
   summarizePublicDealsByDay
 } from "../../lib/data";
 import { dealMatchesMealFilter, mealFilterOptions } from "../../lib/meal-filter";
+import { firstDollarPriceValue } from "../../lib/price-filter";
 import { matchesSearchQuery, normalizeSearchQuery } from "../../lib/public-search";
 
 type DealsPageProps = {
@@ -27,7 +28,7 @@ type DealsPageProps = {
 const quickFilterOptions = [
   { value: "all", label: "All" },
   ...mealFilterOptions.filter((option) => option.value !== "all"),
-  { value: "under-10", label: "Under $10" },
+  { value: "under-10", label: "$10 & under" },
   { value: "time-listed", label: "Time shown" }
 ] as const;
 
@@ -76,23 +77,13 @@ function firstDayRank(daysAvailable: string): number {
   return visibleRanks.length ? Math.min(...visibleRanks) : publicDealDayOptions.length;
 }
 
-function firstPriceValue(price: string): number | undefined {
-  const match = price.match(/\$?\s*(\d+(?:\.\d{1,2})?)/);
-
-  if (!match) {
-    return undefined;
-  }
-
-  return Number(match[1]);
-}
-
 function matchesQuickFilter(deal: PublicDeal, quickFilter: string): boolean {
   if (quickFilter === "breakfast" || quickFilter === "lunch" || quickFilter === "dinner") {
     return dealMatchesMealFilter(deal, quickFilter);
   }
 
   if (quickFilter === "under-10") {
-    const value = firstPriceValue(deal.price);
+    const value = firstDollarPriceValue(deal.price);
     return typeof value === "number" && value <= 10;
   }
 
@@ -238,6 +229,10 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
         query={selectedSearchQuery}
       />
 
+      <p className="resultSummary" aria-live="polite">
+        Showing {visibleDeals.length} of {deals.length} specials.
+      </p>
+
       <section className="filterPanel" aria-label="Area, quick filter, and sort controls">
         <div>
           <p className="eyebrow">Area</p>
@@ -301,6 +296,9 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
             </Link>
             <Link href="/tonight" className="secondaryLink">
               Today
+            </Link>
+            <Link href="/report" className="secondaryLink">
+              Report a missing special
             </Link>
           </div>
         </section>

@@ -1,21 +1,19 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { notFound } from "next/navigation";
-import { getPublicDealById, getPublicDeals, getRestaurantById } from "../../../lib/data";
+import { getPublicDealById, getRestaurantById } from "../../../lib/data";
 import { phoneHref } from "../../phone-link";
 import { displayDescription } from "../../public-copy";
 import { QuickConfirmButton } from "../../quick-confirm-button";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 type DealPageProps = {
   params: Promise<{
     dealId: string;
   }>;
 };
-
-export async function generateStaticParams() {
-  const deals = await getPublicDeals();
-  return deals.map((deal) => ({ dealId: deal.dealId }));
-}
 
 export default async function DealDetailPage({ params }: DealPageProps) {
   const { dealId } = await params;
@@ -113,6 +111,23 @@ export default async function DealDetailPage({ params }: DealPageProps) {
               {deal.sourceQuote || "Check the restaurant page for the latest details."}
             </blockquote>
             <p className="proofCaption">Details checked {deal.lastVerifiedLabel}.</p>
+          </section>
+
+          <section className="proofCard" aria-label="Source and freshness">
+            <h3>Source and freshness</h3>
+            <dl className="proofMeta">
+              <div>
+                <dt>Source</dt>
+                <dd>{deal.sourceDisplayName}</dd>
+              </div>
+              <div>
+                <dt>Freshness</dt>
+                <dd>{deal.freshnessLabel}</dd>
+              </div>
+            </dl>
+            <p className="notes">
+              {deal.evidenceSummary} This is reviewed static prototype data, so confirm the restaurant source before ordering. User reports are reviewed before they change checked dates.
+            </p>
           </section>
 
           <div className="cardActions">
