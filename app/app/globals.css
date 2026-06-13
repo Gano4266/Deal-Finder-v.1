@@ -1,6 +1,7 @@
 :root {
   --brand: #2377ad;
   --brand-strong: #0f2a3d;
+  --brand-deep: #071f31;
   --background: #faf7f2;
   --surface: #fffdf8;
   --surface-quiet: #eef6f4;
@@ -27,6 +28,7 @@
   --shadow: 0 18px 38px rgba(15, 42, 61, 0.09);
   --shadow-tight: 0 6px 16px rgba(15, 42, 61, 0.07);
   --shadow-soft: 0 1px 0 rgba(255, 255, 255, 0.82), 0 10px 26px rgba(15, 42, 61, 0.055);
+  --shadow-brand: 0 18px 44px rgba(7, 31, 49, 0.18);
   --gold-ring: rgba(213, 161, 58, 0.32);
   --app-header-offset: 76px;
   --filter-dock-hide-distance: calc(-100% - 72px);
@@ -50,7 +52,8 @@ body {
   line-height: 1.5;
   letter-spacing: 0;
   background:
-    linear-gradient(180deg, rgba(238, 246, 244, 0.52) 0, rgba(250, 247, 242, 0) 340px),
+    radial-gradient(circle at 50% -18%, rgba(213, 161, 58, 0.18), transparent 260px),
+    linear-gradient(180deg, rgba(238, 246, 244, 0.6) 0, rgba(250, 247, 242, 0) 360px),
     var(--paper);
   -webkit-tap-highlight-color: rgba(213, 161, 58, 0.2);
   touch-action: manipulation;
@@ -68,11 +71,13 @@ a {
   align-items: center;
   justify-content: center;
   gap: 16px;
-  min-height: 66px;
-  padding: calc(9px + env(safe-area-inset-top)) clamp(16px, 4vw, 48px) 9px;
-  background: rgba(255, 253, 248, 0.96);
-  border-bottom: 1px solid rgba(155, 190, 193, 0.58);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.82);
+  min-height: 72px;
+  padding: calc(10px + env(safe-area-inset-top)) clamp(16px, 4vw, 48px) 10px;
+  background:
+    radial-gradient(circle at 50% -30%, rgba(69, 152, 160, 0.34), transparent 270px),
+    linear-gradient(180deg, #0b3148 0%, var(--brand-deep) 100%);
+  border-bottom: 1px solid rgba(213, 161, 58, 0.26);
+  box-shadow: 0 12px 34px rgba(7, 31, 49, 0.16);
 }
 
 .brand {
@@ -85,15 +90,15 @@ a {
 
 .brandMark {
   position: relative;
-  width: 38px;
-  height: 38px;
+  width: 46px;
+  height: 46px;
   flex: 0 0 auto;
-  border-radius: 8px;
+  border-radius: 11px;
   display: grid;
   place-items: center;
   background: url("/icon.svg") center / cover no-repeat;
-  border: 1px solid rgba(15, 42, 61, 0.12);
-  box-shadow: 0 8px 18px rgba(15, 42, 61, 0.08);
+  border: 1px solid rgba(213, 161, 58, 0.24);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .brand strong,
@@ -102,13 +107,13 @@ a {
 }
 
 .brand strong {
-  font-size: 1rem;
-  color: var(--brand-strong);
+  color: #fffdf8;
+  font-size: 1.08rem;
   letter-spacing: 0;
 }
 
 .brand small {
-  color: var(--muted);
+  color: rgba(250, 247, 242, 0.72);
   font-size: 0.76rem;
   font-weight: 750;
   letter-spacing: 0.08em;
@@ -219,11 +224,11 @@ a {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 6px;
-  margin: 14px auto 0;
-  padding: 5px;
-  border: 1px solid rgba(155, 190, 193, 0.62);
+  margin: 12px auto 0;
+  padding: 4px;
+  border: 1px solid rgba(155, 190, 193, 0.52);
   border-radius: 8px;
-  background: rgba(255, 253, 248, 0.94);
+  background: rgba(255, 253, 248, 0.9);
   box-shadow: var(--shadow-soft);
 }
 
@@ -253,10 +258,10 @@ a {
 }
 
 .primaryContentNav a.active {
-  color: #fff;
-  border-color: var(--forest);
-  background: var(--brand-strong);
-  box-shadow: var(--shadow-tight);
+  color: #fffdf8;
+  border-color: rgba(213, 161, 58, 0.5);
+  background: linear-gradient(180deg, #123954, var(--brand-strong));
+  box-shadow: 0 8px 18px rgba(15, 42, 61, 0.14);
 }
 
 .primaryContentNav a.active::after {
@@ -280,15 +285,20 @@ a {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
   gap: 22px;
-  padding: clamp(22px, 3.4vw, 34px) 0 22px;
-  border-bottom: 1px solid rgba(155, 190, 193, 0.54);
+  padding: clamp(22px, 3.4vw, 34px);
+  border: 1px solid rgba(213, 161, 58, 0.2);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 88% 8%, rgba(213, 161, 58, 0.22), transparent 210px),
+    linear-gradient(135deg, var(--brand-deep), #0f2a3d 56%, #123954);
+  box-shadow: var(--shadow-brand);
 }
 
 .heroBand h1,
 .sectionHeader h1 {
   max-width: 820px;
   margin: 0;
-  color: var(--forest);
+  color: #fffdf8;
   font-family: var(--font-display);
   font-size: clamp(1.9rem, 4.4vw, 2.75rem);
   font-weight: 700;
@@ -303,9 +313,19 @@ a {
 .lede,
 .sectionHeader p {
   max-width: 680px;
-  color: var(--muted);
+  color: rgba(250, 247, 242, 0.78);
   font-size: 1.05rem;
   line-height: 1.6;
+}
+
+.heroBand .eyebrow,
+.sectionHeader .eyebrow {
+  color: var(--gold);
+}
+
+.heroBand .notes,
+.sectionHeader .notes {
+  color: rgba(250, 247, 242, 0.68);
 }
 
 .reviewMeta {
@@ -327,11 +347,12 @@ a {
 .statusPanel {
   width: min(100%, 290px);
   padding: 18px 20px;
-  border: 1px solid rgba(35, 119, 173, 0.22);
+  border: 1px solid rgba(213, 161, 58, 0.3);
   border-radius: 8px;
-  color: var(--ink);
-  background: var(--surface);
-  box-shadow: inset 0 2px 0 var(--gold), var(--shadow-soft);
+  color: #fffdf8;
+  background: rgba(255, 253, 248, 0.08);
+  box-shadow: inset 0 2px 0 var(--gold), 0 12px 24px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .statusPanel strong {
@@ -341,7 +362,7 @@ a {
 
 .statusPanel strong {
   display: block;
-  color: var(--forest);
+  color: var(--gold);
   font-size: 2.45rem;
   line-height: 1;
   margin: 8px 0;
@@ -350,7 +371,7 @@ a {
 
 .statusPanel .statusLabel,
 .statusPanel span:last-child {
-  color: var(--muted);
+  color: rgba(250, 247, 242, 0.74);
   font-size: 0.9rem;
 }
 
@@ -1658,7 +1679,28 @@ a {
   .appHeader {
     align-items: center;
     gap: 12px;
-    min-height: 60px;
+    min-height: 58px;
+    padding-top: calc(7px + env(safe-area-inset-top));
+    padding-bottom: 7px;
+  }
+
+  .brand {
+    gap: 9px;
+  }
+
+  .brandMark {
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+  }
+
+  .brand strong {
+    font-size: 1rem;
+  }
+
+  .brand small {
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
   }
 
   .topNav {
@@ -1859,6 +1901,22 @@ a {
 
   .statusPanel {
     width: 100%;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 4px 12px;
+    align-items: center;
+    padding: 12px 14px;
+  }
+
+  .statusPanel strong {
+    grid-row: 1 / span 2;
+    margin: 0;
+    font-size: 2rem;
+  }
+
+  .statusPanel .statusLabel,
+  .statusPanel span:last-child {
+    font-size: 0.82rem;
   }
 
   .factGrid,
@@ -1872,6 +1930,25 @@ a {
   .sectionHeader h1 {
     font-size: clamp(1.65rem, 8vw, 2.15rem);
     line-height: 1.12;
+  }
+
+  .heroBand,
+  .sectionHeader {
+    gap: 14px;
+    padding: 18px;
+  }
+
+  .lede,
+  .sectionHeader p {
+    margin: 9px 0 0;
+    font-size: 0.98rem;
+    line-height: 1.45;
+  }
+
+  .heroBand .notes,
+  .sectionHeader .notes {
+    margin-top: 8px;
+    font-size: 0.9rem;
   }
 
   .dealCard,
