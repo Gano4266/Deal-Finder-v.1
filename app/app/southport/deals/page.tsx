@@ -188,7 +188,13 @@ export default async function SouthportDealsPage({ searchParams }: SouthportDeal
                 </div>
               </div>
               {singleDayDeals.map((deal) => (
-                <PublicDealCard key={deal.dealId} deal={deal} variant="compact" />
+                <PublicDealCard
+                  key={deal.dealId}
+                  deal={deal}
+                  confirmContextPath="/southport/deals"
+                  detailHref={null}
+                  variant="compact"
+                />
               ))}
             </section>
           ) : null}
@@ -203,7 +209,13 @@ export default async function SouthportDealsPage({ searchParams }: SouthportDeal
               </div>
               <div className="dealList compactSecondaryList">
                 {recurringDeals.map((deal) => (
-                  <PublicDealCard key={deal.dealId} deal={deal} variant="secondary" />
+                  <PublicDealCard
+                    key={deal.dealId}
+                    deal={deal}
+                    confirmContextPath="/southport/deals"
+                    detailHref={null}
+                    variant="secondary"
+                  />
                 ))}
               </div>
             </section>

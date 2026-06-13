@@ -107,6 +107,8 @@ export type PublicDeal = {
   prototypeNotice: string;
 };
 
+type PublicMarket = "main" | "southport" | "all";
+
 export const publicDealDayOptions = [
   "Monday",
   "Tuesday",
@@ -1022,7 +1024,7 @@ export async function getPublicDeals(): Promise<PublicDeal[]> {
   return getPublicDealsForMarket("main");
 }
 
-async function getPublicDealsForMarket(market: "main" | "southport" | "all"): Promise<PublicDeal[]> {
+async function getPublicDealsForMarket(market: PublicMarket): Promise<PublicDeal[]> {
   const [dealRows, restaurantRows] = await Promise.all([
     readCsv(publicDealsPath),
     readCsv(restaurantsPath)
@@ -1057,8 +1059,8 @@ export async function getPublicTonightDeals(date = getOperatingDate()): Promise<
     .map((row) => mapDeal(row, restaurantsById));
 }
 
-export async function getPublicDealById(dealId: string): Promise<PublicDeal | undefined> {
-  const deals = await getAllReviewedPrototypeDeals();
+export async function getPublicDealById(dealId: string, market: PublicMarket = "main"): Promise<PublicDeal | undefined> {
+  const deals = await getPublicDealsForMarket(market);
   return deals.find((deal) => deal.dealId === dealId);
 }
 
@@ -1129,7 +1131,7 @@ function mapRestaurant(row: CsvRow, deals: PublicDeal[], restaurantIds = [row.re
   };
 }
 
-function restaurantMatchesMarket(row: CsvRow, market: "main" | "southport" | "all"): boolean {
+function restaurantMatchesMarket(row: CsvRow, market: PublicMarket): boolean {
   if (market === "main") {
     return row.city === "Wilmington" || row.city === "Carolina Beach";
   }
@@ -1141,7 +1143,7 @@ function restaurantMatchesMarket(row: CsvRow, market: "main" | "southport" | "al
   return row.city === "Wilmington" || row.city === "Carolina Beach" || row.city === "Southport" || row.city === "Oak Island";
 }
 
-function passesPublicRestaurantFilter(row: CsvRow, market: "main" | "southport" | "all" = "main"): boolean {
+function passesPublicRestaurantFilter(row: CsvRow, market: PublicMarket = "main"): boolean {
   return (
     restaurantMatchesMarket(row, market) &&
     row.state === "NC" &&
@@ -1164,7 +1166,7 @@ function passesPublicDealRuntimeFilter(
   row: CsvRow,
   restaurantsById: Map<string, CsvRow>,
   date?: Date,
-  market: "main" | "southport" | "all" = "main"
+  market: PublicMarket = "main"
 ): boolean {
   const restaurant = restaurantsById.get(row.restaurant_id);
   const dealPasses = date ? passesPublicDealFilter(row, date) : passesPublicDealFilter(row);
@@ -1196,7 +1198,7 @@ function passesReviewedDealOpsGate(row: CsvRow): boolean {
   );
 }
 
-async function getRestaurantsForMarket(market: "main" | "southport" | "all"): Promise<RestaurantSummary[]> {
+async function getRestaurantsForMarket(market: PublicMarket): Promise<RestaurantSummary[]> {
   const [restaurantRows, deals] = await Promise.all([
     readCsv(restaurantsPath),
     getPublicDealsForMarket(market)
@@ -1221,12 +1223,15 @@ export async function getSouthportRestaurants(): Promise<RestaurantSummary[]> {
   return getRestaurantsForMarket("southport");
 }
 
-export async function getRestaurantById(restaurantId: string): Promise<RestaurantDetail | undefined> {
+export async function getRestaurantById(
+  restaurantId: string,
+  market: PublicMarket = "main"
+): Promise<RestaurantDetail | undefined> {
   const [restaurantRows, deals] = await Promise.all([
     readCsv(restaurantsPath),
-    getAllReviewedPrototypeDeals()
+    getPublicDealsForMarket(market)
   ]);
-  const publicRows = restaurantRows.filter((row) => passesPublicRestaurantFilter(row, "all") && !isPublicRestaurantHold(row));
+  const publicRows = restaurantRows.filter((row) => passesPublicRestaurantFilter(row, market) && !isPublicRestaurantHold(row));
   const group = groupRestaurantRows(publicRows).find((rows) =>
     rows.some((restaurant) => restaurant.restaurant_id === restaurantId)
   );

@@ -95,7 +95,12 @@ export default async function SouthportPage({ searchParams }: SouthportPageProps
                     </div>
                   </div>
                   {singleDayDeals.map((deal) => (
-                    <PublicDealCard key={deal.dealId} deal={deal} />
+                    <PublicDealCard
+                      key={deal.dealId}
+                      deal={deal}
+                      confirmContextPath="/southport"
+                      detailHref={null}
+                    />
                   ))}
                 </section>
               ) : null}
@@ -109,7 +114,13 @@ export default async function SouthportPage({ searchParams }: SouthportPageProps
                     </div>
                   </div>
                   {recurringDeals.map((deal) => (
-                    <PublicDealCard key={deal.dealId} deal={deal} variant="compact" />
+                    <PublicDealCard
+                      key={deal.dealId}
+                      deal={deal}
+                      confirmContextPath="/southport"
+                      detailHref={null}
+                      variant="compact"
+                    />
                   ))}
                 </section>
               ) : null}

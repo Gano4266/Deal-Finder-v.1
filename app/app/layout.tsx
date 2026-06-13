@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { AppHeader } from "./app-header";
+import { FilterDockScrollController } from "./filter-dock-scroll-controller";
 import { PrimaryNav } from "./primary-nav";
+import { QueryScrollRestorer } from "./query-scroll-restorer";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -42,6 +44,10 @@ export default function RootLayout({
       <body>
         <AppHeader />
         <PrimaryNav />
+        <Suspense fallback={null}>
+          <QueryScrollRestorer />
+          <FilterDockScrollController />
+        </Suspense>
         {children}
       </body>
     </html>

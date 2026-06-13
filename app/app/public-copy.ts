@@ -10,3 +10,7 @@ export function displayDescription(description: string): string {
 
   return trimmed;
 }
+
+export function displayRestaurantName(name: string): string {
+  return name.replace(/\s+-\s+.+$/, "").trim();
+}

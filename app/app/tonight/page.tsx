@@ -11,7 +11,12 @@ import {
   summarizePublicDealsByDay,
   weekdayName
 } from "../../lib/data";
-import { dealMatchesMealFilter, mealFilterOptions } from "../../lib/meal-filter";
+import {
+  defaultMealFilterForDeals,
+  dealMatchesMealFilter,
+  type MealFilter,
+  mealFilterOptions
+} from "../../lib/meal-filter";
 import { firstDollarPriceValue } from "../../lib/price-filter";
 import { matchesSearchQuery, normalizeSearchQuery } from "../../lib/public-search";
 
@@ -20,6 +25,7 @@ export const dynamic = "force-dynamic";
 type TonightPageProps = {
   searchParams?: Promise<{
     area?: string;
+    meal?: string;
     q?: string;
     quick?: string;
   }>;
@@ -27,15 +33,36 @@ type TonightPageProps = {
 
 const quickFilterOptions = [
   { value: "all", label: "All" },
-  ...mealFilterOptions.filter((option) => option.value !== "all"),
   { value: "under-10", label: "$10 & under" }
 ] as const;
 
-function queryFor(params: { area: string; q: string; quick: string }) {
+type QuickFilter = (typeof quickFilterOptions)[number]["value"];
+
+function isMealFilter(value: string | undefined): value is MealFilter {
+  return mealFilterOptions.some((option) => option.value === value);
+}
+
+function isQuickFilter(value: string | undefined): value is QuickFilter {
+  return quickFilterOptions.some((option) => option.value === value);
+}
+
+function mealLabel(meal: MealFilter): string {
+  return mealFilterOptions.find((option) => option.value === meal)?.label ?? "All";
+}
+
+function quickLabel(quick: QuickFilter): string {
+  return quickFilterOptions.find((option) => option.value === quick)?.label ?? "All";
+}
+
+function queryFor(params: { area: string; meal: string; q: string; quick: string }) {
   const query = new URLSearchParams();
 
   if (params.area !== "All") {
     query.set("area", params.area);
+  }
+
+  if (params.meal !== "all") {
+    query.set("meal", params.meal);
   }
 
   if (params.q) {
@@ -50,11 +77,7 @@ function queryFor(params: { area: string; q: string; quick: string }) {
   return queryText ? `/tonight?${queryText}` : "/tonight";
 }
 
-function matchesQuickFilter(deal: PublicDeal, quickFilter: string): boolean {
-  if (quickFilter === "breakfast" || quickFilter === "lunch" || quickFilter === "dinner") {
-    return dealMatchesMealFilter(deal, quickFilter);
-  }
-
+function matchesQuickFilter(deal: PublicDeal, quickFilter: QuickFilter): boolean {
   if (quickFilter === "under-10") {
     const value = firstDollarPriceValue(deal.price);
     return typeof value === "number" && value <= 10;
@@ -85,9 +108,9 @@ function matchesDealSearch(deal: PublicDeal, query: string): boolean {
 export default async function TonightPage({ searchParams }: TonightPageProps) {
   const params = await searchParams;
   const selectedSearchQuery = normalizeSearchQuery(params?.q);
-  const selectedQuickFilter = quickFilterOptions.some((option) => option.value === params?.quick)
-    ? params?.quick ?? "all"
-    : "all";
+  const legacyMealFilter = isMealFilter(params?.quick) && params?.quick !== "all" ? params.quick : undefined;
+  const requestedMealFilter = isMealFilter(params?.meal) ? params.meal : legacyMealFilter;
+  const selectedQuickFilter = isQuickFilter(params?.quick) ? params.quick : "all";
   const [deals, allDeals] = await Promise.all([
     getPublicTonightDeals(),
     getPublicDeals()
@@ -96,7 +119,9 @@ export default async function TonightPage({ searchParams }: TonightPageProps) {
   const dateLabel = shortDate();
   const dayCounts = summarizePublicDealsByDay(allDeals);
   const searchFilteredDeals = deals.filter((deal) => matchesDealSearch(deal, selectedSearchQuery));
-  const quickFilteredDeals = searchFilteredDeals.filter((deal) => matchesQuickFilter(deal, selectedQuickFilter));
+  const selectedMealFilter = requestedMealFilter ?? defaultMealFilterForDeals(searchFilteredDeals.length > 0 ? searchFilteredDeals : deals);
+  const mealFilteredDeals = searchFilteredDeals.filter((deal) => dealMatchesMealFilter(deal, selectedMealFilter));
+  const quickFilteredDeals = mealFilteredDeals.filter((deal) => matchesQuickFilter(deal, selectedQuickFilter));
   const areaOptions = ["All", ...summarizePublicDealsByArea(quickFilteredDeals).map(({ area }) => area)] as const;
   const selectedArea = areaOptions.includes((params?.area ?? "All") as (typeof areaOptions)[number])
     ? params?.area ?? "All"
@@ -112,10 +137,24 @@ export default async function TonightPage({ searchParams }: TonightPageProps) {
   const dayAreaCounts = new Map(summarizePublicDealsByArea(quickFilteredDeals).map((item) => [item.area, item.count]));
   const countForArea = (area: (typeof areaOptions)[number]) =>
     area === "All" ? quickFilteredDeals.length : dayAreaCounts.get(area) ?? 0;
-  const countForQuickFilter = (quickFilter: (typeof quickFilterOptions)[number]["value"]) =>
+  const countForMealFilter = (mealFilter: MealFilter) =>
     searchFilteredDeals
       .filter((deal) => selectedArea === "All" || deal.areaGroup === selectedArea)
+      .filter((deal) => matchesQuickFilter(deal, selectedQuickFilter))
+      .filter((deal) => dealMatchesMealFilter(deal, mealFilter)).length;
+  const countForQuickFilter = (quickFilter: QuickFilter) =>
+    searchFilteredDeals
+      .filter((deal) => selectedArea === "All" || deal.areaGroup === selectedArea)
+      .filter((deal) => dealMatchesMealFilter(deal, selectedMealFilter))
       .filter((deal) => matchesQuickFilter(deal, quickFilter)).length;
+  const automaticMealMessage =
+    requestedMealFilter === undefined && selectedMealFilter !== "all"
+      ? ` Defaulted to ${mealLabel(selectedMealFilter).toLowerCase()} based on current local time.`
+      : "";
+  const secondaryFilterSummary = [
+    selectedArea === "All" ? "Area: All" : `Area: ${selectedArea}`,
+    selectedQuickFilter === "all" ? "More: All" : quickLabel(selectedQuickFilter)
+  ].join(" · ");
   const emptyHeading = selectedSearchQuery
     ? `No specials match "${selectedSearchQuery}" for today.`
     : selectedArea === "All"
@@ -154,54 +193,83 @@ export default async function TonightPage({ searchParams }: TonightPageProps) {
         ))}
       </nav>
 
-      <nav className="segmentedNav compactFilters" aria-label="Deals today by area">
-        {areaOptions.map((area) => (
-          <Link
-            key={area}
-            href={queryFor({ area, q: selectedSearchQuery, quick: selectedQuickFilter }) as Route}
-            className={area === selectedArea ? "active" : ""}
-            aria-current={area === selectedArea ? "page" : undefined}
-          >
-            <span>{area}</span>
-            <strong>{countForArea(area)}</strong>
-          </Link>
-        ))}
-      </nav>
+      <section className="filterDock tonightFilterDock" aria-label="Search and filters for today">
+        <SearchForm
+          action="/tonight"
+          clearHref={queryFor({ area: selectedArea, meal: selectedMealFilter, q: "", quick: selectedQuickFilter })}
+          hiddenFields={[
+            selectedArea !== "All" ? { name: "area", value: selectedArea } : undefined,
+            selectedMealFilter !== "all" ? { name: "meal", value: selectedMealFilter } : undefined,
+            selectedQuickFilter !== "all" ? { name: "quick", value: selectedQuickFilter } : undefined
+          ].filter((field): field is { name: string; value: string } => Boolean(field))}
+          label="Search today's deals"
+          placeholder="Search tacos, burgers, lunch..."
+          query={selectedSearchQuery}
+        />
 
-      <SearchForm
-        action="/tonight"
-        clearHref={queryFor({ area: selectedArea, q: "", quick: selectedQuickFilter })}
-        hiddenFields={[
-          selectedArea !== "All" ? { name: "area", value: selectedArea } : undefined,
-          selectedQuickFilter !== "all" ? { name: "quick", value: selectedQuickFilter } : undefined
-        ].filter((field): field is { name: string; value: string } => Boolean(field))}
-        label="Search today's deals"
-        placeholder="Try tacos, pizza, burger, lunch..."
-        query={selectedSearchQuery}
-      />
-
-      <p className="resultSummary" aria-live="polite">
-        Showing {visibleDeals.length} of {deals.length} specials for today.
-      </p>
-
-      <section className="filterPanel" aria-label="Meal and quick filters for today">
-        <div>
-          <p className="eyebrow">Meal & quick</p>
-          <nav className="segmentedNav compactFilters" aria-label="Filter today's deals by meal or quick option">
-            {quickFilterOptions.map((option) => (
+        <div className="filterDockGroup mealFilterGroup">
+          <p className="eyebrow">Meal</p>
+          <nav className="segmentedNav compactFilters" aria-label="Filter today's deals by meal">
+            {mealFilterOptions.map((option) => (
               <Link
                 key={option.value}
-                href={queryFor({ area: selectedArea, q: selectedSearchQuery, quick: option.value }) as Route}
-                className={option.value === selectedQuickFilter ? "active" : ""}
-                aria-current={option.value === selectedQuickFilter ? "page" : undefined}
+                href={queryFor({ area: selectedArea, meal: option.value, q: selectedSearchQuery, quick: selectedQuickFilter }) as Route}
+                className={option.value === selectedMealFilter ? "active" : ""}
+                aria-current={option.value === selectedMealFilter ? "page" : undefined}
               >
                 <span>{option.label}</span>
-                <strong>{countForQuickFilter(option.value)}</strong>
+                <strong>{countForMealFilter(option.value)}</strong>
               </Link>
             ))}
           </nav>
         </div>
+
+        <details className="filterDisclosure">
+          <summary>
+            <span>Filters</span>
+            <small>{secondaryFilterSummary}</small>
+          </summary>
+          <div className="filterDisclosureBody">
+            <div className="filterDockGroup">
+              <p className="eyebrow">Area</p>
+              <nav className="segmentedNav compactFilters" aria-label="Deals today by area">
+                {areaOptions.map((area) => (
+                  <Link
+                    key={area}
+                    href={queryFor({ area, meal: selectedMealFilter, q: selectedSearchQuery, quick: selectedQuickFilter }) as Route}
+                    className={area === selectedArea ? "active" : ""}
+                    aria-current={area === selectedArea ? "page" : undefined}
+                  >
+                    <span>{area}</span>
+                    <strong>{countForArea(area)}</strong>
+                  </Link>
+                ))}
+              </nav>
+            </div>
+
+            <div className="filterDockGroup compactFilterGroup">
+              <p className="eyebrow">More filters</p>
+              <nav className="segmentedNav compactFilters" aria-label="Filter today's deals by extra option">
+                {quickFilterOptions.map((option) => (
+                  <Link
+                    key={option.value}
+                    href={queryFor({ area: selectedArea, meal: selectedMealFilter, q: selectedSearchQuery, quick: option.value }) as Route}
+                    className={option.value === selectedQuickFilter ? "active" : ""}
+                    aria-current={option.value === selectedQuickFilter ? "page" : undefined}
+                  >
+                    <span>{option.label}</span>
+                    <strong>{countForQuickFilter(option.value)}</strong>
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          </div>
+        </details>
       </section>
+
+      <p className="resultSummary" aria-live="polite">
+        Showing {visibleDeals.length} of {deals.length} specials for today.{automaticMealMessage}
+      </p>
 
       {visibleDeals.length === 0 ? (
         <section className="emptyState" aria-label="No public deals">

@@ -4,6 +4,7 @@ import { SearchForm } from "../search-form";
 import { matchesSearchQuery, normalizeSearchQuery } from "../../lib/public-search";
 import { getRestaurants, publicAreaGroupOptions } from "../../lib/data";
 import { phoneHref } from "../phone-link";
+import { displayRestaurantName } from "../public-copy";
 
 type RestaurantsPageProps = {
   searchParams?: Promise<{
@@ -170,9 +171,13 @@ export default async function RestaurantsPage({ searchParams }: RestaurantsPageP
       <section className="restaurantList" aria-label="Restaurants with deals">
         {withDeals.map((restaurant) => (
           <article key={restaurant.restaurantId} className="restaurantCard">
-            <div>
-              <p className="eyebrow">{restaurant.neighborhood || "Wilmington"}</p>
-              <h2>{restaurant.name}</h2>
+            <div className="restaurantMain">
+              <p className="restaurantLine">
+                <span>{restaurant.neighborhood || "Wilmington"}</span>
+                <span className="dot" aria-hidden="true" />
+                <span>{restaurant.areaGroup}</span>
+              </p>
+              <h2>{displayRestaurantName(restaurant.name)}</h2>
               <div className="badgeRow" aria-label="Restaurant status">
                 <span>{restaurant.publicDealCount} deal{restaurant.publicDealCount === 1 ? "" : "s"}</span>
                 <span>Checked {displayChecked(restaurant.lastChecked)}</span>
@@ -183,7 +188,7 @@ export default async function RestaurantsPage({ searchParams }: RestaurantsPageP
               <p>{displayTags(restaurant.cuisine || restaurant.tags) || "Restaurant in the Forkcast set."}</p>
               <p className="locationLine">{restaurant.address}</p>
             </div>
-            <div className="cardActions">
+            <div className="cardActions restaurantActions">
               <Link href={`/restaurants/${restaurant.restaurantId}` as Route} className="primaryLink">
                 View restaurant
               </Link>
@@ -218,11 +223,19 @@ export default async function RestaurantsPage({ searchParams }: RestaurantsPageP
           <h2>On our radar</h2>
           {sourceOnly.map((restaurant) => (
             <article key={restaurant.restaurantId} className="restaurantCard compactRestaurantCard">
-              <div>
-                <h3>{restaurant.name}</h3>
-                <p>{restaurant.neighborhood || "Wilmington"} / checked {displayChecked(restaurant.lastChecked)}</p>
+              <div className="restaurantMain">
+                <p className="restaurantLine">
+                  <span>{restaurant.neighborhood || "Wilmington"}</span>
+                  <span className="dot" aria-hidden="true" />
+                  <span>Watching</span>
+                </p>
+                <h3>{displayRestaurantName(restaurant.name)}</h3>
+                <div className="badgeRow" aria-label="Restaurant status">
+                  <span>Checked {displayChecked(restaurant.lastChecked)}</span>
+                  {restaurant.areaGroup ? <span>{restaurant.areaGroup}</span> : null}
+                </div>
               </div>
-              <div className="cardActions">
+              <div className="cardActions restaurantActions">
                 {phoneHref(restaurant.phone) ? (
                   <a href={phoneHref(restaurant.phone)} className="secondaryLink">
                     Call

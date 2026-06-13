@@ -8,6 +8,9 @@ export const mealFilterOptions = [
 ] as const;
 
 export type MealFilter = (typeof mealFilterOptions)[number]["value"];
+export type TimedMealFilter = Exclude<MealFilter, "all">;
+
+const mealTimeZone = "America/New_York";
 
 function minutesFromTime(value: string): number | undefined {
   const [hourText, minuteText = "0"] = value.split(":");
@@ -76,4 +79,31 @@ export function dealMatchesMealFilter(deal: PublicDeal, meal: MealFilter): boole
     text.includes("evening") ||
     overlapsWindow(deal.startTime, deal.endTime, 16 * 60, 24 * 60)
   );
+}
+
+export function currentMealFilterForDate(date = new Date()): TimedMealFilter {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: mealTimeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).formatToParts(date);
+  const hour = Number(parts.find((part) => part.type === "hour")?.value ?? "0") % 24;
+  const minute = Number(parts.find((part) => part.type === "minute")?.value ?? "0");
+  const minutes = hour * 60 + minute;
+
+  if (minutes < 11 * 60) {
+    return "breakfast";
+  }
+
+  if (minutes < 16 * 60) {
+    return "lunch";
+  }
+
+  return "dinner";
+}
+
+export function defaultMealFilterForDeals(deals: PublicDeal[], date = new Date()): MealFilter {
+  const currentMeal = currentMealFilterForDate(date);
+  return deals.some((deal) => dealMatchesMealFilter(deal, currentMeal)) ? currentMeal : "all";
 }

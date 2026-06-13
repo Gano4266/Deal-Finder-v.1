@@ -3,6 +3,7 @@ import { SearchForm } from "../../search-form";
 import { getSouthportRestaurants } from "../../../lib/data";
 import { matchesSearchQuery, normalizeSearchQuery } from "../../../lib/public-search";
 import { phoneHref } from "../../phone-link";
+import { displayRestaurantName } from "../../public-copy";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,26 @@ function queryFor(q: string) {
 
   const queryText = query.toString();
   return queryText ? `/southport/restaurants?${queryText}` : "/southport/restaurants";
+}
+
+function displayChecked(value: string) {
+  if (!value) {
+    return "recently";
+  }
+
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+  if (!match) {
+    return value;
+  }
+
+  const [, year, month, day] = match;
+  return new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+    timeZone: "America/New_York",
+    year: "numeric"
+  }).format(new Date(`${year}-${month}-${day}T12:00:00-04:00`));
 }
 
 export default async function SouthportRestaurantsPage({ searchParams }: SouthportRestaurantsPageProps) {
@@ -111,11 +132,16 @@ export default async function SouthportRestaurantsPage({ searchParams }: Southpo
           <section className="restaurantList" aria-label="Southport restaurants with deals">
             {withDeals.map((restaurant) => (
               <article key={restaurant.restaurantId} className="restaurantCard">
-                <div>
-                  <p className="eyebrow">{restaurant.neighborhood || "Southport"}</p>
-                  <h2>{restaurant.name}</h2>
+                <div className="restaurantMain">
+                  <p className="restaurantLine">
+                    <span>{restaurant.neighborhood || "Southport"}</span>
+                    <span className="dot" aria-hidden="true" />
+                    <span>{restaurant.areaGroup}</span>
+                  </p>
+                  <h2>{displayRestaurantName(restaurant.name)}</h2>
                   <div className="badgeRow" aria-label="Restaurant status">
                     <span>{restaurant.publicDealCount} deal{restaurant.publicDealCount === 1 ? "" : "s"}</span>
+                    <span>Checked {displayChecked(restaurant.lastChecked)}</span>
                     {restaurant.publicDealDays.length > 0 ? (
                       <span>{restaurant.publicDealDays.join(" / ")}</span>
                     ) : null}
@@ -123,7 +149,7 @@ export default async function SouthportRestaurantsPage({ searchParams }: Southpo
                   <p>{restaurant.cuisine || restaurant.tags || "Restaurant in the Southport preview."}</p>
                   <p className="locationLine">{restaurant.address}</p>
                 </div>
-                <div className="cardActions">
+                <div className="cardActions restaurantActions">
                   <Link href="/southport/deals" className="primaryLink">
                     View Southport deals
                   </Link>
@@ -147,11 +173,19 @@ export default async function SouthportRestaurantsPage({ searchParams }: Southpo
               <h2>On our radar</h2>
               {sourceOnly.map((restaurant) => (
                 <article key={restaurant.restaurantId} className="restaurantCard compactRestaurantCard">
-                  <div>
-                    <h3>{restaurant.name}</h3>
-                    <p>{restaurant.neighborhood || "Southport"} / updated {restaurant.lastChecked}</p>
+                  <div className="restaurantMain">
+                    <p className="restaurantLine">
+                      <span>{restaurant.neighborhood || "Southport"}</span>
+                      <span className="dot" aria-hidden="true" />
+                      <span>Watching</span>
+                    </p>
+                    <h3>{displayRestaurantName(restaurant.name)}</h3>
+                    <div className="badgeRow" aria-label="Restaurant status">
+                      <span>Checked {displayChecked(restaurant.lastChecked)}</span>
+                      <span>{restaurant.areaGroup}</span>
+                    </div>
                   </div>
-                  <div className="cardActions">
+                  <div className="cardActions restaurantActions">
                     {phoneHref(restaurant.phone) ? (
                       <a href={phoneHref(restaurant.phone)} className="secondaryLink">
                         Call

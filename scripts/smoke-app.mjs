@@ -129,6 +129,8 @@ async function assertAdminDisabled(pathname) {
 }
 
 const deals = readCsv("fixtures/prototype/deals.csv");
+const mainMarketCities = new Set(["Wilmington", "Carolina Beach"]);
+const southportMarketCities = new Set(["Southport", "Oak Island"]);
 const publicFixtureCities = new Set(["Wilmington", "Southport", "Oak Island", "Carolina Beach"]);
 const restaurants = readCsv("fixtures/prototype/restaurants.csv").filter((row) =>
   publicFixtureCities.has(row.city) &&
@@ -138,6 +140,8 @@ const restaurants = readCsv("fixtures/prototype/restaurants.csv").filter((row) =
   row.is_live_data === "false"
 );
 const restaurantsById = new Map(restaurants.map((restaurant) => [restaurant.restaurant_id, restaurant]));
+const mainRestaurants = restaurants.filter((restaurant) => mainMarketCities.has(restaurant.city));
+const southportRestaurants = restaurants.filter((restaurant) => southportMarketCities.has(restaurant.city));
 
 function easternDateString(date = new Date()) {
   const parts = new Intl.DateTimeFormat("en-US", {
@@ -198,6 +202,8 @@ function passesPublicRuntimeDealGate(deal) {
 
 const visibleDeals = deals.filter(passesPublicRuntimeDealGate);
 const hiddenDeals = deals.filter((deal) => !passesPublicRuntimeDealGate(deal));
+const mainVisibleDeals = visibleDeals.filter((deal) => mainMarketCities.has(restaurantsById.get(deal.restaurant_id)?.city ?? ""));
+const southportVisibleDeals = visibleDeals.filter((deal) => southportMarketCities.has(restaurantsById.get(deal.restaurant_id)?.city ?? ""));
 const proofAssets = Array.from(new Set(visibleDeals.map((deal) => publicAssetUrl(deal.screenshot_path)).filter(Boolean)));
 
 const failures = [];
@@ -221,16 +227,18 @@ await check("pwa apple touch icon", () => assertAsset("/apple-touch-icon.png"));
 await check("tonight", () => assertPage("/tonight", ["Today's forecast", "Verify details before you order"]));
 await check("tonight quick confirm", () => assertPage("/tonight", ["I checked this"]));
 await check("tonight keyword search", () => assertPage("/tonight?q=taco", ["Search today's deals", "$1.99 tacos"]));
-await check("tonight breakfast filter", () => assertPage("/tonight?quick=breakfast", ["Today's forecast", "Breakfast"]));
-await check("tonight lunch filter", () => assertPage("/tonight?quick=lunch", ["Today's forecast", "Lunch"]));
-await check("tonight dinner filter", () => assertPage("/tonight?quick=dinner", ["Today's forecast", "Dinner"]));
+await check("tonight breakfast filter", () => assertPage("/tonight?meal=breakfast", ["Today's forecast", "Breakfast"]));
+await check("tonight lunch filter", () => assertPage("/tonight?meal=lunch", ["Today's forecast", "Lunch"]));
+await check("tonight dinner filter", () => assertPage("/tonight?meal=dinner", ["Today's forecast", "Dinner"]));
+await check("tonight legacy meal quick filter", () => assertPage("/tonight?quick=lunch", ["Today's forecast", "Lunch"]));
 await check("deals filters", () => assertPage("/deals?area=Downtown&day=Tuesday&quick=under-10&sort=area", ["$10 & under", "Food specials worth knowing"]));
 await check("deals quick confirm", () => assertPage("/deals", ["Food specials worth knowing", "I checked this"]));
 await check("deals keyword search", () => assertPage("/deals?q=taco", ["Search deals", "$2 tacos"]));
 await check("deals keyword no match", () => assertPage("/deals?q=notarealdeal", ["No specials match \"notarealdeal\" yet."]));
-await check("deals breakfast filter", () => assertPage("/deals?quick=breakfast", ["Breakfast", "Katy's Grill & Bar"]));
-await check("deals lunch filter", () => assertPage("/deals?quick=lunch", ["Lunch", "Hell's Kitchen"]));
-await check("deals dinner filter", () => assertPage("/deals?quick=dinner", ["Dinner", "$2 tacos"]));
+await check("deals breakfast filter", () => assertPage("/deals?meal=breakfast", ["Breakfast", "Katy's Grill & Bar"]));
+await check("deals lunch filter", () => assertPage("/deals?meal=lunch", ["Lunch", "Hell's Kitchen"]));
+await check("deals dinner filter", () => assertPage("/deals?meal=dinner", ["Dinner", "$2 tacos"]));
+await check("deals legacy meal quick filter", () => assertPage("/deals?quick=lunch", ["Lunch", "Hell's Kitchen"]));
 await check("carolina beach main filter", () => assertPage("/deals?area=Carolina%20Beach", ["Carolina Beach", "K38 Baja Grill"]));
 await check("southport separate from main deals", async () => {
   const body = await assertPage("/deals", ["Food specials worth knowing"]);
@@ -408,6 +416,15 @@ await check("southport restaurants", () => assertPage("/southport/restaurants", 
 await check("southport deals keyword search", () => assertPage("/southport/deals?q=lunch", ["Search Southport deals", "Provision Company", "Southport preview"]));
 await check("southport deals lunch filter", () => assertPage("/southport/deals?quick=lunch", ["Lunch", "Provision Company", "Southport preview"]));
 await check("southport restaurants keyword search", () => assertPage("/southport/restaurants?q=provision", ["Search Southport restaurants", "Provision Company", "Southport preview"]));
+await check("southport main detail isolation", async () => {
+  for (const deal of southportVisibleDeals) {
+    await assertMissingPage(`/deals/${deal.deal_id}`);
+  }
+
+  for (const restaurant of southportRestaurants) {
+    await assertMissingPage(`/restaurants/${restaurant.restaurant_id}`);
+  }
+});
 await check("invalid deal filters fallback", () => assertPage("/deals?area=Nope&day=Funday&quick=nope&sort=nope", [
   "Food specials worth knowing",
   "$2 tacos"
@@ -441,7 +458,7 @@ await check("sample restaurant deals", () => assertPage("/restaurants/beat-stree
   "/deals/deal-beat-street-tuesday-2-tacos"
 ]));
 
-for (const deal of visibleDeals) {
+for (const deal of mainVisibleDeals) {
   await check(`deal ${deal.deal_id}`, () => assertPage(`/deals/${deal.deal_id}`, [
     "Official details",
     publicAssetUrl(deal.screenshot_path)
@@ -452,7 +469,7 @@ for (const deal of hiddenDeals) {
   await check(`hidden deal ${deal.deal_id}`, () => assertMissingPage(`/deals/${deal.deal_id}`));
 }
 
-for (const restaurant of restaurants) {
+for (const restaurant of mainRestaurants) {
   await check(`restaurant ${restaurant.restaurant_id}`, () => assertPage(`/restaurants/${restaurant.restaurant_id}`, [restaurant.restaurant_id]));
 }
 
