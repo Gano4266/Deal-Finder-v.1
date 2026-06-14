@@ -43,13 +43,21 @@ NEXT_PUBLIC_REPORT_EMAIL=
 
 ## Pre-Deploy Gate
 
-Run locally from `app/`:
+Run locally from the repo root:
+
+```sh
+npm run verify
+```
+
+This checks promotion-blocker regression tests, admin guard regression tests, typecheck/lint, public fixture data validation, and production build. Vercel also runs `npm run verify` through the checked-in `vercel.json`, so deploys fail before build output if fixture validation fails.
+
+For the heavier local acceptance pass from `app/`, run:
 
 ```sh
 npm run accept
 ```
 
-This checks data validation, typecheck, production build, public route smoke, production admin-disabled behavior, PWA manifest/icons, proof assets, and iPhone-size mobile screenshots.
+This additionally checks public route smoke, production admin-disabled behavior, PWA manifest/icons, proof assets, and iPhone-size mobile screenshots.
 
 ## Post-Deploy Gate
 
@@ -76,7 +84,7 @@ Then test on iPhone Safari:
 
 ## Production Rules
 
-- Do not enable `/admin` for the friend pilot.
+- Do not enable `/admin` for the friend pilot. Production `/admin/*` returns 404 unless `DEAL_FINDER_ADMIN_ENABLED=true`.
 - Keep `robots.txt` no-indexed during the private soft pilot.
 - Do not present prototype rows as live availability.
 - Keep HubSpot intake variables configured before sharing the report form.

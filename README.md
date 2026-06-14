@@ -70,6 +70,24 @@ AI output is never a source. Third-party aggregators, Reddit, reviews, comments,
 - [Weekly audit summary template](ops/templates/weekly-audit-summary-template.md)
 - [Weekly ops runbook](ops/weekly-ops-runbook.md)
 
+## Operator Commands
+
+Run the full verification gate from the repo root:
+
+```bash
+npm run verify
+```
+
+Run the read-only research-to-publish flow for a dated intake packet:
+
+```bash
+npm run research:flow -- ops/research/intake/<area>-YYYY-MM-DD
+```
+
+`npm run verify` runs promotion-blocker regression tests, admin guard regression tests, app typecheck/lint, public fixture data validation, and production build.
+
+`research:flow` validates the intake contract, runs the dry-run promotion guard, prints a fixture promotion packet, validates current public fixture data, typechecks, builds, and writes a human-readable `promotion-checklist.md` inside the intake folder. It does not edit `fixtures/prototype/*`, approve rows, scrape sites, call external APIs, or make research data public.
+
 ## Seed Backlog
 
 - [Wilmington restaurant sources](ops/seeds/wilmington-restaurant-sources.csv)

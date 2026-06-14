@@ -3,10 +3,19 @@
   "private": true,
   "scripts": {
     "build": "cd app && npm run build",
+    "verify": "node scripts/verify.mjs",
+    "test:promotion": "node --test tests/promotion-blockers.test.mjs",
+    "test:admin-guard": "node --test tests/admin-guard.test.mjs",
+    "validate:data": "cd app && npm run validate:data",
+    "typecheck": "cd app && npm run typecheck",
+    "lint": "cd app && npm run lint",
+    "smoke": "cd app && npm run smoke",
+    "accept": "cd app && npm run accept",
     "research:validate": "node scripts/validate-research-intake.mjs",
     "research:summary": "node scripts/summarize-research-intake.mjs",
     "research:dry-run": "node scripts/dry-run-promote-research-intake.mjs",
-    "research:promotion-packet": "node scripts/prepare-fixture-promotion-packet.mjs"
+    "research:promotion-packet": "node scripts/prepare-fixture-promotion-packet.mjs",
+    "research:flow": "node scripts/research-flow.mjs"
   },
   "dependencies": {
     "next": "16.2.7",

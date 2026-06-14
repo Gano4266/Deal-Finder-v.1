@@ -61,3 +61,27 @@ node scripts/dry-run-promote-research-intake.mjs ops/research/intake/<area>-YYYY
 ```
 
 This command is read-only and has no `--write` mode. It reports theoretically promotable rows, blocked rows, blocker reasons, fields still needed, and destination fixture files that would eventually need separate reviewed manual updates. Rows remain blocked if dine-in, takeout/carryout, or delivery applicability is unknown. It does not approve rows, promote candidates, modify fixtures, or make intake data public.
+
+## One-Prompt / One-Command Workflow
+
+For a complete operator pass, create the dated intake packet from official-source research, then run:
+
+```bash
+npm run research:flow -- ops/research/intake/<area>-YYYY-MM-DD
+```
+
+The flow runs:
+
+- intake contract validation
+- promotion dry-run
+- fixture promotion packet output
+- current public fixture data validation
+- app typecheck
+- app build
+- optional smoke with `--smoke` or `FORKCAST_RESEARCH_FLOW_SMOKE=1`
+
+It also writes `promotion-checklist.md` inside the intake folder. The checklist groups blockers by evidence, source tier, freshness, service mode, location scope, copy approval, review mapping, AI/discovery-only evidence, fixture metadata, and other causes. It lists fields still needed, destination fixture files for any future reviewed manual promotion, and the exact next command or operator action.
+
+The flow remains no-public-fixture-write by design. It may write `promotion-checklist.md` inside the canonical intake folder, but it does not edit `fixtures/prototype/*`, approve rows, scrape websites, call external APIs, or make research rows public. Rows can publish only after acceptable official evidence or direct confirmation, verified confidence, approved review, approved public copy, food-only alcohol classification, no conflicts, valid evidence paths/screenshots/hashes, valid relationships, freshness metadata, and a passing fixture validation gate.
+
+AI output is never source evidence. Third-party aggregators, social chatter, reviews, comments, and user notes can create leads, but they cannot publish a deal without acceptable official evidence or direct confirmation.
