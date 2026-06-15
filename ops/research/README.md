@@ -64,6 +64,17 @@ This command is read-only and has no `--write` mode. It reports theoretically pr
 
 ## One-Prompt / One-Command Workflow
 
+For the phase-based ops front door, use:
+
+```bash
+npm run ops -- readiness ops/research/intake/<area>-YYYY-MM-DD
+npm run ops -- intake ops/research/intake/<area>-YYYY-MM-DD
+npm run ops -- promote:plan ops/research/intake/<area>-YYYY-MM-DD
+npm run ops -- deploy:check
+```
+
+`ops readiness` is the first Phase 1 automation command. It is read-only and separates rows into `already_public_clean`, `ready_to_promote`, and blocked categories so operators do not chase fixture rows that are already safely public.
+
 For a complete operator pass, create the dated intake packet from official-source research, then run:
 
 ```bash

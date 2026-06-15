@@ -4,8 +4,10 @@
   "scripts": {
     "build": "cd app && npm run build",
     "verify": "node scripts/verify.mjs",
+    "ops": "node scripts/ops.mjs",
     "test:promotion": "node --test tests/promotion-blockers.test.mjs",
     "test:admin-guard": "node --test tests/admin-guard.test.mjs",
+    "test:readiness": "node --test tests/readiness-report.test.mjs",
     "validate:data": "cd app && npm run validate:data",
     "typecheck": "cd app && npm run typecheck",
     "lint": "cd app && npm run lint",
@@ -15,6 +17,7 @@
     "research:summary": "node scripts/summarize-research-intake.mjs",
     "research:dry-run": "node scripts/dry-run-promote-research-intake.mjs",
     "research:promotion-packet": "node scripts/prepare-fixture-promotion-packet.mjs",
+    "research:readiness": "node scripts/readiness-report.mjs",
     "research:flow": "node scripts/research-flow.mjs"
   },
   "dependencies": {

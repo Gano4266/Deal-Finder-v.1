@@ -78,15 +78,25 @@ Run the full verification gate from the repo root:
 npm run verify
 ```
 
+Use the phase-based ops front door for intake readiness and release work:
+
+```bash
+npm run ops -- readiness ops/research/intake/<area>-YYYY-MM-DD
+npm run ops -- promote:plan ops/research/intake/<area>-YYYY-MM-DD
+npm run ops -- deploy:check
+```
+
 Run the read-only research-to-publish flow for a dated intake packet:
 
 ```bash
 npm run research:flow -- ops/research/intake/<area>-YYYY-MM-DD
 ```
 
-`npm run verify` runs promotion-blocker regression tests, admin guard regression tests, app typecheck/lint, public fixture data validation, and production build.
+`npm run verify` runs promotion-blocker regression tests, admin guard regression tests, ops readiness regression tests, app typecheck/lint, public fixture data validation, and production build.
 
 `research:flow` validates the intake contract, runs the dry-run promotion guard, prints a fixture promotion packet, validates current public fixture data, typechecks, builds, and writes a human-readable `promotion-checklist.md` inside the intake folder. It does not edit `fixtures/prototype/*`, approve rows, scrape sites, call external APIs, or make research data public.
+
+Phase 1 ops automation is intentionally read-only. `ops readiness` separates already-public fixture-clean rows from rows ready for exact-ID promotion and rows blocked by evidence, review, copy, freshness, scope, or metadata issues. `ops scrape` and `ops promote:apply` are reserved for the next automation phases.
 
 ## Seed Backlog
 

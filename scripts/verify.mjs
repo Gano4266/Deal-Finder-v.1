@@ -9,7 +9,7 @@ const allowedArgs = new Set(["--help", "-h", "--smoke"]);
 if (args.includes("--help") || args.includes("-h")) {
   console.log("Usage: npm run verify [-- --smoke]");
   console.log("");
-  console.log("Runs promotion/admin regression tests, app typecheck, lint, public data validation, and production build.");
+  console.log("Runs promotion/admin/readiness regression tests, app typecheck, lint, public data validation, and production build.");
   console.log("Smoke is optional because it requires a configured running server or base URL.");
   process.exit(0);
 }
@@ -34,6 +34,12 @@ const steps = [
     name: "Admin guard regression tests",
     command: "npm",
     args: ["run", "test:admin-guard"],
+    cwd: repoRoot
+  },
+  {
+    name: "Ops readiness regression tests",
+    command: "npm",
+    args: ["run", "test:readiness"],
     cwd: repoRoot
   },
   {
