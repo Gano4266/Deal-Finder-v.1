@@ -8,13 +8,14 @@ const phaseArgs = args.slice(1).filter((arg) => arg !== "--");
 
 const phases = new Map([
   ["readiness", runReadiness],
+  ["intake:new", runIntakeNew],
   ["intake", runIntake],
   ["review", runReview],
   ["promote:plan", runPromotePlan],
   ["deploy:check", runDeployCheck],
   ["deploy:smoke", runDeploySmoke],
-  ["scrape", notImplemented("scrape", "Phase 2 will capture official sources into canonical intake folders.")],
-  ["promote:apply", notImplemented("promote:apply", "Phase 3 will write fixtures by exact reviewed IDs only.")]
+  ["scrape", runScrape],
+  ["promote:apply", runPromoteApply]
 ]);
 
 function usage(exitCode = 0) {
@@ -22,13 +23,14 @@ function usage(exitCode = 0) {
   console.log("");
   console.log("Phases:");
   console.log("- readiness <intake> [--json]");
+  console.log("- intake:new <area-slug> [--date YYYY-MM-DD] [--area-name \"Area Name\"] [--dry-run]");
   console.log("- intake <intake>");
   console.log("- review <intake>");
   console.log("- promote:plan <intake>");
   console.log("- deploy:check");
   console.log("- deploy:smoke -- --url <deployed-url>");
-  console.log("- scrape (reserved for official-source capture automation)");
-  console.log("- promote:apply (reserved for exact-ID reviewed fixture promotion)");
+  console.log("- scrape <intake> [--dry-run] [--source <source_id>] [--limit <n>] [--no-screenshot] [--confirm-terms-reviewed]");
+  console.log("- promote:apply <intake> --deal <deal_id> [--deal <deal_id>] [--dry-run|--write-reviewed-fixtures]");
   process.exit(exitCode);
 }
 
@@ -76,6 +78,16 @@ function runReadiness() {
   runNode("scripts/readiness-report.mjs", phaseArgs);
 }
 
+function runIntakeNew() {
+  const area = phaseArgs.find((arg) => !arg.startsWith("--"));
+  if (!area) {
+    console.error("intake:new requires an area slug.");
+    usage(1);
+  }
+
+  runNode("scripts/scaffold-intake-packet.mjs", phaseArgs);
+}
+
 function runIntake() {
   const intake = requireIntake("intake");
   runNpm("research:validate", ["--", intake]);
@@ -116,6 +128,16 @@ function runDeploySmoke() {
       DEAL_FINDER_SMOKE_SKIP_REPORT_POST: "1"
     }
   });
+}
+
+function runScrape() {
+  requireIntake("scrape");
+  runNode("scripts/scrape-official-sources.mjs", phaseArgs);
+}
+
+function runPromoteApply() {
+  requireIntake("promote:apply");
+  runNode("scripts/promote-reviewed-fixtures.mjs", phaseArgs);
 }
 
 function notImplemented(name, reason) {

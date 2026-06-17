@@ -2,18 +2,11 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import {
-  readCsv,
   repoRoot,
-  validateIntakeContract,
-  value
+  validateIntakeContract
 } from "./research-intake-contract.mjs";
-import {
-  destinationFiles,
-  promotionBlockers,
-  publicPromotionRowLabel,
-  summarizeBlockerCategories,
-  todayInWilmington
-} from "./promotion-blockers.mjs";
+import { destinationFiles } from "./promotion-blockers.mjs";
+import { buildReadinessReport } from "./readiness-report.mjs";
 
 const args = process.argv.slice(2);
 const forbiddenWriteFlags = new Set(["--write", "--write-reviewed-fixtures", "--write-fixtures"]);
@@ -107,63 +100,51 @@ function gitStatusFor(paths) {
 }
 
 function analyzeDealRows() {
-  const dealPath = path.join(intakeDir, "deal-intake.csv");
-  if (!fs.existsSync(dealPath)) {
-    return {
-      totalRows: 0,
-      promotableRows: [],
-      blockedRows: [],
-      blockerCategories: [],
-      fieldsNeeded: [],
-      error: "deal-intake.csv is missing"
-    };
-  }
-
+  let report;
   try {
-    const dealIntake = readCsv(dealPath, "deal-intake.csv");
-    const today = todayInWilmington();
-    const promotableRows = [];
-    const blockedRows = [];
-
-    dealIntake.rows.forEach((row, index) => {
-      const gate = promotionBlockers(row, today);
-      const entry = {
-        row: index + 2,
-        id: publicPromotionRowLabel(row, index),
-        restaurant_id: value(row, "restaurant_id"),
-        deal_title: value(row, "deal_title") || value(row, "public_title") || "(untitled)"
-      };
-
-      if (gate.blockers.length === 0) {
-        promotableRows.push(entry);
-        return;
-      }
-
-      blockedRows.push({
-        ...entry,
-        blockers: gate.blockers,
-        fieldsNeeded: gate.fieldsNeeded
-      });
-    });
-
-    return {
-      totalRows: dealIntake.rows.length,
-      promotableRows,
-      blockedRows,
-      blockerCategories: summarizeBlockerCategories(blockedRows),
-      fieldsNeeded: [...new Set(blockedRows.flatMap((row) => row.fieldsNeeded))].sort(),
-      error: undefined
-    };
+    report = buildReadinessReport(intakeDir);
   } catch (error) {
     return {
       totalRows: 0,
+      alreadyPublicRows: [],
       promotableRows: [],
       blockedRows: [],
       blockerCategories: [],
       fieldsNeeded: [],
+      statuses: {},
       error: error.message
     };
   }
+
+  if (!report.ok) {
+    return {
+      totalRows: report.summary.totalRows,
+      alreadyPublicRows: [],
+      promotableRows: [],
+      blockedRows: [],
+      blockerCategories: [],
+      fieldsNeeded: [],
+      statuses: report.summary.statuses,
+      error: report.contract.failures.join("; ")
+    };
+  }
+
+  const alreadyPublicRows = report.rows.filter((row) => row.status === "already_public_clean");
+  const promotableRows = report.rows.filter((row) => row.status === "ready_to_promote");
+  const blockedRows = report.rows.filter((row) =>
+    row.status !== "already_public_clean" && row.status !== "ready_to_promote"
+  );
+
+  return {
+    totalRows: report.summary.totalRows,
+    alreadyPublicRows,
+    promotableRows,
+    blockedRows,
+    blockerCategories: report.summary.blockerCategories,
+    fieldsNeeded: report.summary.fieldsNeeded,
+    statuses: report.summary.statuses,
+    error: undefined
+  };
 }
 
 function nextAction({ analysis, steps, contract, smokeRequested }) {
@@ -182,7 +163,11 @@ function nextAction({ analysis, steps, contract, smokeRequested }) {
   }
 
   if (analysis.promotableRows.length > 0) {
-    return "Make a reviewed manual fixture promotion from the packet/checklist, then run npm run verify before deploy.";
+    return "Run ops promote:apply with exact deal IDs in dry-run mode, inspect the plan, then use write mode only for reviewed rows.";
+  }
+
+  if (analysis.alreadyPublicRows.length > 0) {
+    return "No fixture promotion needed for already-public clean rows. Continue source freshness checks or add new reviewed candidates.";
   }
 
   if (!smokeRequested) {
@@ -223,9 +208,18 @@ function writeChecklist({ analysis, contract, steps, publicFixtureStatus, exactN
     "## Promotion Readiness",
     "",
     `- Deal rows scanned: ${analysis.totalRows}`,
+    `- Already public / fixture-clean: ${analysis.alreadyPublicRows.length}`,
     `- Promotable rows: ${analysis.promotableRows.length}`,
     `- Blocked rows: ${analysis.blockedRows.length}`,
     `- Public fixtures changed by this flow: ${publicFixtureStatus.changed ? "yes or already dirty" : "no"}`,
+    "",
+    "## Statuses",
+    "",
+    ...(Object.keys(analysis.statuses).length > 0
+      ? Object.entries(analysis.statuses)
+          .sort(([left], [right]) => left.localeCompare(right))
+          .map(([status, count]) => `- ${status}: ${count}`)
+      : ["- None"]),
     "",
     "## Blocker Categories",
     "",
@@ -249,6 +243,14 @@ function writeChecklist({ analysis, contract, steps, publicFixtureStatus, exactN
           ...analysis.promotableRows.map((row) => `- ${row.id} (row ${row.row}): ${row.deal_title}`)
         ]
       : ["### Promotable", "", "- None"]),
+    "",
+    ...(analysis.alreadyPublicRows.length > 0
+      ? [
+          "### Already Public / Fixture-Clean",
+          "",
+          ...analysis.alreadyPublicRows.map((row) => `- ${row.id} (row ${row.row}): ${row.deal_title}`)
+        ]
+      : ["### Already Public / Fixture-Clean", "", "- None"]),
     "",
     ...(analysis.blockedRows.length > 0
       ? [
@@ -363,6 +365,7 @@ const writtenChecklist = writeChecklist({
 console.log("\n== Research Flow Summary ==");
 console.log(`Intake folder: ${relativePath(intakeDir)}`);
 console.log(`Validation: ${contract.failures.length === 0 ? "pass" : "fail"} (${contract.failures.length} failures, ${contract.warnings.length} warnings)`);
+console.log(`Already public / fixture-clean: ${analysis.alreadyPublicRows.length}`);
 console.log(`Promotable rows: ${analysis.promotableRows.length}`);
 console.log(`Blocked rows: ${analysis.blockedRows.length}`);
 

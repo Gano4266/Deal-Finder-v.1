@@ -9,7 +9,7 @@ const allowedArgs = new Set(["--help", "-h", "--smoke"]);
 if (args.includes("--help") || args.includes("-h")) {
   console.log("Usage: npm run verify [-- --smoke]");
   console.log("");
-  console.log("Runs promotion/admin/readiness regression tests, app typecheck, lint, public data validation, and production build.");
+  console.log("Runs promotion/admin/readiness/scrape/apply regression tests, app typecheck, lint, public data validation, and production build.");
   console.log("Smoke is optional because it requires a configured running server or base URL.");
   process.exit(0);
 }
@@ -40,6 +40,24 @@ const steps = [
     name: "Ops readiness regression tests",
     command: "npm",
     args: ["run", "test:readiness"],
+    cwd: repoRoot
+  },
+  {
+    name: "Intake scaffold regression tests",
+    command: "npm",
+    args: ["run", "test:intake-new"],
+    cwd: repoRoot
+  },
+  {
+    name: "Official scrape regression tests",
+    command: "npm",
+    args: ["run", "test:scrape"],
+    cwd: repoRoot
+  },
+  {
+    name: "Reviewed fixture apply regression tests",
+    command: "npm",
+    args: ["run", "test:promote-apply"],
     cwd: repoRoot
   },
   {

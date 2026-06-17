@@ -81,8 +81,12 @@ npm run verify
 Use the phase-based ops front door for intake readiness and release work:
 
 ```bash
+npm run ops -- intake:new <area-slug> --area-name "Area Name"
+npm run ops -- scrape ops/research/intake/<area>-YYYY-MM-DD --dry-run
+npm run ops -- scrape ops/research/intake/<area>-YYYY-MM-DD --source <source_id> --confirm-terms-reviewed
 npm run ops -- readiness ops/research/intake/<area>-YYYY-MM-DD
 npm run ops -- promote:plan ops/research/intake/<area>-YYYY-MM-DD
+npm run ops -- promote:apply ops/research/intake/<area>-YYYY-MM-DD --deal <deal_id> --dry-run
 npm run ops -- deploy:check
 ```
 
@@ -96,7 +100,13 @@ npm run research:flow -- ops/research/intake/<area>-YYYY-MM-DD
 
 `research:flow` validates the intake contract, runs the dry-run promotion guard, prints a fixture promotion packet, validates current public fixture data, typechecks, builds, and writes a human-readable `promotion-checklist.md` inside the intake folder. It does not edit `fixtures/prototype/*`, approve rows, scrape sites, call external APIs, or make research data public.
 
-Phase 1 ops automation is intentionally read-only. `ops readiness` separates already-public fixture-clean rows from rows ready for exact-ID promotion and rows blocked by evidence, review, copy, freshness, scope, or metadata issues. `ops scrape` and `ops promote:apply` are reserved for the next automation phases.
+`ops intake:new` creates an empty canonical intake packet with template headers, `area_brief.json`, and local artifact folders. It does not research restaurants, scrape, approve rows, or write fixtures.
+
+Phase 1 ops automation is intentionally read-only. `ops readiness` separates already-public fixture-clean rows from rows ready for exact-ID promotion and rows blocked by evidence, review, copy, freshness, scope, or metadata issues.
+
+Phase 2 adds capture-only official-source automation. `ops scrape` can collect reviewed `tier_1_official` source pages from a canonical intake packet into `source-captures.csv`, `source-checks.csv`, local `raw/` text/HTML, and local `screenshots/` artifacts. It does not edit `deal-intake.csv`, approve rows, promote fixtures, publish data, or hydrate public routes. Sources with robots/terms notes require `--confirm-terms-reviewed`; third-party, social, login-required, permission-required, inactive, and non-automated rows are skipped.
+
+Phase 3 adds exact-ID reviewed fixture apply. `ops promote:apply` requires one or more explicit `--deal <deal_id>` arguments and defaults to dry-run unless `--write-reviewed-fixtures` is passed. It refuses broad all-row promotion, blocked rows, existing public deal rewrites, missing support rows, support-row drift, missing local evidence, invalid relationships, and any write that fails `npm run validate:data` in `app/`. Successful writes update only reviewed fixture rows plus manifest counts and print the generated git diff.
 
 ## Seed Backlog
 
@@ -119,4 +129,4 @@ Static-data app prototype. `/tonight` reads reviewed public rows from `fixtures/
 
 ## Next Practical Milestone
 
-Use the source-gap report and validation script to promote the next reviewed food deals safely. Do not automate crawling yet.
+Use `ops scrape` to refresh official source captures for review, then use the source-gap report and validation scripts to promote the next reviewed food deals safely.

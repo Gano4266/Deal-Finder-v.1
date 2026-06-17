@@ -20,6 +20,14 @@ Examples: `ops/research/intake/wilmington-2026-06-10/`, `ops/research/intake/dow
 
 Do not create intake or sweep directories outside `ops/research/intake/`. Do not use a flat area name without a date suffix. The date suffix is the research run date, not the publication date.
 
+Create a blank packet from the repo templates with:
+
+```bash
+npm run ops -- intake:new <area-slug> --area-name "Area Name"
+```
+
+Use `--date YYYY-MM-DD` for a specific research-run date. The scaffold command writes only empty template files, `area_brief.json`, `raw/.gitkeep`, and `screenshots/.gitkeep`; it does not research, scrape, approve, or publish anything.
+
 ## Validate Intake Compatibility
 
 Place copied external research in a dated intake folder, then run:
@@ -60,20 +68,61 @@ Use the dry-run guard to see whether reviewed `deal-intake.csv` rows appear to s
 node scripts/dry-run-promote-research-intake.mjs ops/research/intake/<area>-YYYY-MM-DD
 ```
 
-This command is read-only and has no `--write` mode. It reports theoretically promotable rows, blocked rows, blocker reasons, fields still needed, and destination fixture files that would eventually need separate reviewed manual updates. Rows remain blocked if dine-in, takeout/carryout, or delivery applicability is unknown. It does not approve rows, promote candidates, modify fixtures, or make intake data public.
+This command is read-only and has no `--write` mode. It uses the same readiness planner as `ops readiness`, so rows that are already public and fixture-clean are reported as already public instead of blocked on fixture-only metadata. It reports rows already public, rows ready for exact-ID promotion, blocked rows, blocker reasons, fields still needed, and destination fixture files. Rows remain blocked if dine-in, takeout/carryout, or delivery applicability is unknown. It does not approve rows, promote candidates, modify fixtures, or make intake data public.
 
 ## One-Prompt / One-Command Workflow
 
 For the phase-based ops front door, use:
 
 ```bash
+npm run ops -- intake:new <area-slug> --area-name "Area Name"
+npm run ops -- scrape ops/research/intake/<area>-YYYY-MM-DD --dry-run
+npm run ops -- scrape ops/research/intake/<area>-YYYY-MM-DD --source <source_id> --confirm-terms-reviewed
 npm run ops -- readiness ops/research/intake/<area>-YYYY-MM-DD
 npm run ops -- intake ops/research/intake/<area>-YYYY-MM-DD
 npm run ops -- promote:plan ops/research/intake/<area>-YYYY-MM-DD
+npm run ops -- promote:apply ops/research/intake/<area>-YYYY-MM-DD --deal <deal_id> --dry-run
 npm run ops -- deploy:check
 ```
 
-`ops readiness` is the first Phase 1 automation command. It is read-only and separates rows into `already_public_clean`, `ready_to_promote`, and blocked categories so operators do not chase fixture rows that are already safely public.
+`ops readiness` is the Phase 1 automation command. It is read-only and separates rows into `already_public_clean`, `ready_to_promote`, and blocked categories so operators do not chase fixture rows that are already safely public.
+
+## Phase 2 Official-Source Capture
+
+`ops scrape` is the Phase 2 capture command. It only reads source rows already present in `source-inventory.csv` and only attempts rows that are:
+
+- `source_tier=tier_1_official`
+- `automation_allowed=true`
+- `permission_required=false`
+- `login_required=false`
+- `source_status=active`
+- inside a canonical `ops/research/intake/<area>-YYYY-MM-DD/` packet
+
+Rows with `robots_or_terms_notes` are skipped unless the operator passes `--confirm-terms-reviewed` after reviewing the source terms. Social, partner, third-party, review, user-note, blocked, inactive, login-required, and permission-required rows remain manual or discovery-only.
+
+On capture, the command writes review inputs only:
+
+- `source-captures.csv`
+- `source-checks.csv`
+- source-level freshness fields in `source-inventory.csv`
+- local `raw/` text/HTML artifacts
+- local `screenshots/` artifacts unless `--no-screenshot` is used
+- local `raw/scrape-results.json`
+
+It does not create deal candidates, approve review tasks, edit `fixtures/prototype/*`, publish public rows, scrape social media, use AI output as evidence, or make public routes depend on live scraping. Successful source checks use existing status vocabulary and leave review state at `workflow_status_after=needs_review` with `confidence_status_after=probable`; failed attempts remain `unverified` and require manual source review.
+
+## Phase 3 Exact-ID Fixture Apply
+
+`ops promote:apply` is the Phase 3 fixture writer. It is not a reviewer and it is not a broad auto-promotion command. Operators must name exact reviewed deal IDs:
+
+```bash
+npm run ops -- promote:apply ops/research/intake/<area>-YYYY-MM-DD --deal <deal_id> --dry-run
+npm run ops -- promote:apply ops/research/intake/<area>-YYYY-MM-DD --deal <deal_id> --write-reviewed-fixtures
+```
+
+The command refuses to write unless all selected deal rows pass the existing promotion blockers after static fixture metadata is applied. It also requires the restaurant, source, source capture, source check, review task, and audit event support rows to exist in the intake packet or match existing public fixture rows exactly. Existing public deal IDs are never rewritten.
+
+When write mode is requested, the command appends only missing exact-ID fixture rows, updates `fixture-manifest.json` counts, runs `npm run validate:data` from `app/`, restores file snapshots on validation failure, and prints the generated git diff after a successful write. It does not scrape, call external APIs, approve review tasks, create deal candidates, or let research rows hydrate public routes.
 
 For a complete operator pass, create the dated intake packet from official-source research, then run:
 
@@ -84,7 +133,7 @@ npm run research:flow -- ops/research/intake/<area>-YYYY-MM-DD
 The flow runs:
 
 - intake contract validation
-- promotion dry-run
+- canonical promotion dry-run/readiness plan
 - fixture promotion packet output
 - current public fixture data validation
 - app typecheck

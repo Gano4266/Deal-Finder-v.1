@@ -647,7 +647,13 @@ function buildPacket(intakeDir) {
     },
     summary: {
       approvedRowsScanned: rows.length,
-      intakeMetadataOnlyBlocked: rows.filter((row) => row.intake_metadata_only_blocked).length,
+      alreadyPublicFixtureClean: rows.filter((row) =>
+        row.public_fixture_exists &&
+        row.public_fixture_metadata_matched &&
+        row.public_relationships_present &&
+        row.public_fixture_non_metadata_gaps.length === 0
+      ).length,
+      intakeRowsMissingFixtureMetadataOnly: rows.filter((row) => row.intake_metadata_only_blocked).length,
       publicFixtureRowsMetadataMatched: rows.filter((row) => row.public_fixture_metadata_matched).length,
       publicFixtureRowsMissing: rows.filter((row) => !row.public_fixture_exists).length,
       rowsWithMissingPublicRelationships: rows.filter((row) => !row.public_relationships_present).length,

@@ -36,6 +36,8 @@ Direct confirmation is treated as `tier_1_official` evidence when captured with 
 
 Start with manual and browser-assisted capture. Automated scanner work should begin with official websites and menu pages. Do not make fully automated Instagram/Facebook scraping part of the first implementation.
 
+Phase 2 automated capture is limited to reviewed `tier_1_official` source-inventory rows with `automation_allowed=true`, no login requirement, no special permission requirement, and active source status. Rows with robots/terms notes require an explicit operator confirmation flag after review. The scraper may write intake evidence rows and local raw artifacts, but it must not create approved deal rows, edit public fixtures, publish to `/tonight`, or treat page text as a finished deal without human review.
+
 ## Attribution
 
 Public deal details should include a source link when possible and a last verified date. Internal records should preserve source tier, source name, captured timestamp, and reviewer notes.

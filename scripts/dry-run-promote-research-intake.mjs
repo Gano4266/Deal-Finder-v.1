@@ -1,87 +1,24 @@
 import fs from "node:fs";
 import path from "node:path";
-import { readCsv, repoRoot, validateIntakeContract, value } from "./research-intake-contract.mjs";
-import {
-  categorizeBlockedRows,
-  destinationFiles,
-  promotionBlockers,
-  publicFixtureMetadataBlockers,
-  publicPromotionRowLabel,
-  todayInWilmington
-} from "./promotion-blockers.mjs";
+import { buildReadinessReport } from "./readiness-report.mjs";
+import { repoRoot } from "./research-intake-contract.mjs";
 
-function loadDealRows(intakeDir) {
-  const dealPath = path.join(intakeDir, "deal-intake.csv");
-  if (!fs.existsSync(dealPath)) {
-    return { rows: [], missingDealIntake: true };
-  }
+const args = process.argv.slice(2);
+const forbiddenWriteFlags = new Set(["--write", "--write-reviewed-fixtures", "--write-fixtures"]);
 
-  return { ...readCsv(dealPath, "deal-intake.csv"), missingDealIntake: false };
+function usage(exitCode = 0) {
+  console.log("Usage: node scripts/dry-run-promote-research-intake.mjs ops/research/intake/[folder-name]");
+  process.exit(exitCode);
 }
 
-function buildDryRun(intakeDir) {
-  const { rows, missingDealIntake } = loadDealRows(intakeDir);
-  const promotable = [];
-  const blocked = [];
-  const today = todayInWilmington();
-
-  rows.forEach((row, index) => {
-    const result = promotionBlockers(row, today);
-    const entry = {
-      row: index + 2,
-      id: publicPromotionRowLabel(row, index),
-      restaurant_id: value(row, "restaurant_id"),
-      deal_title: value(row, "deal_title")
-    };
-
-    if (result.blockers.length === 0) {
-      promotable.push(entry);
-    } else {
-      blocked.push({
-        ...entry,
-        blockers: result.blockers,
-        fields_needed_before_manual_promotion: result.fieldsNeeded
-      });
-    }
-  });
-
-  return {
-    intakeFolder: path.relative(repoRoot, intakeDir),
-    dryRunOnly: true,
-    missingDealIntake,
-    totalRowsScanned: rows.length,
-    theoreticallyPromotableRows: promotable,
-    blockedRows: blocked,
-    destinationFilesThatWouldNeedManualReviewedUpdates: destinationFiles,
-    manualMappingDecisionsRequired: [
-      "Confirm each restaurant row exists or define the reviewed restaurant fixture mapping.",
-      "Map source_id and evidence pointers to reviewed public fixture source, capture, source check, review task, and audit event rows.",
-      "Confirm cross-fixture relationships: candidate, restaurant, source, capture, check, review task, and audit event references.",
-      "Confirm public copy, food-only or approved food-safe copy, dates, recurrence, restrictions, and freshness.",
-      "Assign published_at and ensure hidden_at remains empty only in a separate reviewed promotion task.",
-      "Run the existing fixture validator after any future manual fixture edits."
-    ],
-    note: "Dry run only. This script does not approve rows, promote deals, write fixtures, or hydrate public routes."
-  };
+function rowsWithStatus(report, status) {
+  return report.rows.filter((row) => row.status === status);
 }
 
-function buildPromotionReadiness(report, contract) {
-  const fixtureMetadataOnlyRows = report.blockedRows.filter((row) =>
-    row.blockers.length > 0 && row.blockers.every((blocker) => publicFixtureMetadataBlockers.has(blocker))
+function blockedRows(report) {
+  return report.rows.filter((row) =>
+    row.status !== "already_public_clean" && row.status !== "ready_to_promote"
   );
-
-  const evidenceOrReviewBlockedRows = report.blockedRows.length - fixtureMetadataOnlyRows.length;
-  const safeNextAction = fixtureMetadataOnlyRows.length > 0
-    ? "Prepare reviewed fixture metadata for approved rows, then rerun dry-run before any manual fixture edits."
-    : "Resolve evidence, review, freshness, and public-copy blockers before fixture mapping.";
-
-  return {
-    contractClean: contract.failures.length === 0,
-    contractWarningCount: contract.warnings.length,
-    rowsBlockedOnlyByPublicFixtureMetadata: fixtureMetadataOnlyRows.length,
-    rowsBlockedByEvidenceReviewOrCopy: evidenceOrReviewBlockedRows,
-    safeNextAction
-  };
 }
 
 function printRows(title, rows, formatter) {
@@ -89,79 +26,110 @@ function printRows(title, rows, formatter) {
   rows.forEach((row) => console.log(`- ${formatter(row)}`));
 }
 
-function printRowIds(title, rows) {
-  console.log(`- ${title}: ${rows.length}${rows.length > 0 ? ` (${rows.map((row) => row.id).join(", ")})` : ""}`);
+function nextCommand(report) {
+  const readyRows = rowsWithStatus(report, "ready_to_promote");
+  if (readyRows.length === 0) {
+    return report.nextAction;
+  }
+
+  const dealArgs = readyRows
+    .map((row) => row.deal_id)
+    .filter(Boolean)
+    .map((dealId) => `--deal ${dealId}`)
+    .join(" ");
+
+  return `npm run ops -- promote:apply ${report.intakeFolder} ${dealArgs} --dry-run`;
 }
 
-function printDryRun(report) {
-  console.log(`Research intake promotion dry run: ${report.intakeFolder}`);
+function printPlan(report) {
+  console.log(`Research intake promotion plan: ${report.intakeFolder}`);
   console.log("Dry run only. No fixture edits, approvals, promotions, scraping, or API calls.");
 
-  if (report.missingDealIntake) {
-    console.log("\nMissing optional file: deal-intake.csv");
+  if (!report.ok) {
+    console.log("\nContract failures");
+    report.contract.failures.forEach((failure) => console.log(`- ${failure}`));
+    console.log(`\nNext action: ${report.nextAction}`);
+    return;
   }
 
-  console.log(`\nTotal rows scanned: ${report.totalRowsScanned}`);
-
-  if (report.promotionReadiness) {
-    console.log("\nPromotion readiness");
-    console.log(`- Contract clean: ${report.promotionReadiness.contractClean ? "yes" : "no"}`);
-    console.log(`- Contract warnings: ${report.promotionReadiness.contractWarningCount}`);
-    console.log(`- Rows blocked only by public fixture metadata: ${report.promotionReadiness.rowsBlockedOnlyByPublicFixtureMetadata}`);
-    console.log(`- Rows blocked by evidence/review/copy: ${report.promotionReadiness.rowsBlockedByEvidenceReviewOrCopy}`);
-    console.log(`- Safe next action: ${report.promotionReadiness.safeNextAction}`);
+  if (report.contract.warnings.length > 0) {
+    console.log("\nContract warnings");
+    report.contract.warnings.forEach((warning) => console.log(`- ${warning}`));
   }
 
-  if (report.blockerGroups) {
-    console.log("\nBlocked row groups");
-    printRowIds("metadata-only", report.blockerGroups.metadataOnly);
-    printRowIds("evidence/review/copy", report.blockerGroups.evidenceReviewOrCopy);
-    printRowIds("service-mode", report.blockerGroups.serviceMode);
-    printRowIds("scope", report.blockerGroups.scope);
-    printRowIds("AI evidence", report.blockerGroups.aiEvidence);
+  console.log("\nPromotion readiness");
+  console.log(`- Total rows scanned: ${report.summary.totalRows}`);
+  console.log(`- Already public / fixture-clean: ${report.summary.alreadyPublicClean}`);
+  console.log(`- Ready for exact-ID promotion: ${report.summary.readyToPromote}`);
+  console.log(`- Blocked or needs review: ${blockedRows(report).length}`);
+
+  console.log("\nStatuses");
+  Object.entries(report.summary.statuses)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .forEach(([status, count]) => console.log(`- ${status}: ${count}`));
+
+  console.log("\nBlocker categories");
+  if (report.summary.blockerCategories.length === 0) {
+    console.log("- none");
+  } else {
+    report.summary.blockerCategories.forEach((category) => {
+      console.log(`- ${category.category}: ${category.count}`);
+    });
   }
 
   printRows(
-    "Theoretically promotable rows",
-    report.theoreticallyPromotableRows,
-    (row) => `${row.id} (${row.row}) ${row.deal_title || "(untitled)"}`
+    "Already public / fixture-clean",
+    rowsWithStatus(report, "already_public_clean"),
+    (row) => `${row.id} (${row.row}) ${row.deal_title}`
   );
 
   printRows(
-    "Blocked rows",
-    report.blockedRows,
-    (row) => `${row.id} (${row.row}): ${row.blockers.join("; ")}`
+    "Ready for exact-ID promotion",
+    rowsWithStatus(report, "ready_to_promote"),
+    (row) => `${row.id} (${row.row}) ${row.deal_title}`
   );
 
-  if (report.blockedRows.length > 0) {
-    console.log("\nFields still needed before manual promotion");
-    report.blockedRows.forEach((row) => {
-      const needed = row.fields_needed_before_manual_promotion.length > 0
-        ? row.fields_needed_before_manual_promotion.join(", ")
-        : "manual review";
+  printRows(
+    "Blocked or needs review",
+    blockedRows(report),
+    (row) => `${row.id} (${row.row}): ${row.blockers.length > 0 ? row.blockers.join("; ") : row.label}`
+  );
+
+  if (blockedRows(report).length > 0) {
+    console.log("\nFields still needed before promotion");
+    blockedRows(report).forEach((row) => {
+      const needed = row.fieldsNeeded.length > 0 ? row.fieldsNeeded.join(", ") : "manual review";
       console.log(`- ${row.id} (${row.row}): ${needed}`);
     });
   }
 
-  console.log("\nDestination files that would eventually need reviewed manual updates");
-  report.destinationFilesThatWouldNeedManualReviewedUpdates.forEach((file) => console.log(`- ${file}`));
+  console.log("\nDestination files for future reviewed promotion");
+  report.destinationFilesForFuturePromotion.forEach((file) => console.log(`- ${file}`));
 
-  console.log("\nManual mapping decisions required first");
-  report.manualMappingDecisionsRequired.forEach((decision) => console.log(`- ${decision}`));
+  console.log("\nManual decisions still required before any write");
+  [
+    "Confirm each exact deal ID selected for apply.",
+    "Review generated fixture operations before --write-reviewed-fixtures.",
+    "Do not use AI output, third-party chatter, or user notes as source evidence.",
+    "Run npm run verify after any successful fixture write."
+  ].forEach((decision) => console.log(`- ${decision}`));
+
+  console.log(`\nSuggested next command: ${nextCommand(report)}`);
 }
 
-const intakeArg = process.argv[2];
-const forbiddenWriteFlags = new Set(["--write", "--write-reviewed-fixtures", "--write-fixtures"]);
+const forbiddenWriteFlag = args.find((arg) => forbiddenWriteFlags.has(arg));
+if (forbiddenWriteFlag) {
+  console.error(`${forbiddenWriteFlag} is not implemented. This promotion plan is dry-run-only.`);
+  process.exit(1);
+}
+
+const intakeArg = args.find((arg) => !arg.startsWith("--"));
+if (args.includes("--help") || args.includes("-h")) {
+  usage(0);
+}
 
 if (!intakeArg) {
-  console.error("Usage: node scripts/dry-run-promote-research-intake.mjs ops/research/intake/[folder-name]");
-  process.exit(1);
-}
-
-const forbiddenWriteFlag = process.argv.find((arg) => forbiddenWriteFlags.has(arg));
-if (forbiddenWriteFlag) {
-  console.error(`${forbiddenWriteFlag} is not implemented. This promotion guard is dry-run-only.`);
-  process.exit(1);
+  usage(1);
 }
 
 const intakeDir = path.resolve(process.cwd(), intakeArg);
@@ -170,22 +138,16 @@ if (!fs.existsSync(intakeDir) || !fs.statSync(intakeDir).isDirectory()) {
   process.exit(1);
 }
 
-const contract = validateIntakeContract(intakeDir);
-if (contract.failures.length > 0) {
-  console.error(`Research intake contract failed for ${contract.relativePath}:`);
-  contract.failures.forEach((failure) => console.error(`- ${failure}`));
-  process.exit(1);
-}
-
 let report;
-
 try {
-  report = buildDryRun(intakeDir);
-  report.promotionReadiness = buildPromotionReadiness(report, contract);
-  report.blockerGroups = categorizeBlockedRows(report.blockedRows);
+  report = buildReadinessReport(intakeDir);
 } catch (error) {
-  console.error(`Research intake dry run failed: ${error.message}`);
+  console.error(`Research intake promotion plan failed: ${error.message}`);
   process.exit(1);
 }
 
-printDryRun(report);
+printPlan(report);
+
+if (!report.ok) {
+  process.exit(1);
+}

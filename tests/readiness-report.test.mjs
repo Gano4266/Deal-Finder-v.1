@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import path from "node:path";
 import test from "node:test";
 import { buildReadinessReport } from "../scripts/readiness-report.mjs";
@@ -26,4 +27,20 @@ test("June 3 review-only intake rows remain blocked instead of promotable", () =
   assert.equal(report.summary.readyToPromote, 0);
   assert.equal(report.summary.blockedRows, 34);
   assert.equal(report.summary.statuses.already_public_clean ?? 0, 0);
+});
+
+test("dry-run promotion plan uses readiness status for already-public rows", () => {
+  const result = spawnSync(
+    "npm",
+    ["run", "research:dry-run", "--", "ops/research/intake/wilmington-2026-06-13"],
+    {
+      cwd: repoRoot,
+      encoding: "utf8",
+      shell: false
+    }
+  );
+
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /Already public \/ fixture-clean: 28/);
+  assert.doesNotMatch(result.stdout, /Rows blocked only by public fixture metadata: 28/);
 });

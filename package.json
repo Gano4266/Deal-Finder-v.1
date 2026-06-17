@@ -8,6 +8,9 @@
     "test:promotion": "node --test tests/promotion-blockers.test.mjs",
     "test:admin-guard": "node --test tests/admin-guard.test.mjs",
     "test:readiness": "node --test tests/readiness-report.test.mjs",
+    "test:scrape": "node --test tests/scrape-official-sources.test.mjs",
+    "test:promote-apply": "node --test tests/promote-reviewed-fixtures.test.mjs",
+    "test:intake-new": "node --test tests/scaffold-intake-packet.test.mjs",
     "validate:data": "cd app && npm run validate:data",
     "typecheck": "cd app && npm run typecheck",
     "lint": "cd app && npm run lint",
@@ -18,7 +21,10 @@
     "research:dry-run": "node scripts/dry-run-promote-research-intake.mjs",
     "research:promotion-packet": "node scripts/prepare-fixture-promotion-packet.mjs",
     "research:readiness": "node scripts/readiness-report.mjs",
-    "research:flow": "node scripts/research-flow.mjs"
+    "research:flow": "node scripts/research-flow.mjs",
+    "research:intake-new": "node scripts/scaffold-intake-packet.mjs",
+    "research:scrape": "node scripts/scrape-official-sources.mjs",
+    "research:promote-apply": "node scripts/promote-reviewed-fixtures.mjs"
   },
   "dependencies": {
     "next": "16.2.7",
