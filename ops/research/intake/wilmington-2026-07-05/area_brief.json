@@ -1,0 +1,7 @@
+{
+  "area_name": "Wilmington Discovery Loop Intake (2026-07-05)",
+  "research_mode": "gpt_discovery_loop_plus_intake_conversion",
+  "market_scope": "Wilmington broad scope (includes Carolina Beach)",
+  "checked_at": "2026-07-05",
+  "notes": "28 new restaurant/deal candidates found via a 6-pass GPT discovery loop (stopped clean on a zero-result pass), then converted to deal-intake schema by a separate GPT worker. All rows are workflow_status=needs_review, none publish-eligible. dine_in/takeout/delivery service-mode flags were deliberately left blank by the conversion worker where the source evidence did not state them - see deal-intake.csv warnings from `npm run research:validate`. Companion files (restaurant-source-list, source-inventory, source-captures, review-tasks) were auto-derived from deal-intake.csv's own columns, not independently re-researched."
+}

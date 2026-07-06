@@ -86,3 +86,24 @@ Reason: Carryout place rows in `ops/seeds/wilmington-carryout-places.csv` are op
 Decision: Use Forkcast as the product name and lock the brand direction around "Today's forecast."
 
 Reason: Forkcast gives the product a stronger, more memorable frame than Deal Finder. It supports a local dining intelligence position instead of a generic coupon or listing-app position. The exact production logo vector remains provisional until the Signal F mark is tested at app-icon sizes.
+
+## 2026-07-05: Dallas/LA/NYC Scaffolds and Hermes Ranking Bias — Noted, Not Fixed
+
+Decision: `ops/research/intake/dallas-tx-2026-07-03/`, `los-angeles-2026-07-03/`, and
+`new-york-2026-07-03/` remain in the repo as empty scaffolds (zero data rows). No
+code change is made to `scripts/hermes-auto-run-v2.mjs` at this time.
+
+Reason: These three markets are not authorized per the Market Scope section of
+`CLAUDE.md` — only Wilmington (plus Carolina Beach) and the Southport Phase A
+shell are in scope. The scaffolds themselves currently pose no live risk since
+`hermes-auto-run-v2.mjs`'s `listCandidates()` filters out any candidate with
+`rowCount === 0`, which excludes all three today.
+
+Flag for future attention: `hermes-auto-run-v2.mjs` hardcodes
+`const marketPrefixes = ["los-angeles", "new-york", "dallas"]` and ranks intake
+folders by this order when candidates do have rows, and the script's own
+`ops/hermes/state.md` explicitly recommends preferring these three markets. If
+any of these folders ever gain real data rows, this ranking would actively favor
+out-of-scope markets over Wilmington. This is a real latent compliance risk, not
+resolved by this entry — revisit before Hermes automation is run unattended, or
+before any of these three folders are populated with real intake data.
