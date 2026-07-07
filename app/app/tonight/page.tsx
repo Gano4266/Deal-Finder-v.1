@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { PublicDealCard } from "../public-deal-card";
 import { SearchForm } from "../search-form";
+import { TodayLocationClient } from "../today-location-client";
 import {
   type PublicDeal,
   getPublicDeals,
@@ -19,6 +20,7 @@ import {
 } from "../../lib/meal-filter";
 import { firstDollarPriceValue } from "../../lib/price-filter";
 import { matchesSearchQuery, normalizeSearchQuery } from "../../lib/public-search";
+import { sortDealsForSelectedArea } from "../../lib/today-location";
 
 export const dynamic = "force-dynamic";
 
@@ -200,33 +202,6 @@ function matchesDealSearch(deal: PublicDeal, query: string): boolean {
   ], query);
 }
 
-const areaNeighbors: Record<string, string[]> = {
-  Downtown: ["South Front", "College Rd / UNCW"],
-  "South Front": ["Downtown", "College Rd / UNCW", "South Wilmington"],
-  "College Rd / UNCW": ["South Front", "Mayfaire/Ogden", "Monkey Junction", "Downtown"],
-  "Mayfaire/Ogden": ["College Rd / UNCW", "Other Wilmington"],
-  "Monkey Junction": ["South Wilmington", "Carolina Beach", "College Rd / UNCW"],
-  "South Wilmington": ["Monkey Junction", "South Front", "Other Wilmington"],
-  "Carolina Beach": ["Monkey Junction", "South Wilmington"],
-  "Other Wilmington": ["Mayfaire/Ogden", "College Rd / UNCW", "South Wilmington"]
-};
-
-function areaFocusRank(deal: PublicDeal, selectedArea: string): number {
-  if (selectedArea === "All") {
-    return 0;
-  }
-
-  if (deal.areaGroup === selectedArea) {
-    return 0;
-  }
-
-  if (areaNeighbors[selectedArea]?.includes(deal.areaGroup)) {
-    return 1;
-  }
-
-  return 2;
-}
-
 export default async function TonightPage({ searchParams }: TonightPageProps) {
   const params = await searchParams;
   const selectedSearchQuery = normalizeSearchQuery(params?.q);
@@ -247,12 +222,7 @@ export default async function TonightPage({ searchParams }: TonightPageProps) {
   const areaOptions = ["All", ...summarizePublicDealsByArea(quickFilteredDeals).map(({ area }) => area)];
   const selectedArea = areaOptions.includes(params?.area ?? "All") ? params?.area ?? "All" : "All";
   const visibleDeals = quickFilteredDeals;
-  const sortedDeals = [...visibleDeals].sort(
-    (left, right) =>
-      areaFocusRank(left, selectedArea) - areaFocusRank(right, selectedArea) ||
-      left.areaGroup.localeCompare(right.areaGroup) ||
-      left.restaurantName.localeCompare(right.restaurantName)
-  );
+  const sortedDeals = sortDealsForSelectedArea(visibleDeals, selectedArea);
   const singleDayDeals = sortedDeals.filter((deal) => deal.scheduleKind === "single_day");
   const recurringDeals = sortedDeals.filter((deal) => deal.scheduleKind === "recurring");
   const dayAreaCounts = new Map(summarizePublicDealsByArea(quickFilteredDeals).map((item) => [item.area, item.count]));
@@ -371,6 +341,14 @@ export default async function TonightPage({ searchParams }: TonightPageProps) {
         </div>
       </section>
 
+      <TodayLocationClient
+        selectedArea={selectedArea}
+        areaOptions={areaOptions}
+        selectedMeal={selectedMealFilter}
+        selectedQuick={selectedQuickFilter}
+        selectedSearchQuery={selectedSearchQuery}
+      />
+
       <section className="filterDock tonightFilterDock" aria-label="Search and filters for today">
         <SearchForm
           action="/tonight"
@@ -460,7 +438,7 @@ export default async function TonightPage({ searchParams }: TonightPageProps) {
               </div>
             </div>
             {singleDayDeals.map((deal) => (
-              <PublicDealCard key={deal.dealId} deal={deal} />
+              <PublicDealCard key={deal.dealId} deal={deal} selectedArea={selectedArea} />
             ))}
           </section>
 
@@ -474,7 +452,7 @@ export default async function TonightPage({ searchParams }: TonightPageProps) {
               </div>
               <div className="dealList compactSecondaryList">
                 {recurringDeals.map((deal) => (
-                  <PublicDealCard key={deal.dealId} deal={deal} variant="secondary" />
+                  <PublicDealCard key={deal.dealId} deal={deal} selectedArea={selectedArea} variant="secondary" />
                 ))}
               </div>
             </section>

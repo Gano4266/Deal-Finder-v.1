@@ -3,11 +3,13 @@ import type { Route } from "next";
 import type { PublicDeal } from "../lib/data";
 import { displayDescription, displayRestaurantName } from "./public-copy";
 import { QuickConfirmButton } from "./quick-confirm-button";
+import { getDealDistanceLabel } from "../lib/today-location";
 
 type PublicDealCardProps = {
   deal: PublicDeal;
   confirmContextPath?: string;
   detailHref?: Route | null;
+  selectedArea?: string;
   variant?: "standard" | "compact" | "secondary";
 };
 
@@ -27,6 +29,7 @@ export function PublicDealCard({
   deal,
   confirmContextPath,
   detailHref,
+  selectedArea,
   variant = "standard"
 }: PublicDealCardProps) {
   const isCompact = variant !== "standard";
@@ -36,6 +39,7 @@ export function PublicDealCard({
   const description = displayDescription(deal.publicDescription);
   const restaurantName = displayRestaurantName(deal.restaurantName);
   const contextValue = isCompact ? deal.scheduleLabel : deal.area || deal.areaGroup;
+  const distanceLabel = getDealDistanceLabel(deal, selectedArea);
   const className = [
     "dealCard",
     isCompact ? "compactDealCard" : "",
@@ -60,6 +64,7 @@ export function PublicDealCard({
           <span>{deal.price || "See details"}</span>
           <span>{timeLabel(deal)}</span>
           <span>{contextValue}</span>
+          {distanceLabel ? <span className="distanceBadge">{distanceLabel}</span> : null}
         </div>
         <p className="dealTrustLine">
           <a href={deal.sourceUrl} className="sourceLink">
