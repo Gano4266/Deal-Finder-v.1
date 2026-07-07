@@ -19,9 +19,9 @@ export function QuickConfirmButton({
 }: QuickConfirmButtonProps) {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const statusMessage = status === "error"
-    ? "Could not park this check."
+    ? "Couldn't send that — try again."
     : status === "sent"
-      ? "Checked date updates after review."
+      ? "Thanks — we'll double-check and update soon."
       : "";
 
   async function confirmDeal() {
@@ -58,7 +58,7 @@ export function QuickConfirmButton({
   return (
     <span className="quickConfirm">
       <button type="button" className="secondaryLink" onClick={confirmDeal} disabled={status === "sending"}>
-        {status === "sending" ? "Parking..." : status === "sent" ? "Parked for review" : "I checked this"}
+        {status === "sending" ? "Sending…" : status === "sent" ? "Got it, thanks!" : "Still accurate?"}
       </button>
       {statusMessage ? (
         <span aria-live="polite" className={status === "error" ? "errorMessage" : "successMessage"}>
