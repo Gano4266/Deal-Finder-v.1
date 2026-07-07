@@ -64,8 +64,8 @@ a {
 }
 
 .appHeader {
-  position: sticky;
-  top: 0;
+  position: relative;
+  top: auto;
   z-index: 10;
   display: flex;
   align-items: center;
@@ -528,8 +528,8 @@ a {
 }
 
 .filterDock {
-  position: sticky;
-  top: var(--app-header-offset);
+  position: relative;
+  top: auto;
   z-index: 6;
   display: grid;
   grid-template-columns: minmax(260px, 0.78fr) minmax(0, 1fr) minmax(240px, 0.72fr);
@@ -804,7 +804,7 @@ a {
 }
 
 .dealCard {
-  grid-template-columns: minmax(0, 1.14fr) minmax(190px, 0.34fr) minmax(210px, 0.36fr);
+  grid-template-columns: minmax(0, 1fr) minmax(190px, 0.32fr);
   gap: 18px;
   align-items: stretch;
   padding: 0;
@@ -1214,7 +1214,7 @@ a {
 }
 
 .compactDealCard {
-  grid-template-columns: minmax(0, 1.14fr) minmax(190px, 0.34fr) minmax(210px, 0.36fr);
+  grid-template-columns: minmax(0, 1fr) minmax(190px, 0.32fr);
   align-items: stretch;
 }
 
@@ -2063,5 +2063,238 @@ a {
 @media (prefers-reduced-motion: reduce) {
   .filterDock {
     transition: none;
+  }
+}
+
+/* Today gates 1-5: consumer card hierarchy, intent chips, area-aware/location controls. */
+.dealCardMetaBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.dealCardMetaBar span {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(155, 190, 193, 0.5);
+  border-radius: 999px;
+  padding: 0 10px;
+  color: var(--brand-strong, var(--forest));
+  background: rgba(238, 246, 244, 0.72);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.dealTrustLine {
+  margin: 10px 0 0;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.dealTrustLine .sourceLink {
+  color: var(--brand, var(--accent));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.dealDetailsLink,
+.dealReportLink {
+  min-width: 112px;
+}
+
+.distanceBadge {
+  border-color: rgba(35, 119, 173, 0.32) !important;
+  background: rgba(35, 119, 173, 0.1) !important;
+}
+
+.todayFocusPanel {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.36fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid rgba(155, 190, 193, 0.54);
+  border-radius: 8px;
+  background: rgba(255, 253, 248, 0.94);
+  box-shadow: var(--shadow-soft);
+}
+
+.todayFocusCopy h2 {
+  margin: 0;
+  color: var(--forest);
+  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+  line-height: 1.2;
+}
+
+.todayFocusCopy p:last-child {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.todayFocusControls {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.intentChipNav,
+.areaChipNav,
+.areaQuickChips {
+  display: flex;
+  gap: 8px;
+  max-width: 100%;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.intentChipNav::-webkit-scrollbar,
+.areaChipNav::-webkit-scrollbar,
+.areaQuickChips::-webkit-scrollbar {
+  display: none;
+}
+
+.intentChipNav a,
+.areaChipNav a,
+.areaQuickChips a {
+  min-height: 40px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(155, 190, 193, 0.58);
+  border-radius: 999px;
+  padding: 0 13px;
+  color: var(--forest);
+  background: var(--surface);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.intentChipNav a.active,
+.areaChipNav a.active,
+.areaQuickChips a.active {
+  color: #fffdf8;
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.intentChipNav strong,
+.areaChipNav strong {
+  min-width: 21px;
+  min-height: 21px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  padding: 0 6px;
+  color: var(--forest);
+  background: rgba(255, 253, 248, 0.86);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.areaChipNav a,
+.areaQuickChips a {
+  min-height: 34px;
+  font-size: 0.82rem;
+}
+
+.todayLocationPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px 18px;
+  align-items: center;
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid rgba(155, 190, 193, 0.58);
+  border-radius: 8px;
+  background: rgba(255, 253, 248, 0.96);
+  box-shadow: var(--shadow-soft);
+}
+
+.todayLocationCopy {
+  min-width: 0;
+}
+
+.todayLocationCopy h2 {
+  margin: 0;
+  color: var(--forest);
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  line-height: 1.2;
+}
+
+.todayLocationCopy p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.privacyNote {
+  font-size: 0.88rem;
+}
+
+.locationStatus {
+  display: inline-flex;
+  margin-top: 10px !important;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-weight: 700;
+}
+
+.locationStatus.success {
+  color: var(--success-text, #1c5f3d);
+  background: rgba(223, 242, 233, 0.86);
+}
+
+.locationStatus.denied,
+.locationStatus.unsupported {
+  color: var(--urgent-text);
+  background: rgba(251, 232, 230, 0.86);
+}
+
+.todayLocationActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.todayLocationActions > * {
+  min-height: 42px;
+}
+
+.nearMeButton {
+  cursor: pointer;
+  font: inherit;
+}
+
+@media (max-width: 760px) {
+  .todayFocusPanel,
+  .todayLocationPanel {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 12px;
+  }
+
+  .todayLocationActions {
+    justify-content: stretch;
+  }
+
+  .todayLocationActions > * {
+    flex: 1 1 145px;
+  }
+
+  .intentChipNav a,
+  .areaChipNav a,
+  .areaQuickChips a {
+    min-height: 38px;
   }
 }
