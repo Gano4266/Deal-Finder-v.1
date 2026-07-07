@@ -1,0 +1,8 @@
+artifact,purpose,path
+restaurant_breadth_batch02_2026-07-06.xlsx,Batch 02 15-distinct-restaurant breadth workbook,/mnt/data/restaurant_breadth_batch02_2026-07-06.xlsx
+developer_handoff_forkcast_coverage_2026-07-06.xlsx,Developer handoff workbook with batch/cumulative review and next actions,/mnt/data/developer_handoff_forkcast_coverage_2026-07-06.xlsx
+developer_handoff_forkcast_coverage_2026-07-06.zip,Complete handoff package for developers / Codex / Claude,/mnt/data/developer_handoff_forkcast_coverage_2026-07-06.zip
+greater_wilmington_specials_matrix_v1.xlsx,Earlier master matrix with 207 restaurants and 570 normalized deal-item rows,/mnt/data/greater_wilmington_specials_matrix_v1.xlsx
+source_capture_prior76_hardened_review_2026-07-06.xlsx,Hardening review of prior row-based source-capture batches,/mnt/data/source_capture_prior76_hardened_review_2026-07-06.xlsx
+source_capture_p1_sprint_2026-07-06.xlsx,P1 screenshot/copy/scope source grouping sprint,/mnt/data/source_capture_p1_sprint_2026-07-06.xlsx
+restaurant_breadth_batch01_2026-07-06.xlsx,First corrected 15-distinct-restaurant breadth batch,/mnt/data/restaurant_breadth_batch01_2026-07-06.xlsx

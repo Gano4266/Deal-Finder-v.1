@@ -1,0 +1,7 @@
+evidence_file,source_url,sha256,captured_at,capture_type
+evidence_text/brents_bistro_official_site.md,https://brentsbistro.com/,sha256:49fb4969707f0588160431470389482ec4cee9fd27df506bf8985bf859fd3548,2026-07-06,text_capture_from_web_tool
+evidence_text/circa_1922_happy_hour_bites_pdf.md,https://static1.squarespace.com/static/68c45e5c5157736767a0e9be/t/68d424829ced873bec34c5f8/1758733442902/Circa+1922+-+Fall+2025+Bar+Menu.pdf,sha256:3b374a2a1f4116d74ae2c672e22f4c6d0b9e67fd5545f8763e57933489060956,2026-07-06,text_capture_from_web_tool
+evidence_text/circa_1922_home_and_pdf.md,https://www.circa1922.com/,sha256:3a9e85b58a2b506092c86235a46435d9c5473f02fe54b65fc64cfc4b7f293961,2026-07-06,text_capture_from_web_tool
+evidence_text/hibachi_bistro_official_site.md,https://hibachibistro.com/,sha256:58f6720c7d7c46a386b3d0ab1faa01ed9582a19ddff0ce48e62e1220a775e269,2026-07-06,text_capture_from_web_tool
+evidence_text/hibachi_to_go_official_site.md,https://www.hibachitogo.com/,sha256:e224f2f21b80c16e78f8d150e44b48dc0307f706b2e4507d8addc1f82405594f,2026-07-06,text_capture_from_web_tool
+evidence_text/junction_421_daily_blue_plate.md,https://junction421.com/dinner-menu/,sha256:b8003d08a7b853b10ebe524061ec41093b8a6ac4df0438e1cc616e3767e28965,2026-07-06,text_capture_from_web_tool

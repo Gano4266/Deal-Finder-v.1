@@ -1,0 +1,12 @@
+restaurant,signal,category,bucket,source_url,status,next_action
+Vicious Biscuit — Wilmington,Free biscuit Monday-Friday when dining in through rewards app,Rewards / Breakfast,B_source_backed_needs_capture,https://viciousbiscuit.com/,needs screenshot/rewards terms capture,Capture rewards app terms; public copy should state reward membership + dine-in restriction.
+Islands Fresh Mex Grill,Before 5 PM taco special: chicken/beef/veggie tacos $1.99,Taco Special,A_source_backed_candidate_after_review,https://www.islandsfreshmexgrill.com/menu,source text confirmed; screenshot needed,Create item-level row with drink-purchase and limit-4 restrictions.
+Islands Fresh Mex Grill,After 5 PM taco special: chicken/beef/veggie tacos $1.00,Taco Special,A_source_backed_candidate_after_review,https://www.islandsfreshmexgrill.com/menu,source text confirmed; screenshot needed,Create item-level row with drink-purchase and limit-4 restrictions.
+The German Cafe,Thursday 50% off wine by the bottle,Alcohol Only / Suppressed,E_suppressed_drink_only,https://www.thegermancafe.com/,suppressed,Do not publish in food feed unless food component appears.
+Little Dipper Fondue,Date Night experience copy,Date Night / Experience,C_experience_lead_not_deal,https://www.littledipperfondue.com/,not a deal yet,Need price/schedule or prix-fixe terms before item expansion.
+The Eagles Dare,Events include food/community,Event Food Lead,C_event_food_lead,https://www.theeaglesdare.com/,not a deal yet,Capture event vendor/menu terms or demote.
+RUMCOW.,Happy-hour food lead,Happy Hour Food Lead,C_manual_social_needed,https://rumcowwilmington.com/,exact terms missing,Manual official social/direct confirmation.
+On Thyme Restaurant,Happy-hour food lead,Happy Hour Food Lead,C_manual_social_needed,https://www.oohyougotthyme.com/,official site blocked/fetch failed,Manual official social/direct confirmation.
+Bluewater Waterfront Grill,Sunday brunch 10am-3pm,Brunch Coverage,D_checked_no_offer_found,https://www.bluewaterdining.com/menu,coverage only,Do not itemize as deal.
+Oceanic at Crystal Pier,Sunday brunch 10am-3pm,Brunch Coverage,D_checked_no_offer_found,https://www.oceanicrestaurant.com/our-menu,coverage only,Do not itemize as deal.
+Drift Coffee & Kitchen,Loyalty app / Biscoff Stack availability,Loyalty / Item Lead,C_loyalty_or_item_lead_not_deal,https://driftcoffee.kitchen/,not a deal yet,Keep coverage-only until exact reward/free-food terms appear.

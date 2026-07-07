@@ -1,0 +1,31 @@
+{
+  "package": "forkcast_clean_developer_handoff_2026-07-06",
+  "generated_for": "Forkcast / Deal Finder / Tony Greater Wilmington handoff",
+  "generated_at": "2026-07-06",
+  "audience": [
+    "main developers",
+    "Codex",
+    "Claude"
+  ],
+  "critical_rule": "Process 15 distinct restaurants/concepts per breadth batch; do not process 15 item rows.",
+  "publication_boundary": "Research handoff only; no public-ready rows without source capture, durable evidence, human review, freshness, copy approval, and native Deal Finder readiness.",
+  "primary_entrypoints": {
+    "developer_handoff_workbook": "00_final_handoff/developer_handoff_forkcast_coverage_2026-07-06.xlsx",
+    "master_matrix_workbook": "01_current_master_matrix/greater_wilmington_specials_matrix_v1.xlsx",
+    "master_atlas_workbook": "01_current_master_matrix/greater_wilmington_master_atlas_v1.xlsx",
+    "breadth_batch_01": "02_restaurant_breadth_passes/restaurant_breadth_batch01_2026-07-06.xlsx",
+    "breadth_batch_02": "02_restaurant_breadth_passes/restaurant_breadth_batch02_2026-07-06.xlsx",
+    "hardening_workbook": "04_hardening_and_p1_sprint/source_capture_prior76_hardened_review_2026-07-06.xlsx",
+    "p1_sprint_workbook": "04_hardening_and_p1_sprint/source_capture_p1_sprint_2026-07-06.xlsx"
+  },
+  "headline_counts": {
+    "restaurants_concepts_tracked": 207,
+    "deal_item_rows_normalized": 570,
+    "strong_A_candidates": 54,
+    "B_source_backed_capture_needed": 127,
+    "C_leads_needing_official_confirmation": 169,
+    "happy_hour_rows_preserved": 50,
+    "prior_source_capture_rows_reviewed": 75,
+    "breadth_restaurants_completed": 30
+  }
+}
