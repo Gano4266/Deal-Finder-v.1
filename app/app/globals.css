@@ -1248,6 +1248,73 @@ a {
   color: var(--forest);
 }
 
+/* Deal detail: primary panel carries the decision, proof panel recedes. */
+.dealDetailGrid {
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  align-items: start;
+}
+
+.dealDetailGrid .detailPanel h2 {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  line-height: 1.15;
+}
+
+.dealPrimaryPanel {
+  padding: clamp(20px, 3vw, 28px);
+}
+
+.dealPrimaryPanel .forecastReadDetail {
+  margin-bottom: 16px;
+}
+
+.primaryFactGrid .bigFact dd {
+  font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.detailPrimaryActions {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(201, 217, 215, 0.7);
+}
+
+.dealProofPanel {
+  background: rgba(255, 253, 248, 0.8);
+  box-shadow: none;
+}
+
+.dealProofPanel h2 {
+  font-size: 1.15rem;
+}
+
+.dealProofPanel .factGrid dd {
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.detailSecondaryActions {
+  margin-top: 16px;
+}
+
+.detailSecondaryActions .secondaryLink {
+  min-height: 38px;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  padding: 0 8px;
+  color: var(--brand);
+  font-size: 0.9rem;
+}
+
+.detailSecondaryActions .secondaryLink:hover {
+  transform: none;
+  background: rgba(238, 246, 244, 0.8);
+  box-shadow: none;
+}
+
 .proofCard {
   display: grid;
   gap: 12px;

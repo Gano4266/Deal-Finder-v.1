@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { notFound } from "next/navigation";
 import { getPublicDealById, getRestaurantById } from "../../../lib/data";
+import { ForecastConfidence } from "../../forecast-confidence";
 import { phoneHref } from "../../phone-link";
 import { displayDescription } from "../../public-copy";
 import { QuickConfirmButton } from "../../quick-confirm-button";
@@ -40,15 +41,20 @@ export default async function DealDetailPage({ params }: DealPageProps) {
         </Link>
       </section>
 
-      <section className="detailGrid">
-        <article className="detailPanel">
+      <section className="detailGrid dealDetailGrid">
+        <article className="detailPanel dealPrimaryPanel">
           <h2>Deal details</h2>
-          <dl className="factGrid">
-            <div>
+          <ForecastConfidence
+            lastVerifiedAt={deal.lastVerifiedAt}
+            lastVerifiedLabel={deal.lastVerifiedLabel}
+            variant="detail"
+          />
+          <dl className="factGrid primaryFactGrid">
+            <div className="bigFact">
               <dt>Price</dt>
               <dd>{deal.price || "See details"}</dd>
             </div>
-            <div>
+            <div className="bigFact">
               <dt>Time</dt>
               <dd>{deal.timeWindow}</dd>
             </div>
@@ -74,9 +80,29 @@ export default async function DealDetailPage({ params }: DealPageProps) {
           <p className="notes">
             {deal.restrictionNotes || "Check the restaurant source for any extra restrictions."}
           </p>
+          <div className="cardActions detailPrimaryActions">
+            <a href={deal.sourceUrl} className="primaryLink">
+              Check official details
+            </a>
+            <QuickConfirmButton
+              contextPath={`/deals/${deal.dealId}`}
+              dealId={deal.dealId}
+              dealTitle={deal.publicTitle}
+              restaurantId={deal.restaurantId}
+              restaurantName={deal.restaurantName}
+            />
+            {restaurantPhoneHref ? (
+              <a href={restaurantPhoneHref} className="secondaryLink">
+                Call restaurant
+              </a>
+            ) : null}
+            <Link href={`/restaurants/${deal.restaurantId}` as Route} className="secondaryLink">
+              View restaurant
+            </Link>
+          </div>
         </article>
 
-        <article className="detailPanel">
+        <article className="detailPanel dealProofPanel">
           <h2>Official details</h2>
           <dl className="factGrid">
             <div>
@@ -130,25 +156,7 @@ export default async function DealDetailPage({ params }: DealPageProps) {
             </p>
           </section>
 
-          <div className="cardActions">
-            <a href={deal.sourceUrl} className="primaryLink">
-              Check official details
-            </a>
-            <Link href={`/restaurants/${deal.restaurantId}` as Route} className="secondaryLink">
-              View restaurant
-            </Link>
-            {restaurantPhoneHref ? (
-              <a href={restaurantPhoneHref} className="secondaryLink">
-                Call restaurant
-              </a>
-            ) : null}
-            <QuickConfirmButton
-              contextPath={`/deals/${deal.dealId}`}
-              dealId={deal.dealId}
-              dealTitle={deal.publicTitle}
-              restaurantId={deal.restaurantId}
-              restaurantName={deal.restaurantName}
-            />
+          <div className="cardActions detailSecondaryActions">
             <Link href={`/report?dealId=${deal.dealId}` as Route} className="secondaryLink">
               Report an issue
             </Link>
