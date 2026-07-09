@@ -132,8 +132,7 @@ a {
 
 .topNav a,
 .primaryLink,
-.secondaryLink,
-.sourceLink {
+.secondaryLink {
   min-height: 44px;
   display: inline-flex;
   align-items: center;
@@ -172,8 +171,7 @@ a {
   box-shadow: var(--shadow-tight);
 }
 
-.primaryLink,
-.sourceLink {
+.primaryLink {
   color: #fff;
   background: var(--brand-strong);
   border: 1px solid var(--brand-strong);
@@ -186,8 +184,7 @@ a {
 
 .topNav a:hover,
 .primaryLink:hover,
-.secondaryLink:hover,
-.sourceLink:hover {
+.secondaryLink:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-tight);
 }
@@ -206,7 +203,6 @@ a {
 .topNav a:active,
 .primaryLink:active,
 .secondaryLink:active,
-.sourceLink:active,
 .primaryContentNav a:active,
 .segmentedNav a:active,
 .dayCoverage a:active {
@@ -808,11 +804,9 @@ a {
   gap: 18px;
   align-items: stretch;
   padding: 0;
-  border-left: 7px solid var(--accent);
 }
 
 .dealMain,
-.dealMetricGrid,
 .dealActionRail {
   padding: 18px 0;
 }
@@ -822,22 +816,13 @@ a {
   padding-left: 18px;
 }
 
-.dealMetricGrid {
-  align-content: center;
-}
-
 .dealActionRail {
   align-content: center;
   padding-right: 18px;
 }
 
-.secondaryDealCard {
-  border-left-color: rgba(35, 119, 173, 0.72);
-}
-
 .dealCard:has(.dealCardPrimaryLink:hover) {
   border-color: rgba(35, 119, 173, 0.42);
-  border-left-color: var(--gold);
   box-shadow: var(--shadow);
 }
 
@@ -856,7 +841,6 @@ a {
   grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
 }
 
-.dealCard h2,
 .candidateCard h2,
 .restaurantCard h2,
 .restaurantCard h3 {
@@ -867,16 +851,26 @@ a {
   letter-spacing: 0;
 }
 
+.dealCard h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.22rem, 2.4vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.16;
+  letter-spacing: 0;
+}
+
 .restaurantLine {
   display: flex;
   flex-wrap: wrap;
   gap: 7px;
   align-items: center;
   margin: 0 0 8px;
-  color: var(--brand);
-  font-size: 0.78rem;
-  font-weight: 820;
-  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -1352,7 +1346,10 @@ a {
 
 .sectionTitleRow h2 {
   margin: 0;
-  color: var(--forest);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+  line-height: 1.15;
 }
 
 .countPill {
@@ -1962,17 +1959,11 @@ a {
     gap: 0;
     padding: 0;
     border-left: 1px solid rgba(155, 190, 193, 0.46);
-    border-top: 6px solid var(--accent);
-  }
-
-  .secondaryDealCard {
-    border-top-color: rgba(35, 119, 173, 0.72);
   }
 
   .dealMain,
-  .dealMetricGrid,
   .dealActionRail {
-    padding: 10px 14px;
+    padding: 12px 16px;
   }
 
   .dealCopy {
@@ -1985,31 +1976,6 @@ a {
 
   .dealCard .locationLine {
     display: none;
-  }
-
-  .dealMetricGrid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    padding-top: 0;
-  }
-
-  .dealMetricGrid div {
-    flex: 1 1 118px;
-    min-height: 0;
-    padding: 7px 9px;
-    border: 1px solid rgba(155, 190, 193, 0.42);
-    border-radius: 7px;
-    background: rgba(238, 246, 244, 0.58);
-  }
-
-  .dealMetricGrid dt {
-    font-size: 0.66rem;
-  }
-
-  .dealMetricGrid dd {
-    margin-top: 3px;
-    font-size: 0.92rem;
   }
 
   .dealActionRail {
@@ -2066,47 +2032,172 @@ a {
   }
 }
 
-/* Today gates 1-5: consumer card hierarchy, intent chips, area-aware/location controls. */
-.dealCardMetaBar {
+/* UI overhaul v1: one loud element per card, quiet metadata, forecast-confidence signal. */
+.dealMetaLine {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 4px 8px;
+  align-items: baseline;
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  font-weight: 650;
+}
+
+.dealMetaLine strong {
+  color: var(--ink);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.dealMetaLine [aria-hidden="true"] {
+  color: rgba(82, 100, 107, 0.5);
+}
+
+.distanceNote {
+  color: var(--brand);
+  font-weight: 720;
+}
+
+.dealSignal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: center;
   margin-top: 12px;
 }
 
-.dealCardMetaBar span {
-  min-height: 32px;
+.forecastRead {
   display: inline-flex;
   align-items: center;
+  gap: 7px;
+  min-height: 28px;
   border: 1px solid rgba(155, 190, 193, 0.5);
   border-radius: 999px;
-  padding: 0 10px;
-  color: var(--brand-strong, var(--forest));
+  padding: 3px 11px;
+  color: var(--brand-strong);
   background: rgba(238, 246, 244, 0.72);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.forecast-high {
+  border-color: rgba(213, 161, 58, 0.5);
+  color: #6b4e0c;
+  background: rgba(213, 161, 58, 0.16);
+}
+
+.forecast-low,
+.forecast-unknown {
+  border-style: dashed;
+  border-color: rgba(155, 190, 193, 0.66);
+  color: var(--muted);
+  background: transparent;
+}
+
+.forecastBars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+  flex: 0 0 auto;
+}
+
+.forecastBars i {
+  width: 3px;
+  height: 5px;
+  border-radius: 2px;
+  background: rgba(15, 42, 61, 0.14);
+}
+
+.forecastBars i:nth-child(2) {
+  height: 8px;
+}
+
+.forecastBars i:nth-child(3) {
+  height: 12px;
+}
+
+.forecastBars i.filled {
+  background: var(--gold);
+}
+
+.forecast-low .forecastBars i.filled,
+.forecast-unknown .forecastBars i.filled {
+  background: rgba(82, 100, 107, 0.72);
+}
+
+.forecastReadDetail {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  min-height: 0;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.forecastReadDetail .forecastChipRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.forecastReadDetail strong {
+  font-size: 0.98rem;
+}
+
+.forecastReadDetail p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.sourceLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  color: var(--brand);
   font-size: 0.84rem;
-  font-weight: 700;
-}
-
-.dealTrustLine {
-  margin: 10px 0 0;
-  font-size: 0.86rem;
-  font-weight: 700;
-}
-
-.dealTrustLine .sourceLink {
-  color: var(--brand, var(--accent));
+  font-weight: 750;
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration-color: rgba(35, 119, 173, 0.38);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 150ms ease;
 }
 
-.dealDetailsLink,
-.dealReportLink {
+.sourceLink:hover {
+  text-decoration-color: currentColor;
+}
+
+.sourceLink:focus-visible {
+  border-radius: 4px;
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.dealDetailsLink {
   min-width: 112px;
 }
 
-.distanceBadge {
-  border-color: rgba(35, 119, 173, 0.32) !important;
-  background: rgba(35, 119, 173, 0.1) !important;
+.dealActionRail .secondaryLink {
+  min-height: 38px;
+  justify-content: flex-start;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  padding: 0 8px;
+  color: var(--brand);
+  font-size: 0.9rem;
+}
+
+.dealActionRail .secondaryLink:hover {
+  transform: none;
+  background: rgba(238, 246, 244, 0.8);
+  box-shadow: none;
 }
 
 .todayFocusPanel {
