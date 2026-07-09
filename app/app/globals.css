@@ -841,12 +841,20 @@ a {
   grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
 }
 
-.candidateCard h2,
-.restaurantCard h2,
-.restaurantCard h3 {
+.candidateCard h2 {
   margin: 0;
   color: var(--forest);
   font-size: 1.3rem;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.restaurantCard h2,
+.restaurantCard h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.22rem;
+  font-weight: 800;
   line-height: 1.2;
   letter-spacing: 0;
 }
@@ -1245,20 +1253,16 @@ a {
 
 .detailPanel h2 {
   margin: 0 0 16px;
-  color: var(--forest);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  line-height: 1.15;
 }
 
 /* Deal detail: primary panel carries the decision, proof panel recedes. */
 .dealDetailGrid {
   grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
   align-items: start;
-}
-
-.dealDetailGrid .detailPanel h2 {
-  color: var(--ink);
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  line-height: 1.15;
 }
 
 .dealPrimaryPanel {
