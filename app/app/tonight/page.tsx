@@ -293,62 +293,6 @@ export default async function TonightPage({ searchParams }: TonightPageProps) {
         ))}
       </nav>
 
-      <section className="todayFocusPanel" aria-label="Today view controls">
-        <div className="todayFocusCopy">
-          <p className="eyebrow">Today mode</p>
-          <h2>{selectedArea === "All" ? "All Wilmington" : `${selectedArea} first`}</h2>
-          <p>
-            {selectedArea === "All"
-              ? "Choose an intent or area to make the feed more useful."
-              : "This is area-aware sorting without using your exact location."}
-          </p>
-        </div>
-        <div className="todayFocusControls">
-          <nav className="intentChipNav" aria-label="Quick today filters">
-            <Link
-              href={queryFor({ area: selectedArea, meal: "all", q: selectedSearchQuery, quick: "all" }) as Route}
-              className={selectedMealFilter === "all" && selectedQuickFilter === "all" ? "active" : ""}
-              aria-current={selectedMealFilter === "all" && selectedQuickFilter === "all" ? "page" : undefined}
-            >
-              <span>All today</span>
-              <strong>{searchFilteredDeals.length}</strong>
-            </Link>
-            {intentChips.map((chip) => (
-              <Link
-                key={`${chip.kind}-${chip.value}`}
-                href={hrefForIntentChip(chip) as Route}
-                className={isIntentChipActive(chip) ? "active" : ""}
-                aria-current={isIntentChipActive(chip) ? "page" : undefined}
-              >
-                <span>{chip.label}</span>
-                <strong>{countForIntentChip(chip)}</strong>
-              </Link>
-            ))}
-          </nav>
-          <nav className="areaChipNav" aria-label="Prioritize today's deals by area">
-            {areaOptions.map((area) => (
-              <Link
-                key={area}
-                href={queryFor({ area, meal: selectedMealFilter, q: selectedSearchQuery, quick: selectedQuickFilter }) as Route}
-                className={area === selectedArea ? "active" : ""}
-                aria-current={area === selectedArea ? "page" : undefined}
-              >
-                <span>{area === "All" ? "All Wilmington" : area}</span>
-                <strong>{countForArea(area)}</strong>
-              </Link>
-            ))}
-          </nav>
-        </div>
-      </section>
-
-      <TodayLocationClient
-        selectedArea={selectedArea}
-        areaOptions={areaOptions}
-        selectedMeal={selectedMealFilter}
-        selectedQuick={selectedQuickFilter}
-        selectedSearchQuery={selectedSearchQuery}
-      />
-
       <section className="filterDock tonightFilterDock" aria-label="Search and filters for today">
         <SearchForm
           action="/tonight"
@@ -404,6 +348,64 @@ export default async function TonightPage({ searchParams }: TonightPageProps) {
             </div>
           </div>
         </details>
+      </section>
+
+      <section className="todayControlDeck" aria-label="Today view controls">
+        <div className="todayFocusPanel">
+          <div className="todayFocusCopy">
+            <p className="eyebrow">Today mode</p>
+            <h2>{selectedArea === "All" ? "All Wilmington" : `${selectedArea} first`}</h2>
+            <p>
+              {selectedArea === "All"
+                ? "Choose an intent or area to make the feed more useful."
+                : "This is area-aware sorting without using your exact location."}
+            </p>
+          </div>
+          <div className="todayFocusControls">
+            <nav className="intentChipNav" aria-label="Quick today filters">
+              <Link
+                href={queryFor({ area: selectedArea, meal: "all", q: selectedSearchQuery, quick: "all" }) as Route}
+                className={selectedMealFilter === "all" && selectedQuickFilter === "all" ? "active" : ""}
+                aria-current={selectedMealFilter === "all" && selectedQuickFilter === "all" ? "page" : undefined}
+              >
+                <span>All today</span>
+                <strong>{searchFilteredDeals.length}</strong>
+              </Link>
+              {intentChips.map((chip) => (
+                <Link
+                  key={`${chip.kind}-${chip.value}`}
+                  href={hrefForIntentChip(chip) as Route}
+                  className={isIntentChipActive(chip) ? "active" : ""}
+                  aria-current={isIntentChipActive(chip) ? "page" : undefined}
+                >
+                  <span>{chip.label}</span>
+                  <strong>{countForIntentChip(chip)}</strong>
+                </Link>
+              ))}
+            </nav>
+            <nav className="areaChipNav" aria-label="Prioritize today's deals by area">
+              {areaOptions.map((area) => (
+                <Link
+                  key={area}
+                  href={queryFor({ area, meal: selectedMealFilter, q: selectedSearchQuery, quick: selectedQuickFilter }) as Route}
+                  className={area === selectedArea ? "active" : ""}
+                  aria-current={area === selectedArea ? "page" : undefined}
+                >
+                  <span>{area === "All" ? "All Wilmington" : area}</span>
+                  <strong>{countForArea(area)}</strong>
+                </Link>
+              ))}
+            </nav>
+          </div>
+        </div>
+
+        <TodayLocationClient
+          selectedArea={selectedArea}
+          areaOptions={areaOptions}
+          selectedMeal={selectedMealFilter}
+          selectedQuick={selectedQuickFilter}
+          selectedSearchQuery={selectedSearchQuery}
+        />
       </section>
 
       <p className="resultSummary" aria-live="polite">
