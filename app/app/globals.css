@@ -1855,8 +1855,16 @@ a {
 
   .filterDock .primaryLink,
   .filterDock .secondaryLink {
-    min-height: 38px;
+    min-height: 44px;
     flex: 0 0 auto;
+  }
+
+  .filterDock .searchField input {
+    min-height: 44px;
+  }
+
+  .filterDisclosure summary {
+    min-height: 44px;
   }
 
   .filterDock > .filterDockGroup {
@@ -1887,9 +1895,9 @@ a {
 
   .filterDock .segmentedNav a {
     flex: 0 0 auto;
-    min-height: 32px;
-    padding: 0 9px;
-    font-size: 0.82rem;
+    min-height: 42px;
+    padding: 0 12px;
+    font-size: 0.84rem;
   }
 
   .filterDock .segmentedNav strong {
@@ -1943,20 +1951,35 @@ a {
     scrollbar-width: none;
   }
 
+	  body {
+	    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+	  }
+
 	  .primaryContentNav {
+	    position: fixed;
+	    left: 0;
+	    right: 0;
+	    bottom: 0;
+	    z-index: 30;
 	    display: grid;
-	    grid-template-columns: repeat(4, minmax(0, 1fr));
-	    width: min(1120px, calc(100% - 24px));
-	    margin-top: 10px;
-	    gap: 4px;
-	    padding: 6px;
+	    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+	    width: 100%;
+	    margin: 0;
+	    gap: 2px;
+	    padding: 6px max(10px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+	    border: 0;
+	    border-top: 1px solid rgba(155, 190, 193, 0.6);
+	    border-radius: 0;
+	    background: rgba(255, 253, 248, 0.97);
+	    box-shadow: 0 -10px 26px rgba(15, 42, 61, 0.14);
+	    backdrop-filter: blur(12px);
 	  }
 
 	  .primaryContentNav a {
 	    min-width: 0;
-	    min-height: 42px;
-	    padding: 0 8px;
-	    font-size: 0.84rem;
+	    min-height: 48px;
+	    padding: 0 6px;
+	    font-size: 0.82rem;
 	  }
 
 	  .reportFormPanel {
@@ -1971,20 +1994,20 @@ a {
     width: 100%;
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
-    gap: 4px 12px;
+    gap: 2px 10px;
     align-items: center;
-    padding: 12px 14px;
+    padding: 8px 12px;
   }
 
   .statusPanel strong {
     grid-row: 1 / span 2;
     margin: 0;
-    font-size: 2rem;
+    font-size: 1.7rem;
   }
 
   .statusPanel .statusLabel,
   .statusPanel span:last-child {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
   }
 
   .factGrid,
@@ -1994,29 +2017,41 @@ a {
     grid-template-columns: 1fr;
   }
 
+  .primaryFactGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .primaryFactGrid div {
+    grid-column: 1 / -1;
+  }
+
+  .primaryFactGrid .bigFact {
+    grid-column: auto;
+  }
+
   .heroBand h1,
   .sectionHeader h1 {
-    font-size: clamp(1.65rem, 8vw, 2.15rem);
-    line-height: 1.12;
+    font-size: clamp(1.45rem, 6.6vw, 1.85rem);
+    line-height: 1.1;
   }
 
   .heroBand,
   .sectionHeader {
-    gap: 14px;
-    padding: 18px;
+    gap: 10px;
+    padding: 15px 16px;
   }
 
   .lede,
   .sectionHeader p {
-    margin: 9px 0 0;
-    font-size: 0.98rem;
-    line-height: 1.45;
+    margin: 7px 0 0;
+    font-size: 0.92rem;
+    line-height: 1.42;
   }
 
   .heroBand .notes,
   .sectionHeader .notes {
-    margin-top: 8px;
-    font-size: 0.9rem;
+    margin-top: 6px;
+    font-size: 0.84rem;
   }
 
   .dealCard,
@@ -2050,11 +2085,30 @@ a {
   }
 
   .dealActionRail {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: center;
     gap: 8px;
     border-top: 1px solid rgba(155, 190, 193, 0.4);
+  }
+
+  .dealActionRail .primaryLink {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .dealActionRail .secondaryLink {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+    padding: 0 6px;
+  }
+
+  .dealActionRail .quickConfirm {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
   }
 
   .secondaryDealCard {
@@ -2478,6 +2532,14 @@ a {
     gap: 10px;
   }
 
+  .todayLocationActions > * {
+    min-height: 44px;
+  }
+
+  .detailSecondaryActions .secondaryLink {
+    min-height: 44px;
+  }
+
   .todayLocationActions {
     justify-content: stretch;
   }
@@ -2489,6 +2551,7 @@ a {
   .intentChipNav a,
   .areaChipNav a,
   .areaQuickChips a {
-    min-height: 38px;
+    min-height: 44px;
+    padding: 0 15px;
   }
 }
