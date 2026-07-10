@@ -132,8 +132,7 @@ a {
 
 .topNav a,
 .primaryLink,
-.secondaryLink,
-.sourceLink {
+.secondaryLink {
   min-height: 44px;
   display: inline-flex;
   align-items: center;
@@ -172,8 +171,7 @@ a {
   box-shadow: var(--shadow-tight);
 }
 
-.primaryLink,
-.sourceLink {
+.primaryLink {
   color: #fff;
   background: var(--brand-strong);
   border: 1px solid var(--brand-strong);
@@ -186,8 +184,7 @@ a {
 
 .topNav a:hover,
 .primaryLink:hover,
-.secondaryLink:hover,
-.sourceLink:hover {
+.secondaryLink:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-tight);
 }
@@ -206,7 +203,6 @@ a {
 .topNav a:active,
 .primaryLink:active,
 .secondaryLink:active,
-.sourceLink:active,
 .primaryContentNav a:active,
 .segmentedNav a:active,
 .dayCoverage a:active {
@@ -808,11 +804,9 @@ a {
   gap: 18px;
   align-items: stretch;
   padding: 0;
-  border-left: 7px solid var(--accent);
 }
 
 .dealMain,
-.dealMetricGrid,
 .dealActionRail {
   padding: 18px 0;
 }
@@ -822,22 +816,13 @@ a {
   padding-left: 18px;
 }
 
-.dealMetricGrid {
-  align-content: center;
-}
-
 .dealActionRail {
   align-content: center;
   padding-right: 18px;
 }
 
-.secondaryDealCard {
-  border-left-color: rgba(35, 119, 173, 0.72);
-}
-
 .dealCard:has(.dealCardPrimaryLink:hover) {
   border-color: rgba(35, 119, 173, 0.42);
-  border-left-color: var(--gold);
   box-shadow: var(--shadow);
 }
 
@@ -856,14 +841,31 @@ a {
   grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
 }
 
-.dealCard h2,
-.candidateCard h2,
-.restaurantCard h2,
-.restaurantCard h3 {
+.candidateCard h2 {
   margin: 0;
   color: var(--forest);
   font-size: 1.3rem;
   line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.restaurantCard h2,
+.restaurantCard h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.22rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.dealCard h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.22rem, 2.4vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.16;
   letter-spacing: 0;
 }
 
@@ -873,10 +875,10 @@ a {
   gap: 7px;
   align-items: center;
   margin: 0 0 8px;
-  color: var(--brand);
-  font-size: 0.78rem;
-  font-weight: 820;
-  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -1251,7 +1253,70 @@ a {
 
 .detailPanel h2 {
   margin: 0 0 16px;
-  color: var(--forest);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  line-height: 1.15;
+}
+
+/* Deal detail: primary panel carries the decision, proof panel recedes. */
+.dealDetailGrid {
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  align-items: start;
+}
+
+.dealPrimaryPanel {
+  padding: clamp(20px, 3vw, 28px);
+}
+
+.dealPrimaryPanel .forecastReadDetail {
+  margin-bottom: 16px;
+}
+
+.primaryFactGrid .bigFact dd {
+  font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.detailPrimaryActions {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(201, 217, 215, 0.7);
+}
+
+.dealProofPanel {
+  background: rgba(255, 253, 248, 0.8);
+  box-shadow: none;
+}
+
+.dealProofPanel h2 {
+  font-size: 1.15rem;
+}
+
+.dealProofPanel .factGrid dd {
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.detailSecondaryActions {
+  margin-top: 16px;
+}
+
+.detailSecondaryActions .secondaryLink {
+  min-height: 38px;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  padding: 0 8px;
+  color: var(--brand);
+  font-size: 0.9rem;
+}
+
+.detailSecondaryActions .secondaryLink:hover {
+  transform: none;
+  background: rgba(238, 246, 244, 0.8);
+  box-shadow: none;
 }
 
 .proofCard {
@@ -1352,7 +1417,10 @@ a {
 
 .sectionTitleRow h2 {
   margin: 0;
-  color: var(--forest);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+  line-height: 1.15;
 }
 
 .countPill {
@@ -1456,7 +1524,7 @@ a {
 .formField span {
   display: block;
   margin-bottom: 8px;
-  color: var(--forest);
+  color: var(--brand-strong);
   font-weight: 800;
 }
 
@@ -1787,8 +1855,16 @@ a {
 
   .filterDock .primaryLink,
   .filterDock .secondaryLink {
-    min-height: 38px;
+    min-height: 44px;
     flex: 0 0 auto;
+  }
+
+  .filterDock .searchField input {
+    min-height: 44px;
+  }
+
+  .filterDisclosure summary {
+    min-height: 44px;
   }
 
   .filterDock > .filterDockGroup {
@@ -1819,9 +1895,9 @@ a {
 
   .filterDock .segmentedNav a {
     flex: 0 0 auto;
-    min-height: 32px;
-    padding: 0 9px;
-    font-size: 0.82rem;
+    min-height: 42px;
+    padding: 0 12px;
+    font-size: 0.84rem;
   }
 
   .filterDock .segmentedNav strong {
@@ -1875,20 +1951,35 @@ a {
     scrollbar-width: none;
   }
 
+	  body {
+	    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+	  }
+
 	  .primaryContentNav {
+	    position: fixed;
+	    left: 0;
+	    right: 0;
+	    bottom: 0;
+	    z-index: 30;
 	    display: grid;
-	    grid-template-columns: repeat(4, minmax(0, 1fr));
-	    width: min(1120px, calc(100% - 24px));
-	    margin-top: 10px;
-	    gap: 4px;
-	    padding: 6px;
+	    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+	    width: 100%;
+	    margin: 0;
+	    gap: 2px;
+	    padding: 6px max(10px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+	    border: 0;
+	    border-top: 1px solid rgba(155, 190, 193, 0.6);
+	    border-radius: 0;
+	    background: rgba(255, 253, 248, 0.97);
+	    box-shadow: 0 -10px 26px rgba(15, 42, 61, 0.14);
+	    backdrop-filter: blur(12px);
 	  }
 
 	  .primaryContentNav a {
 	    min-width: 0;
-	    min-height: 42px;
-	    padding: 0 8px;
-	    font-size: 0.84rem;
+	    min-height: 48px;
+	    padding: 0 6px;
+	    font-size: 0.82rem;
 	  }
 
 	  .reportFormPanel {
@@ -1903,20 +1994,20 @@ a {
     width: 100%;
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
-    gap: 4px 12px;
+    gap: 2px 10px;
     align-items: center;
-    padding: 12px 14px;
+    padding: 8px 12px;
   }
 
   .statusPanel strong {
     grid-row: 1 / span 2;
     margin: 0;
-    font-size: 2rem;
+    font-size: 1.7rem;
   }
 
   .statusPanel .statusLabel,
   .statusPanel span:last-child {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
   }
 
   .factGrid,
@@ -1926,29 +2017,41 @@ a {
     grid-template-columns: 1fr;
   }
 
+  .primaryFactGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .primaryFactGrid div {
+    grid-column: 1 / -1;
+  }
+
+  .primaryFactGrid .bigFact {
+    grid-column: auto;
+  }
+
   .heroBand h1,
   .sectionHeader h1 {
-    font-size: clamp(1.65rem, 8vw, 2.15rem);
-    line-height: 1.12;
+    font-size: clamp(1.45rem, 6.6vw, 1.85rem);
+    line-height: 1.1;
   }
 
   .heroBand,
   .sectionHeader {
-    gap: 14px;
-    padding: 18px;
+    gap: 10px;
+    padding: 15px 16px;
   }
 
   .lede,
   .sectionHeader p {
-    margin: 9px 0 0;
-    font-size: 0.98rem;
-    line-height: 1.45;
+    margin: 7px 0 0;
+    font-size: 0.92rem;
+    line-height: 1.42;
   }
 
   .heroBand .notes,
   .sectionHeader .notes {
-    margin-top: 8px;
-    font-size: 0.9rem;
+    margin-top: 6px;
+    font-size: 0.84rem;
   }
 
   .dealCard,
@@ -1962,17 +2065,11 @@ a {
     gap: 0;
     padding: 0;
     border-left: 1px solid rgba(155, 190, 193, 0.46);
-    border-top: 6px solid var(--accent);
-  }
-
-  .secondaryDealCard {
-    border-top-color: rgba(35, 119, 173, 0.72);
   }
 
   .dealMain,
-  .dealMetricGrid,
   .dealActionRail {
-    padding: 10px 14px;
+    padding: 12px 16px;
   }
 
   .dealCopy {
@@ -1987,37 +2084,31 @@ a {
     display: none;
   }
 
-  .dealMetricGrid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    padding-top: 0;
-  }
-
-  .dealMetricGrid div {
-    flex: 1 1 118px;
-    min-height: 0;
-    padding: 7px 9px;
-    border: 1px solid rgba(155, 190, 193, 0.42);
-    border-radius: 7px;
-    background: rgba(238, 246, 244, 0.58);
-  }
-
-  .dealMetricGrid dt {
-    font-size: 0.66rem;
-  }
-
-  .dealMetricGrid dd {
-    margin-top: 3px;
-    font-size: 0.92rem;
-  }
-
   .dealActionRail {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: center;
     gap: 8px;
     border-top: 1px solid rgba(155, 190, 193, 0.4);
+  }
+
+  .dealActionRail .primaryLink {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .dealActionRail .secondaryLink {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+    padding: 0 6px;
+  }
+
+  .dealActionRail .quickConfirm {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
   }
 
   .secondaryDealCard {
@@ -2066,74 +2157,209 @@ a {
   }
 }
 
-/* Today gates 1-5: consumer card hierarchy, intent chips, area-aware/location controls. */
-.dealCardMetaBar {
+/* UI overhaul v1: one loud element per card, quiet metadata, forecast-confidence signal. */
+.dealMetaLine {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 4px 8px;
+  align-items: baseline;
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  font-weight: 650;
+}
+
+.dealMetaLine strong {
+  color: var(--ink);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.dealMetaLine [aria-hidden="true"] {
+  color: rgba(82, 100, 107, 0.5);
+}
+
+.distanceNote {
+  color: var(--brand);
+  font-weight: 720;
+}
+
+.dealSignal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: center;
   margin-top: 12px;
 }
 
-.dealCardMetaBar span {
-  min-height: 32px;
+.forecastRead {
   display: inline-flex;
   align-items: center;
+  gap: 7px;
+  min-height: 28px;
   border: 1px solid rgba(155, 190, 193, 0.5);
   border-radius: 999px;
-  padding: 0 10px;
-  color: var(--brand-strong, var(--forest));
+  padding: 3px 11px;
+  color: var(--brand-strong);
   background: rgba(238, 246, 244, 0.72);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.forecast-high {
+  border-color: rgba(213, 161, 58, 0.5);
+  color: #6b4e0c;
+  background: rgba(213, 161, 58, 0.16);
+}
+
+.forecast-low,
+.forecast-unknown {
+  border-style: dashed;
+  border-color: rgba(155, 190, 193, 0.66);
+  color: var(--muted);
+  background: transparent;
+}
+
+.forecastBars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+  flex: 0 0 auto;
+}
+
+.forecastBars i {
+  width: 3px;
+  height: 5px;
+  border-radius: 2px;
+  background: rgba(15, 42, 61, 0.14);
+}
+
+.forecastBars i:nth-child(2) {
+  height: 8px;
+}
+
+.forecastBars i:nth-child(3) {
+  height: 12px;
+}
+
+.forecastBars i.filled {
+  background: var(--gold);
+}
+
+.forecast-low .forecastBars i.filled,
+.forecast-unknown .forecastBars i.filled {
+  background: rgba(82, 100, 107, 0.72);
+}
+
+.forecastReadDetail {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  min-height: 0;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.forecastReadDetail .forecastChipRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.forecastReadDetail strong {
+  font-size: 0.98rem;
+}
+
+.forecastReadDetail p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.sourceLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  color: var(--brand);
   font-size: 0.84rem;
-  font-weight: 700;
-}
-
-.dealTrustLine {
-  margin: 10px 0 0;
-  font-size: 0.86rem;
-  font-weight: 700;
-}
-
-.dealTrustLine .sourceLink {
-  color: var(--brand, var(--accent));
+  font-weight: 750;
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration-color: rgba(35, 119, 173, 0.38);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 150ms ease;
 }
 
-.dealDetailsLink,
-.dealReportLink {
+.sourceLink:hover {
+  text-decoration-color: currentColor;
+}
+
+.sourceLink:focus-visible {
+  border-radius: 4px;
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.dealDetailsLink {
   min-width: 112px;
 }
 
-.distanceBadge {
-  border-color: rgba(35, 119, 173, 0.32) !important;
-  background: rgba(35, 119, 173, 0.1) !important;
+.dealActionRail .secondaryLink {
+  min-height: 38px;
+  justify-content: flex-start;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  padding: 0 8px;
+  color: var(--brand);
+  font-size: 0.9rem;
 }
 
-.todayFocusPanel {
+.dealActionRail .secondaryLink:hover {
+  transform: none;
+  background: rgba(238, 246, 244, 0.8);
+  box-shadow: none;
+}
+
+.todayControlDeck {
   display: grid;
-  grid-template-columns: minmax(220px, 0.36fr) minmax(0, 1fr);
-  gap: 16px;
-  align-items: start;
-  margin-top: 18px;
-  padding: 16px;
-  border: 1px solid rgba(155, 190, 193, 0.54);
+  gap: 14px;
+  margin-top: 14px;
+  padding: 14px 16px;
+  border: 1px solid rgba(155, 190, 193, 0.5);
   border-radius: 8px;
   background: rgba(255, 253, 248, 0.94);
   box-shadow: var(--shadow-soft);
 }
 
+.todayFocusPanel {
+  display: grid;
+  grid-template-columns: minmax(200px, 0.3fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.todayFocusCopy .eyebrow {
+  margin-bottom: 4px;
+  font-size: 0.68rem;
+}
+
 .todayFocusCopy h2 {
   margin: 0;
-  color: var(--forest);
-  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+  color: var(--brand-strong);
+  font-size: 1.05rem;
   line-height: 1.2;
 }
 
 .todayFocusCopy p:last-child {
-  margin: 8px 0 0;
+  margin: 5px 0 0;
   color: var(--muted);
-  font-size: 0.92rem;
-  line-height: 1.45;
+  font-size: 0.84rem;
+  line-height: 1.4;
 }
 
 .todayFocusControls {
@@ -2181,9 +2407,10 @@ a {
 .intentChipNav a.active,
 .areaChipNav a.active,
 .areaQuickChips a.active {
-  color: #fffdf8;
-  border-color: var(--accent);
-  background: var(--accent);
+  color: var(--brand-strong);
+  border-color: rgba(213, 161, 58, 0.72);
+  background: rgba(213, 161, 58, 0.19);
+  box-shadow: inset 0 0 0 1px rgba(213, 161, 58, 0.16);
 }
 
 .intentChipNav strong,
@@ -2194,10 +2421,25 @@ a {
   place-items: center;
   border-radius: 999px;
   padding: 0 6px;
-  color: var(--forest);
-  background: rgba(255, 253, 248, 0.86);
+  color: var(--muted);
+  background: rgba(238, 246, 244, 0.88);
   font-size: 0.72rem;
   font-variant-numeric: tabular-nums;
+}
+
+.intentChipNav a.active strong,
+.areaChipNav a.active strong {
+  color: var(--brand-strong);
+  background: rgba(255, 253, 248, 0.9);
+}
+
+@media (min-width: 761px) {
+  .intentChipNav,
+  .areaChipNav,
+  .areaQuickChips {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
 }
 
 .areaChipNav a,
@@ -2209,35 +2451,37 @@ a {
 .todayLocationPanel {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 14px 18px;
+  gap: 10px 18px;
   align-items: center;
-  margin-top: 18px;
-  padding: 16px;
-  border: 1px solid rgba(155, 190, 193, 0.58);
-  border-radius: 8px;
-  background: rgba(255, 253, 248, 0.96);
-  box-shadow: var(--shadow-soft);
+  padding-top: 14px;
+  border-top: 1px solid rgba(201, 217, 215, 0.7);
 }
 
 .todayLocationCopy {
   min-width: 0;
 }
 
+.todayLocationCopy .eyebrow {
+  margin-bottom: 4px;
+  font-size: 0.68rem;
+}
+
 .todayLocationCopy h2 {
   margin: 0;
-  color: var(--forest);
-  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  color: var(--brand-strong);
+  font-size: 1.05rem;
   line-height: 1.2;
 }
 
 .todayLocationCopy p {
-  margin: 6px 0 0;
+  margin: 5px 0 0;
   color: var(--muted);
-  line-height: 1.45;
+  font-size: 0.84rem;
+  line-height: 1.4;
 }
 
 .privacyNote {
-  font-size: 0.88rem;
+  font-size: 0.78rem;
 }
 
 .locationStatus {
@@ -2276,12 +2520,24 @@ a {
 }
 
 @media (max-width: 760px) {
+  .todayControlDeck {
+    gap: 12px;
+    margin-top: 12px;
+    padding: 12px;
+  }
+
   .todayFocusPanel,
   .todayLocationPanel {
     grid-template-columns: 1fr;
-    gap: 12px;
-    margin-top: 14px;
-    padding: 12px;
+    gap: 10px;
+  }
+
+  .todayLocationActions > * {
+    min-height: 44px;
+  }
+
+  .detailSecondaryActions .secondaryLink {
+    min-height: 44px;
   }
 
   .todayLocationActions {
@@ -2295,6 +2551,7 @@ a {
   .intentChipNav a,
   .areaChipNav a,
   .areaQuickChips a {
-    min-height: 38px;
+    min-height: 44px;
+    padding: 0 15px;
   }
 }

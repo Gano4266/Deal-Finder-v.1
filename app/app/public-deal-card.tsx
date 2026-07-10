@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import type { PublicDeal } from "../lib/data";
 import { displayDescription, displayRestaurantName } from "./public-copy";
+import { ForecastConfidence } from "./forecast-confidence";
 import { QuickConfirmButton } from "./quick-confirm-button";
 import { getDealDistanceLabel } from "../lib/today-location";
 
@@ -17,12 +18,10 @@ function timeLabel(deal: PublicDeal): string {
   return deal.timeWindow === "N/A" ? "Time not listed" : deal.timeWindow;
 }
 
-function trustLabel(deal: PublicDeal): string {
-  const sourceLabel = deal.sourceTier.toLowerCase().includes("official")
+function sourceLabel(deal: PublicDeal): string {
+  return deal.sourceTier.toLowerCase().includes("official")
     ? "Official source"
     : "Source checked";
-
-  return `${sourceLabel} · Checked ${deal.lastVerifiedLabel}`;
 }
 
 export function PublicDealCard({
@@ -60,17 +59,28 @@ export function PublicDealCard({
           <span>{restaurantName}</span>
         </p>
         <h2>{deal.publicTitle}</h2>
-        <div className="dealCardMetaBar" aria-label="Deal summary">
-          <span>{deal.price || "See details"}</span>
+        <p className="dealMetaLine" aria-label="Deal summary">
+          <strong>{deal.price || "See details"}</strong>
+          <span aria-hidden="true">·</span>
           <span>{timeLabel(deal)}</span>
+          <span aria-hidden="true">·</span>
           <span>{contextValue}</span>
-          {distanceLabel ? <span className="distanceBadge">{distanceLabel}</span> : null}
-        </div>
-        <p className="dealTrustLine">
-          <a href={deal.sourceUrl} className="sourceLink">
-            {trustLabel(deal)}
-          </a>
+          {distanceLabel ? (
+            <>
+              <span aria-hidden="true">·</span>
+              <span className="distanceNote">{distanceLabel}</span>
+            </>
+          ) : null}
         </p>
+        <div className="dealSignal">
+          <ForecastConfidence
+            lastVerifiedAt={deal.lastVerifiedAt}
+            lastVerifiedLabel={deal.lastVerifiedLabel}
+          />
+          <a href={deal.sourceUrl} className="sourceLink">
+            {sourceLabel(deal)}
+          </a>
+        </div>
         {description ? <p className="dealCopy">{description}</p> : null}
         <p className="locationLine">{isCompact ? deal.area : deal.neighborhood || deal.address}</p>
       </div>
